@@ -315,6 +315,16 @@ ifeq ($(BUILD_TLS),module)
 	TLS_MODULE_CFLAGS+=-DUSE_OPENSSL=$(BUILD_MODULE) $(OPENSSL_CFLAGS) -DBUILD_TLS_MODULE=$(BUILD_MODULE)
 endif
 
+# solesie: LIBURING
+LIBURING_PKGCONFIG := $(shell $(PKG_CONFIG) --exists liburing && echo $$?)
+ifeq ($(LIBURING_PKGCONFIG),1)
+	FINAL_CFLAGS+=-DREDIS_IOURING_DISABLE
+else
+	FINAL_CFLAGS+=$(shell $(PKG_CONFIG) --cflags liburing)
+	FINAL_LDFLAGS += $(shell $(PKG_CONFIG) --libs-only-L liburing)
+	FINAL_LIBS += $(shell $(PKG_CONFIG) --libs-only-l liburing)
+endif
+
 ifndef V
     define MAKE_INSTALL
         @printf '    %b %b\n' $(LINKCOLOR)INSTALL$(ENDCOLOR) $(BINCOLOR)$(1)$(ENDCOLOR) 1>&2
