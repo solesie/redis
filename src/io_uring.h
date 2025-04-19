@@ -4,22 +4,8 @@
 #ifndef REDIS_IOURING_DISABLE
 #include "liburing.h"
 
+/* solesie: TOTALLY THREAD UNSAFE */
 typedef struct _IoUring IOUring;
-
-// IO Operation type supported by IOReq
-// typedef enum { 
-//     INVALID = 0, 
-//     READ, 
-//     WRITE 
-// } OpType;
-
-typedef enum {
-    UNINITIALIZED,
-    INITIALIZED,
-    PENDING,
-    COMPLETED,
-    CANCELED,
-} IOUringOpState;
 
 /* solesie: Please refer to the paper on "NVMe I/O passthrough". */
 typedef struct _IOUringOpOptions{
@@ -27,10 +13,17 @@ typedef struct _IOUringOpOptions{
     int isCqe32;
 } IOUringOpOptions;
 
+/* solesie: The user submits IOUringOp* commands to Linux io_uring, 
+ * and receives the same IOUringOp* upon completion.
+ *
+ * The user must allocate and free IOUringOp memory 
+ * using ioUringOpCalloc() and ioUringOpFree().
+ * However, the user maybe don't need to call ioUringOpFree() directly. */
 typedef struct _IOUringOp{
-    IOUringOpState state;
+    /* solesie: the number of bytes on Complete, and < 0 on failure. */
     ssize_t result;
-    void *userData;
+
+    void *userDefinedData;
 
     /* we use unions with the largest size to avoid
      * indidual allocations for the sqe/cqe */
@@ -47,22 +40,58 @@ typedef struct _IOUringOp{
     } cqe_;
 
     IOUringOpOptions options;
-}IOUringOp;
+} IOUringOp;
+static inline IOUringOp *ioUringOpCalloc(){
+    return zcalloc(sizeof(IOUringOp));
+}
+static inline void ioUringOpFree(IOUringOp **ioUringOp){
+    if(*ioUringOp == NULL){
+        return;
+    }
+    zfree(*ioUringOp);
+    *ioUringOp = NULL;
+}
 
-// typedef struct _IOReq{
-//     int fd;                 /* file descripters */
-//     OpType opType;
-//     uint64_t offset;
-//     size_t size;
-//     void *data;
-//     uint16_t *placementHandle;
+typedef enum {
+    CQ_SYNC,
+    /* solesie: ASYNC means POLLING and EVENT-DRIVEN */ 
+    CQ_ASYNC
+} CQHandlingMode;
 
-//     int is_req_successful;  /* 1 on success, 0 on failure */
-// }IOReq;
+/* solesie: The pool is defined for completed IOUringOp*.
+ * All members must not be accessed directly. */
+typedef struct _CompletedOpsPool{
+	IOUringOp **_arr;
+	size_t _length;
+    size_t _capacity;
+} CompletedOpsPool;
+static inline CompletedOpsPool *cOpsPoolInit(){
+	CompletedOpsPool *pool = (CompletedOpsPool*)zcalloc(sizeof(*pool));
+	return pool;
+}
+static inline void cOpsPoolRelease(CompletedOpsPool **pool) {
+    for(int i = 0; i < (*pool)->_length; ++i){
+        ioUringOpFree(&(*pool)->_arr[i]);
+    }
+    zfree((*pool)->_arr);
+	zfree(*pool);
+    *pool = NULL;
+}
+static inline size_t cOpsPoolGetLength(CompletedOpsPool *pool){
+    return pool->_length;
+}
+static inline IOUringOp *cOpsPoolGet(CompletedOpsPool *pool, size_t idx){
+    if(idx >= pool->_length){
+        return NULL;
+    }
+    return pool->_arr[idx];
+}
 
-IOUring *ioUringCreate(int is_fdp, uint32_t qDepth);
-void ioUringRelease(IOUring *ioUring);
-void submitOne(IOUring* ioUring, IOUringOp *op);
+IOUring *ioUringCreate(int is_fdp, CQHandlingMode cqHandlingMode, uint32_t qDepth, CompletedOpsPool *pool);
+void ioUringRelease(IOUring **ioUring);
+void ioUringSubmitOp(IOUring* ioUring, IOUringOp *op);
+void ioUringClearCOpsPoolAndWaitOp(IOUring *ioUring, size_t minRequests);
+void ioUringClearCOpsPoolAndPollCompleted(IOUring *ioUring);
 
 #endif
 #endif
