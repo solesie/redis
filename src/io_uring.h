@@ -18,11 +18,14 @@ typedef struct _IOUringOpOptions{
  *
  * The user must allocate and free IOUringOp memory 
  * using ioUringOpCalloc() and ioUringOpFree().
- * However, the user maybe don't need to call ioUringOpFree() directly. */
+ * 
+ * However, the user may don't need to call ioUringOpFree() directly, 
+ * because ioUringClearCOpsPoolAndWaitOp() and ioUringClearCOpsPoolAndPollCompleted() free old IOUringOp. */
 typedef struct _IOUringOp{
     /* solesie: the number of bytes on Complete, and < 0 on failure. */
     ssize_t result;
 
+    /* solesie: The user can directly retrieve the submitted IOUringOp from the CompletedOpsPool. */
     void *userDefinedData;
 
     /* we use unions with the largest size to avoid
@@ -35,7 +38,7 @@ typedef struct _IOUringOp{
     /* we have to use a union here because of -Wgnu-variable-sized-type-not-at-end
      * __u64 big_cqe[]; */
     union {
-        __u64 user_data; // first member from from io_uring_cqe
+        __u64 user_data; /* first member from from io_uring_cqe */
         uint8_t data[32];
     } cqe_;
 

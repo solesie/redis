@@ -5,7 +5,7 @@
 
 #include "io_uring.h"
 #include "zmalloc.h"
-#include "server.h"
+#include "redisassert.h"
 #include "fdp_nvme.h"
 #include "atomicvar.h"
 
@@ -26,7 +26,7 @@ struct _IoUring{
 };
 
 
-// http://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerOf2
+/* http://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerOf2 */
 static uint32_t roundUpToNextPowerOfTwo(uint32_t num) {
     if (num == 0) {
         return 0;
@@ -78,6 +78,8 @@ static inline void cOpsClear(CompletedOpsPool *pool) {
     pool->_length = 0;
 }
 
+/* On success, return 1.
+ * On failure, return 0. */
 static void doWait(
 	IOUring *ioUring,
     size_t minRequests,
@@ -92,8 +94,7 @@ static void doWait(
 			count++;
 			IOUringOp *op = (IOUringOp*)io_uring_cqe_get_data(cqe);
 			if(unlikely(op == NULL)){
-				serverLog(LOG_ERR, "solesie: doWait() failed");
-				exit(1);
+				return 0;
 			}
 			
 			memcpy(&op->cqe_, cqe, getCqeSize(&op->options));
@@ -110,6 +111,7 @@ static void doWait(
 			}
 		}
 	}
+	return 1;
 }
 
 /* solesie: Create a Linux io_uring wrapper object that can be used for general purposes.
@@ -135,10 +137,7 @@ IOUring *ioUringCreate(int is_fdp, CQHandlingMode cqHandlingMode, uint32_t qDept
 
     int rc = io_uring_queue_init_params(
         roundUpToNextPowerOfTwo(qDepth), &ioUring->ioRing, &ioUring->params);
-    if(rc < 0){
-        serverLog(LOG_ERR, "solesie: io_uring_queue_init error");
-        exit(1);
-    }
+	assert(rc >= 0);
 
 	ioUring->pollFd = -1;
 	if(cqHandlingMode == CQ_ASYNC){
@@ -164,34 +163,23 @@ void ioUringRelease(IOUring **ioUring){
 
 /* solesie: The op is submitted to io_uring. 
  * On success, 1 is returned; 
- * on failure, -1 is returned. */
+ * on failure, 0 is returned. */
 int ioUringSubmitOp(IOUring *ioUring, IOUringOp *op) {
-	if(unlikely(!areOptionsEqual(&ioUring->options, &op->options))){
-		serverLog(LOG_ERR, "solesie: IOUring options != IOUringOp options ");
-		return -1;
-	}
+	assert(areOptionsEqual(&ioUring->options, &op->options));
 
 	io_uring_sqe_set_data(&op->sqe_.sqe, op);
 	struct io_uring_sqe* sqe = io_uring_get_sqe(&ioUring->ioRing);
-	if (unlikely(!sqe)) {
-		return -1;
-	}
+	assert(sqe);
 	memcpy(sqe, &op->sqe_.sqe, getSqeSize(&op->options));
 
-	if(unlikely(ioUring->pending >= ioUring->qDepth)){
-		serverLog(LOG_WARNING, "solesie: ioUringSubmitOp() too many pending requests");
-		return -1;
-	}
+	assert(ioUring->pending < ioUring->qDepth);
 	++ioUring->pending;
 
 	/* solesie: rc will be 1 */
 	int rc = io_uring_submit(&ioUring->ioRing);
 	if (rc <= 0) {
 		--ioUring->pending;
-		if (unlikely(rc < 0)) {
-			serverLog(LOG_ERR, "solesie: ioUringSubmitOp() failed");
-			exit(1);
-		}
+		assert(rc == 0);
 	}
 	return 1;
 }
@@ -201,11 +189,11 @@ int ioUringSubmitOp(IOUring *ioUring, IOUringOp *op) {
  * 
  * The user can handle completion by using CompletedOpsPool. */
 void ioUringClearCOpsPoolAndWaitOp(IOUring *ioUring, size_t minRequests){
-	if(unlikely(ioUring->pollFd != -1)){
-		serverLog(LOG_ERR, "solesie: ioUringClearCOpsPoolAndWaitOp() only allowed on SYNC object");
-		exit(1);
-	}
-	doWait(ioUring, minRequests, ioUring->pending);
+	/* ioUringClearCOpsPoolAndPollCompleted() only allowed on SYNC object */
+	assert(ioUring->pollFd == -1);
+
+	int flag = doWait(ioUring, minRequests, ioUring->pending);
+	assert(flag);
 	return;
 }
 
@@ -213,14 +201,17 @@ void ioUringClearCOpsPoolAndWaitOp(IOUring *ioUring, size_t minRequests){
  * 
  * The user can handle completion by using CompletedOpsPool. */
 void ioUringClearCOpsPoolAndPollCompleted(IOUring *ioUring){
-	if(unlikely(ioUring->pollFd == -1)){
-		serverLog(LOG_ERR, "solesie: ioUringClearCOpsPoolAndPollCompleted() only allowed on ASYNC object");
-		exit(1);
-	}
+	/* ioUringClearCOpsPoolAndPollCompleted() only allowed on ASYNC object */
+	assert(ioUring->pollFd != -1);
+	
 	if(io_uring_cq_ready(&ioUring->ioRing) <= 0){
-		return; // nothing completed
+		/* nothing completed */
+		return;
 	}
-	doWait(ioUring, 0, ioUring->pending);
+
+	int flag = doWait(ioUring, 0, ioUring->pending);
+	assert(flag);
+	return;
 }
 
 #endif
