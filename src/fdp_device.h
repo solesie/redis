@@ -6,28 +6,24 @@
 
 typedef struct _FdpDevice FdpDevice;
 
-// IO Operation type supported by IOReq
-// typedef enum { 
-//     INVALID = 0, 
-//     READ, 
-//     WRITE 
-// } OpType;
+/* solesie: User-defined request for async operation.
+ * For now, not implemented yet. */
+// typedef struct _IOReq{
+//     IOUringOp *op;
+//     uint64_t offset;
+//     size_t size;
+//     void *data;
+//     uint16_t *placementHandle;
 
-typedef enum {
-    SYNC,
-    EVENT
-} CQHandlingMode;
+//     int is_req_successful;  /* 1 on success, 0 on failure */
+// }IOReq;
 
-FdpDevice *fdpDeviceCreate(
-    CQHandlingMode cqHandlingMode,
-    size_t qDepth,
-    int fd, 
-    size_t ioAlignmentSize, 
-    size_t maxIoSize, 
-    size_t maxWriteSize);
+FdpDevice *fdpDeviceCreate(FdpNvme *fdpNvme, size_t asyncIOUringQDepth);
 void fdpDeviceRelease(FdpDevice *fdpDevice);
-// int fdpDeviceWrite(FdpDevice *fdpDevice, uint64_t offset, uint8_t* data, size_t size, uint8_t placementHandle);
-// int fdpDeviceRead(FdpDevice *fdpDevice, uint64_t offset, uint8_t* data, size_t size);
+ssize_t fdpDeviceWriteSync(FdpDevice *fdpDevice, off_t offset, const uint8_t *data, size_t size, int placementHandle);
+ssize_t fdpDeviceReadSync(FdpDevice *fdpDevice, off_t offset, const uint8_t *data, size_t size);
+// ssize_t fdpDeviceWriteAsync(FdpDevice *fdpDevice, off_t offset, uint8_t *data, size_t size, int placementHandle);
+// int handling();
 
 #endif
 #endif
