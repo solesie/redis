@@ -9,6 +9,19 @@
 #include "fdp_nvme.h"
 #include "atomicvar.h"
 
+/* solesie: The vector is defined for completed IOUringOp*. */
+typedef struct _CompletedIOUringOpsVector{
+	IOUringOp **arr;
+	size_t len;
+    size_t cap;
+} CompletedIOUringOpsVector;
+
+/* solesie: Please refer to the paper on "NVMe I/O passthrough". */
+typedef struct _IOUringOpOptions{
+    int isSqe128;
+    int isCqe32;
+} IOUringOpOptions;
+
 struct _IoUring{
     struct io_uring ioRing;
 	struct io_uring_params params;
@@ -18,13 +31,40 @@ struct _IoUring{
 	IOUringOpOptions options;
 
 	size_t pending;
-	/* solesie: If IOUring handles CQ as ASYNC, poolFd means CQ fd.
+	/* solesie: If IOUring handles CQ as ASYNC, vecFd means CQ fd.
 	 * Otherwise(i.e., CQ on SYNC_BASED), pollFd is -1. */
 	int pollFd;
 
-	CompletedOpsPool *completedOpsPool;
+	CompletedIOUringOpsVector *vec;
 };
 
+/* solesie: The user submits IOUringOp* commands to Linux io_uring, 
+ * and receives the same IOUringOp* upon completion.
+ *
+ * The user must allocate and free IOUringOp memory 
+ * using ioUringOpCreate() and ioUringOpRelease(). */
+struct _IOUringOp{
+    /* solesie: the number of bytes on Complete, and < 0 on failure. */
+    ssize_t result;
+
+    void *userDefinedData;
+
+    /* we use unions with the largest size to avoid
+     * indidual allocations for the sqe/cqe */
+    union {
+        struct io_uring_sqe sqe;
+        uint8_t data[128];
+    } sqe_;
+    
+    /* we have to use a union here because of -Wgnu-variable-sized-type-not-at-end
+     * __u64 big_cqe[]; */
+    union {
+        __u64 user_data; /* first member from from io_uring_cqe */
+        uint8_t data[32];
+    } cqe_;
+
+    IOUringOpOptions options;
+};
 
 /* http://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerOf2 */
 static uint32_t roundUpToNextPowerOfTwo(uint32_t num) {
@@ -50,42 +90,51 @@ static inline int areOptionsEqual(IOUringOpOptions *opt1, IOUringOpOptions *opt2
 static inline size_t getSqeSize(IOUringOpOptions *opt){
 	return opt->isSqe128 ? 128 :  sizeof(struct io_uring_sqe);
 }
-
 static inline size_t getCqeSize(IOUringOpOptions *opt) {
 	return opt->isCqe32 ? 32 : sizeof(struct io_uring_cqe);
 }
 
-static inline void cOpsPoolReserve(CompletedOpsPool *pool, size_t capacity){
-	if(capacity > pool->_capacity){
-		IOUringOp **newArr = (IOUringOp**)zrealloc(pool->_arr, sizeof(IOUringOp*) * capacity);
-		pool->_arr = newArr;
-		pool->_capacity = capacity;
+static inline CompletedIOUringOpsVector *vectorCreate(){
+	CompletedIOUringOpsVector *vec = (CompletedIOUringOpsVector*)zcalloc(sizeof(*vec));
+	return vec;
+}
+static inline void vectorRelease(CompletedIOUringOpsVector **vec) {
+    for(int i = 0; i < (*vec)->len; ++i){
+        ioUringOpRelease(&(*vec)->arr[i]);
+    }
+    zfree((*vec)->arr);
+	zfree(*vec);
+    *vec = NULL;
+}
+static inline void vectorReserve(CompletedIOUringOpsVector *vec, size_t capacity){
+	if(capacity > vec->cap){
+		IOUringOp **newArr = (IOUringOp**)zrealloc(vec->arr, sizeof(IOUringOp*) * capacity);
+		vec->arr = newArr;
+		vec->cap = capacity;
 	}
 }
-
-static inline void cOpsPushBack(CompletedOpsPool *pool, const IOUringOp *op) {
-    if (pool->_length >= pool->_capacity) {
-        size_t newCapacity = pool->_capacity ? pool->_capacity * 2 : 1;
-        cOpsPoolReserve(pool, newCapacity);
+static inline void vectorPushBack(CompletedIOUringOpsVector *vec, const IOUringOp *completedOp) {
+    if (vec->len >= vec->cap) {
+        size_t newCapacity = vec->cap ? vec->cap * 2 : 1;
+        vectorReserve(vec, newCapacity);
     }
-	pool->_arr[pool->_length++] = op;
+	vec->arr[vec->len++] = completedOp;
 }
-
-static inline void cOpsClear(CompletedOpsPool *pool) {
-    for(int i = 0; i < pool->_length; ++i){
-        ioUringOpFree(&pool->_arr[i]);
+static inline void vectorClear(CompletedIOUringOpsVector *vec) {
+    for(int i = 0; i < vec->len; ++i){
+        ioUringOpRelease(&vec->arr[i]);
     }
-    pool->_length = 0;
+    vec->len = 0;
 }
 
 /* On success, return 1.
  * On failure, return 0. */
-static void doWait(
+static int doWait(
 	IOUring *ioUring,
     size_t minRequests,
     size_t maxRequests) {
 
-	cOpsClear(ioUring->completedOpsPool);
+	vectorClear(ioUring->vec);
 
 	size_t count = 0;
 	while (count < maxRequests) {
@@ -102,7 +151,7 @@ static void doWait(
 			--ioUring->pending;
 			
 			op->result = cqe->res;
-			cOpsPushBack(ioUring->completedOpsPool, op);
+			vectorPushBack(ioUring->vec, op);
 		} else {
 			if (count < minRequests) {
 				io_uring_wait_cqe(&ioUring->ioRing, &cqe);
@@ -118,8 +167,8 @@ static void doWait(
  * @param is_fdp Indicates whether the io_uring will be created for NVMe Flexible Data Placement.
  * @param cqHandlingMode Specifies how the user will handle the io_uring completion queue.
  * @param qDepth Represents the size of the io_uring submission/completion queue. 
- * @param pool Must not be NULL. */
-IOUring *ioUringCreate(int is_fdp, CQHandlingMode cqHandlingMode, uint32_t qDepth, CompletedOpsPool *pool){
+ * @param vec Must not be NULL. */
+IOUring *ioUringCreate(int is_fdp, CQHandlingMode cqHandlingMode, uint32_t qDepth){
     IOUring *ioUring = (IOUring*)zcalloc(sizeof(*ioUring));
 
 	ioUring->qDepth = qDepth;
@@ -144,8 +193,8 @@ IOUring *ioUringCreate(int is_fdp, CQHandlingMode cqHandlingMode, uint32_t qDept
 		ioUring->pollFd = ioUring->ioRing.ring_fd;
 	}
 	
-	ioUring->completedOpsPool = pool;
-	cOpsPoolReserve(ioUring->completedOpsPool, qDepth);
+	ioUring->vec = vectorCreate();
+	vectorReserve(ioUring->vec, qDepth);
 
     return ioUring;
 }
@@ -155,7 +204,8 @@ void ioUringRelease(IOUring **ioUring){
 		return;
 	}
 	io_uring_queue_exit(&(*ioUring)->ioRing);
-	cOpsClear((*ioUring)->completedOpsPool);
+	vectorClear((*ioUring)->vec);
+	vectorRelease(&(*ioUring)->vec);
 
     zfree(*ioUring);
 	*ioUring = NULL;
@@ -185,33 +235,73 @@ int ioUringSubmitOp(IOUring *ioUring, IOUringOp *op) {
 }
 
 /* solesie: Waits synchronously until at least minRequests operations are completed.
- * Only to be used in the SYNC Completion Queue mode.
+ * (Only valid when running in the SYNC completion-queue mode, i.e. pollFd == -1)
+
+ * @param ioUring       The io_uring instance (must be in SYNC mode).
+ * @param minRequests   Minimum number of completions to wait for.
+ * @param outCompleted  Output: on return, *outCompleted points to an array
+ *                      of IOUringOp* entries that have completed.
  * 
- * The user can handle completion by using CompletedOpsPool. */
-void ioUringClearCOpsPoolAndWaitOp(IOUring *ioUring, size_t minRequests){
-	/* ioUringClearCOpsPoolAndPollCompleted() only allowed on SYNC object */
+ * @return The number of completed requests (length of *outCompleted)
+ * 
+ * @note While the user may be responsible for freeing the memory of an IOUringOp* created via IOUringOpCreate(), 
+ * manipulation of the internal array(i.e., IOUringOp**) is prohibited. */
+size_t ioUringWaitOps(IOUring *ioUring, size_t minRequests, IOUringOp ***outCompleted){
+	/* ioUringPollOps() only allowed on SYNC object */
 	assert(ioUring->pollFd == -1);
 
 	int flag = doWait(ioUring, minRequests, ioUring->pending);
 	assert(flag);
-	return;
+	*outCompleted = ioUring->vec->arr;
+	return ioUring->vec->len;
 }
 
-/* solesie: Only to be used in the ASYNC Completion Queue mode.
+/* solesie: Polls for completed IOUring operations in ASYNC Completion Queue mode.
+ * (Only to be used in the ASYNC Completion Queue mode)
+ *
+ * @param ioUring       The IOUring instance (must be ASYNC mode).
+ * @param outCompleted  Output: on return, *outCompleted points to an array
+ *                      of IOUringOp* entries that have completed.
  * 
- * The user can handle completion by using CompletedOpsPool. */
-void ioUringClearCOpsPoolAndPollCompleted(IOUring *ioUring){
-	/* ioUringClearCOpsPoolAndPollCompleted() only allowed on ASYNC object */
+ * @return The number of completed requests (length of *outCompleted)
+ * 
+ * @note While the user may be responsible for freeing the memory of an IOUringOp* created via IOUringOpCreate(), 
+ * manipulation of the internal array(i.e., IOUringOp**) is prohibited. */
+size_t ioUringPollCQ(IOUring *ioUring, IOUringOp ***outCompleted){
+	/* ioUringPollCQ() only allowed on ASYNC object */
 	assert(ioUring->pollFd != -1);
 	
 	if(io_uring_cq_ready(&ioUring->ioRing) <= 0){
 		/* nothing completed */
-		return;
+		return 0;
 	}
 
 	int flag = doWait(ioUring, 0, ioUring->pending);
 	assert(flag);
-	return;
+	*outCompleted = ioUring->vec->arr;
+	return ioUring->vec->len;
+}
+
+IOUringOp *ioUringOpCreate(IOUring *ioUring){
+    IOUringOp *ret = zcalloc(sizeof(IOUringOp));
+    ret->options = ioUring->options;
+    return ret;
+}
+
+void ioUringOpRelease(IOUringOp **op){
+    if(*op == NULL){
+        return;
+    }
+    zfree(*op);
+    *op = NULL;
+}
+
+struct io_uring_sqe *ioUringOpGetSqe(IOUringOp *op){
+	return &op->sqe_.sqe;
+}
+
+ssize_t ioUringOpGetResult(IOUringOp *op){
+	return op->result;
 }
 
 #endif
