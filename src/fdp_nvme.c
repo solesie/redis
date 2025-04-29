@@ -474,7 +474,7 @@ int fdpNvmeAllocateFdpHandle(FdpNvme *fdpNvme) {
 static void prepFdpUringCmdSqe(
     FdpNvme *fdpNvme,
     struct io_uring_sqe *sqe,
-    void *buf,
+    const void *buf,
     size_t size,
     off_t start,
     uint8_t opcode,
@@ -513,7 +513,7 @@ static void prepFdpUringCmdSqe(
 void fdpNvmePrepReadUringCmdSqe(
     FdpNvme *fdpNvme,
     struct io_uring_sqe *sqe,
-    void *buf,
+    const void *buf,
     size_t size,
     off_t start) {
     
@@ -523,7 +523,7 @@ void fdpNvmePrepReadUringCmdSqe(
 void fdpNvmePrepWriteUringCmdSqe(
     FdpNvme *fdpNvme,
     struct io_uring_sqe *sqe,
-    void *buf, 
+    const void *buf, 
     size_t size, 
     off_t start, 
     int handle) {
@@ -539,6 +539,10 @@ void fdpNvmePrepWriteUringCmdSqe(
     }
     /* solesie: As Flexible Data Placement Specification, DTYPE should be 2. */
     prepFdpUringCmdSqe(fdpNvme, sqe, buf, size, start, nvme_cmd_write, 2, pid);
+}
+
+uint32_t fdpNvmeGetMaxIOSize(FdpNvme *fdpNvme){
+    return fdpNvme->maxTfrSize;
 }
 
 #endif

@@ -21,6 +21,8 @@ void fdpNvmePrepWriteUringCmdSqe(
     size_t size, 
     off_t start, 
     int handle);
+int fdpNvmeAllocateFdpHandle(FdpNvme *fdpNvme);
+uint32_t fdpNvmeGetMaxIOSize(FdpNvme *fdpNvme);
 
 #endif
 #endif
