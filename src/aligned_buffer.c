@@ -15,7 +15,7 @@ AlignedBuffer *alignedBufferAllocate(FdpNvme *fdpNvme, off_t offset, size_t size
 
     int err = posix_memalign(&ret->ptr, lbSize, prefSz);
     if(err != 0){
-        free(ret);
+        zfree(ret);
         errno = err;
         return NULL;
     }
@@ -24,8 +24,8 @@ AlignedBuffer *alignedBufferAllocate(FdpNvme *fdpNvme, off_t offset, size_t size
 }
 
 void alignedBufferFree(AlignedBuffer *buf){
-    free(buf->ptr);
-    free(buf);
+    zfree(buf->ptr);
+    zfree(buf);
 }
 
 #endif

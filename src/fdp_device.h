@@ -2,6 +2,8 @@
 #define __REDIS_FDP_DEVICE_H
 
 #ifndef REDIS_IOURING_DISABLE
+#include "aligned_buffer.h"
+#include "fdp_nvme.h"
 #include "io_uring.h"
 
 typedef struct _FdpDevice FdpDevice;
@@ -20,8 +22,8 @@ typedef struct _FdpDevice FdpDevice;
 
 FdpDevice *fdpDeviceCreate(FdpNvme *fdpNvme, size_t asyncIOUringQDepth);
 void fdpDeviceRelease(FdpDevice *fdpDevice);
-ssize_t fdpDeviceWriteSync(FdpDevice *fdpDevice, off_t offset, const uint8_t *data, size_t size, int placementHandle);
-ssize_t fdpDeviceReadSync(FdpDevice *fdpDevice, off_t offset, const uint8_t *data, size_t size);
+ssize_t fdpDeviceWriteSync(FdpDevice *fdpDevice, AlignedBuffer *buf, int placementHandle);
+ssize_t fdpDeviceReadSync(FdpDevice *fdpDevice, AlignedBuffer *buf);
 // ssize_t fdpDeviceWriteAsync(FdpDevice *fdpDevice, off_t offset, uint8_t *data, size_t size, int placementHandle);
 // int handling();
 

@@ -17,12 +17,12 @@ typedef enum {
 
 IOUring *ioUringCreate(int is_fdp, CQHandlingMode cqHandlingMode, uint32_t qDepth);
 void ioUringRelease(IOUring **ioUring);
-void ioUringSubmitOp(IOUring* ioUring, IOUringOp *op);
+int ioUringSubmitOp(IOUring *ioUring, IOUringOp *op);
 size_t ioUringWaitOps(IOUring *ioUring, size_t minRequests, IOUringOp ***outCompleted);
 size_t ioUringPollCQ(IOUring *ioUring, IOUringOp ***outCompleted);
 
 IOUringOp *ioUringOpCreate(IOUring *ioUring);
-IOUringOp *ioUringOpRelease(IOUringOp **op);
+void ioUringOpRelease(IOUringOp **op);
 struct io_uring_sqe *ioUringOpGetSqe(IOUringOp *op);
 ssize_t ioUringOpGetResult(IOUringOp *op);
 

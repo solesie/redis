@@ -1,13 +1,11 @@
 #ifndef REDIS_IOURING_DISABLE
 
-#include <stdlib.h>
 #include <string.h>
 
-#include "io_uring.h"
-#include "zmalloc.h"
 #include "redisassert.h"
+#include "zmalloc.h"
+#include "io_uring.h"
 #include "fdp_nvme.h"
-#include "atomicvar.h"
 
 /* solesie: The vector is defined for completed IOUringOp*. */
 typedef struct _CompletedIOUringOpsVector{
@@ -41,7 +39,7 @@ struct _IoUring{
 /* solesie: The user submits IOUringOp* commands to Linux io_uring, 
  * and receives the same IOUringOp* upon completion.
  *
- * The user must allocate and free IOUringOp memory 
+ * The user must allocate and zfree IOUringOp memory 
  * using ioUringOpCreate() and ioUringOpRelease(). */
 struct _IOUringOp{
     /* solesie: the number of bytes on Complete, and < 0 on failure. */
@@ -94,12 +92,12 @@ static inline size_t getCqeSize(IOUringOpOptions *opt) {
 	return opt->isCqe32 ? 32 : sizeof(struct io_uring_cqe);
 }
 
-static inline CompletedIOUringOpsVector *vectorCreate(){
+static inline CompletedIOUringOpsVector *vectorCreate(void){
 	CompletedIOUringOpsVector *vec = (CompletedIOUringOpsVector*)zcalloc(sizeof(*vec));
 	return vec;
 }
 static inline void vectorRelease(CompletedIOUringOpsVector **vec) {
-    for(int i = 0; i < (*vec)->len; ++i){
+    for(size_t i = 0; i < (*vec)->len; ++i){
         ioUringOpRelease(&(*vec)->arr[i]);
     }
     zfree((*vec)->arr);
@@ -113,7 +111,7 @@ static inline void vectorReserve(CompletedIOUringOpsVector *vec, size_t capacity
 		vec->cap = capacity;
 	}
 }
-static inline void vectorPushBack(CompletedIOUringOpsVector *vec, const IOUringOp *completedOp) {
+static inline void vectorPushBack(CompletedIOUringOpsVector *vec, IOUringOp *completedOp) {
     if (vec->len >= vec->cap) {
         size_t newCapacity = vec->cap ? vec->cap * 2 : 1;
         vectorReserve(vec, newCapacity);
@@ -121,9 +119,6 @@ static inline void vectorPushBack(CompletedIOUringOpsVector *vec, const IOUringO
 	vec->arr[vec->len++] = completedOp;
 }
 static inline void vectorClear(CompletedIOUringOpsVector *vec) {
-    for(int i = 0; i < vec->len; ++i){
-        ioUringOpRelease(&vec->arr[i]);
-    }
     vec->len = 0;
 }
 
@@ -142,7 +137,7 @@ static int doWait(
 		if (!io_uring_peek_cqe(&ioUring->ioRing, &cqe) && cqe) {
 			count++;
 			IOUringOp *op = (IOUringOp*)io_uring_cqe_get_data(cqe);
-			if(unlikely(op == NULL)){
+			if(op == NULL){
 				return 0;
 			}
 			

@@ -1,43 +1,18 @@
 #ifndef REDIS_IOURING_DISABLE
+#include <stdio.h>
 #include <regex.h>
 #include <stdlib.h>
 #include <limits.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <ctype.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <sys/ioctl.h>
 #include <linux/nvme_ioctl.h>
+#include "redisassert.h"
 #include "zmalloc.h"
 #include "fdp_nvme.h"
-
-/* Reference: https://github.com/axboe/fio/blob/master/engines/nvme.h
- * If the uapi headers installed on the system lacks nvme uring command
- * support, use the local version to prevent compilation issues. */
-#ifndef CONFIG_NVME_URING_CMD
-struct nvme_uring_cmd {
-    __u8 opcode;
-    __u8 flags;
-    __u16 rsvd1;
-    __u32 nsid;
-    __u32 cdw2;
-    __u32 cdw3;
-    __u64 metadata;
-    __u64 addr;
-    __u32 metadata_len;
-    __u32 data_len;
-    __u32 cdw10;
-    __u32 cdw11;
-    __u32 cdw12;
-    __u32 cdw13;
-    __u32 cdw14;
-    __u32 cdw15;
-    __u32 timeout_ms;
-    __u32 rsvd2;
-};
-#define NVME_URING_CMD_IO _IOWR('N', 0x80, struct nvme_uring_cmd)
-#define NVME_URING_CMD_IO_VEC _IOWR('N', 0x81, struct nvme_uring_cmd)
-#endif /* CONFIG_NVME_URING_CMD */
 
 #define NVME_DEFAULT_IOCTL_TIMEOUT 0
 
@@ -50,6 +25,7 @@ enum nvme_io_mgmt_recv_mo {
 enum nvme_io_opcode {
     nvme_cmd_write = 0x01,
     nvme_cmd_read = 0x02,
+    nvme_cmd_id_ns = 0x06,
     nvme_cmd_io_mgmt_recv = 0x12,
     nvme_cmd_io_mgmt_send = 0x1d,
 };
@@ -66,6 +42,7 @@ struct _FdpNvme{
     uint32_t maxTfrSize;
     uint32_t lbaShift;
     uint64_t startLba;
+    uint32_t preferredWriteSize; /* Refer NVMe command spec Namespace Preferred Write Granularity */
 };
 
 /* solesie: Validates NVMe block-device names using a POSIX regular expression.
@@ -74,7 +51,8 @@ struct _FdpNvme{
 static int isValidNvmeDevice(const char* bdevName) {
     regex_t regex;
     int ret;
-    const char* pattern = "^/dev/nvme\\d+n\\d+(p\\d+)?$";
+    /* ^/dev/nvme\\d+n\\d+(p\\d+)?$ */
+    const char* pattern = "^/dev/nvme[0-9]+n[0-9]+(p[0-9]+)?$";
 
     if (regcomp(&regex, pattern, REG_EXTENDED) != 0) {
         return 0;
@@ -223,6 +201,7 @@ static int readFile(int fd, char **out, size_t *outSize,
  * On failure, return 0. */
 static int readDevAttr(const char *bname, const char *attr, char **out) {
     char path[PATH_MAX];
+    memset(path, 0, sizeof(path));
     snprintf(path, sizeof(path), "/sys/block/%s/%s", bname, attr);
 
     int fd = open(path, O_RDONLY);
@@ -240,12 +219,62 @@ static int readDevAttr(const char *bname, const char *attr, char **out) {
     return 1;
 }
 
-/* solesie: Initialize Namespace ID, Max Transfer Size, LBA shift, and Start LBA of NVMe Device.
+/* NVMe IO Management Receive for specific config reading */
+static int nvmeIOMgmtRecv(
+    int fd,
+    uint32_t nsid,
+    void *data,
+    uint32_t data_len,
+    uint8_t op,
+    uint16_t op_specific) {
+    
+    /* Build the I/O management receive command
+     * For further details on the CDB format, consult the specification
+     * available as "TP4146 Flexible Data Placement 2022.11.30 Ratified"
+     * in the following link:
+     * https://nvmexpress.org/wp-content/uploads/NVM-Express-2.0-Ratified-TPs_20230111.zip */
+    uint32_t cdw10 = (op & 0xf) | (op_specific & 0xff << 16);
+    uint32_t cdw11 = (data_len >> 2) - 1; /* cdw11 is 0 based */
+
+    struct nvme_passthru_cmd cmd = {
+        .opcode = nvme_cmd_io_mgmt_recv,
+        .nsid = nsid,
+        .addr = (uint64_t)(uintptr_t)data,
+        .data_len = data_len,
+        .cdw10 = cdw10,
+        .cdw11 = cdw11,
+        .timeout_ms = NVME_DEFAULT_IOCTL_TIMEOUT,
+    };
+
+    return ioctl(fd, NVME_IOCTL_IO_CMD, &cmd);
+}
+
+/* NVMe Identify-ns for specific config reading */
+static int nvmeIdNs(
+    int fd,
+    uint32_t nsid,
+    void *data,
+    uint32_t data_len) {
+
+    struct nvme_passthru_cmd cmd = {
+        .opcode = nvme_cmd_id_ns,
+        .nsid = nsid,
+        .addr = (uint64_t)(uintptr_t)data,
+        .data_len = data_len,
+        .cdw10 = 0,
+        .timeout_ms = NVME_DEFAULT_IOCTL_TIMEOUT,
+    };
+
+    return ioctl(fd, NVME_IOCTL_ADMIN_CMD, &cmd);
+}
+
+/* solesie: Initialize data of NVMe Device.
  * On success, return 1.
  * On failure, return 0. */
 static int initNvmeData(FdpNvme *fdpNvme, const char *nsName, const char *partName){
     char *nsidStr = NULL, *maxTfrSizeStr = NULL, *lbsStr = NULL, *partStartStr = NULL;
     char full[PATH_MAX];
+    memset(full, 0, sizeof(full));
     snprintf(full, sizeof(full), "%s%s%s",
          nsName, (partName && partName[0]) ? "/" : "",
          (partName && partName[0]) ? partName : "");
@@ -254,7 +283,10 @@ static int initNvmeData(FdpNvme *fdpNvme, const char *nsName, const char *partNa
     int nsidFlag = readDevAttr(nsName, "nsid", &nsidStr);
     int maxTfrSizeFlag = readDevAttr(nsName, "queue/max_hw_sectors_kb", &maxTfrSizeStr);
     int lbsFlag = readDevAttr(nsName, "queue/logical_block_size", &lbsStr);
-    int partStartFlag = readDevAttr(full, "start", &partStartStr);
+    int partStartFlag = 1; 
+    if(partName && partName[0]){
+        partStartFlag = readDevAttr(full, "start", &partStartStr);
+    }
     if(!nsidFlag || !maxTfrSizeFlag || !lbsFlag || !partStartFlag){
         zfree(nsidStr);
         zfree(maxTfrSizeStr);
@@ -269,13 +301,36 @@ static int initNvmeData(FdpNvme *fdpNvme, const char *nsName, const char *partNa
     uint32_t shift = 0;
     while ((1U << shift) < lbs) ++shift;
     fdpNvme->lbaShift = shift;
-    uint64_t partStartBytes = strtoull(partStartStr, NULL, 10) * 512u;
+    uint64_t partStartBytes = 0; 
+    if(partName && partName[0]){
+        partStartBytes = strtoull(partStartStr, NULL, 10) * 512u;
+    }
     fdpNvme->startLba = partStartBytes >> shift;
 
     zfree(nsidStr);
     zfree(maxTfrSizeStr);
     zfree(lbsStr);
     zfree(partStartStr);
+
+    struct {
+        uint8_t rsvd23[24];
+        uint8_t nsfeat;
+        uint8_t rsvd64[39];
+        uint16_t npwg;
+    } idNsData;
+    int err = nvmeIdNs(
+        fdpNvme->fd,
+        fdpNvme->nsid,
+        &idNsData,
+        sizeof(idNsData));
+    if (err) {
+        return 0;
+    }
+    fdpNvme->preferredWriteSize = lbs;
+    if(idNsData.nsfeat & (1 << 4)){
+        fdpNvme->preferredWriteSize = (idNsData.npwg + 1) * lbs;
+    }
+
     return 1;
 }
 
@@ -331,36 +386,6 @@ error:
     zfree(nsName);
     zfree(partName);
     return 0;
-}
-
-/* NVMe IO Mnagement Receive fn for specific config reading */
-static int nvmeIOMgmtRecv(
-    int fd,
-    uint32_t nsid,
-    void *data,
-    uint32_t data_len,
-    uint8_t op,
-    uint16_t op_specific) {
-    
-    /* Build the I/O management receive command
-     * For further details on the CDB format, consult the specification
-     * available as "TP4146 Flexible Data Placement 2022.11.30 Ratified"
-     * in the following link:
-     * https://nvmexpress.org/wp-content/uploads/NVM-Express-2.0-Ratified-TPs_20230111.zip */
-    uint32_t cdw10 = (op & 0xf) | (op_specific & 0xff << 16);
-    uint32_t cdw11 = (data_len >> 2) - 1; /* cdw11 is 0 based */
-
-    struct nvme_passthru_cmd cmd = {
-        .opcode = nvme_cmd_io_mgmt_recv,
-        .nsid = nsid,
-        .addr = (uint64_t)(uintptr_t)data,
-        .data_len = data_len,
-        .cdw10 = cdw10,
-        .cdw11 = cdw11,
-        .timeout_ms = NVME_DEFAULT_IOCTL_TIMEOUT,
-    };
-
-    return ioctl(fd, NVME_IOCTL_IO_CMD, &cmd);
 }
 
 /* solesie: Initialize the FDP specific information (i.e., Placment ID).
@@ -436,7 +461,7 @@ FdpNvme *fdpNvmeCreate(const char *bdevName){
     FdpNvme *fdpNvme = zcalloc(sizeof(*fdpNvme));
 
     int fd = openNvmeCharFile(bdevName);
-    assert(fd >= 0);
+    assert(fd > 0);
     fdpNvme->fd = fd;
 
     int flag = initNvmeInfo(fdpNvme, bdevName);
@@ -485,11 +510,11 @@ static void prepFdpUringCmdSqe(
     /* Clear the SQE entry to avoid some arbitrary flags being set. */
     memset(sqe, 0, sizeof(*sqe));
 
-    sqe.fd = fdpNvme->fd;
-    sqe.opcode = IORING_OP_URING_CMD;
-    sqe.cmd_op = NVME_URING_CMD_IO;
+    sqe->fd = fdpNvme->fd;
+    sqe->opcode = IORING_OP_URING_CMD;
+    sqe->cmd_op = NVME_URING_CMD_IO;
 
-    struct nvme_uring_cmd *cmd = (struct nvme_uring_cmd*)&sqe.cmd;
+    struct nvme_uring_cmd *cmd = (struct nvme_uring_cmd*)&sqe->cmd;
     assert(cmd != NULL);
     memset(cmd, 0, sizeof(struct nvme_uring_cmd));
     cmd->opcode = opcode;
@@ -513,7 +538,7 @@ static void prepFdpUringCmdSqe(
 void fdpNvmePrepReadUringCmdSqe(
     FdpNvme *fdpNvme,
     struct io_uring_sqe *sqe,
-    const void *buf,
+    void *buf,
     size_t size,
     off_t start) {
     
@@ -543,6 +568,18 @@ void fdpNvmePrepWriteUringCmdSqe(
 
 uint32_t fdpNvmeGetMaxIOSize(FdpNvme *fdpNvme){
     return fdpNvme->maxTfrSize;
+}
+
+uint16_t fdpNvmeGetMaxPIDLength(FdpNvme *fdpNvme){
+    return fdpNvme->maxPIDLength;
+}
+
+uint32_t fdpNvmeGetPreferredWriteSize(FdpNvme *fdpNvme){
+    return fdpNvme->preferredWriteSize;
+}
+
+uint32_t fdpNvmeGetLbSize(FdpNvme *fdpNvme){
+    return 1 << fdpNvme->lbaShift ;
 }
 
 #endif
