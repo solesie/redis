@@ -1,4 +1,5 @@
 #ifndef REDIS_IOURING_DISABLE
+#include <pthread.h>
 #include "redisassert.h"
 #include "zmalloc.h"
 #include "fdp_device.h"
@@ -14,17 +15,37 @@ struct _FdpDevice{
     /* Some devices have this transfer size limit due to DMA size limitations.
      * This limit is applicable for both writes and reads. */
     size_t maxIOSize;
+
+    size_t asyncIOUringQDepth;
+    pthread_t asyncIOUringHandlingThread;
 };
 
 /* solesie: check whether user change buf member of not */
 static inline int isAligned(FdpNvme *fdpNvme, AlignedBuffer *buf){
     size_t lbs = fdpNvmeGetLbSize(fdpNvme);
     if(buf->offset % lbs != 0 || 
-        buf->size % lbs != 0 || 
-        buf->preferredSize % fdpNvmeGetPreferredWriteSize(fdpNvme) != 0){
+        buf->size % lbs != 0 ){
         return 0;
     }
     return 1;
+}
+
+static void *handling(void *arg){
+    FdpDevice *fdpDevice = (FdpDevice *)arg;
+    IOUringOp **outCompleted;
+    while(1){
+        size_t completedLen = ioUringPollCQ(fdpDevice->asyncIOUring, &outCompleted);
+        for(size_t i = 0; i < completedLen; ++i){
+            IOUringOp *op = outCompleted[i];
+            ssize_t res = ioUringOpGetResult(op);
+            ioUringOpRelease(&op);
+            if(res != 0){
+                errno = res;
+                printf("solesie: error handling code should be included");
+            }
+        }
+    }
+    return NULL;
 }
 
 /*
@@ -36,18 +57,22 @@ FdpDevice *fdpDeviceCreate(FdpNvme *fdpNvme, size_t asyncIOUringQDepth){
     FdpDevice *fdpDevice = zcalloc(sizeof(*fdpDevice));
     
     fdpDevice->syncIOUring = ioUringCreate(1, CQ_SYNC, 1);
-    if(asyncIOUringQDepth != 0){
-        fdpDevice->asyncIOUring = ioUringCreate(1, CQ_ASYNC, asyncIOUringQDepth);
-    }
+    fdpDevice->asyncIOUringQDepth = asyncIOUringQDepth;
 
     fdpDevice->fdpNvme = fdpNvme;
 
     fdpDevice->maxIOSize = fdpNvmeGetMaxIOSize(fdpNvme);
 
+    if(asyncIOUringQDepth != 0){
+        fdpDevice->asyncIOUring = ioUringCreate(1, CQ_ASYNC, asyncIOUringQDepth);
+        pthread_create(&fdpDevice->asyncIOUringHandlingThread, NULL, handling, fdpDevice);
+    }
+
     return fdpDevice;
 }
 
 void fdpDeviceRelease(FdpDevice *fdpDevice){
+    pthread_detach(fdpDevice->asyncIOUringHandlingThread);
     ioUringRelease(&fdpDevice->syncIOUring);
     ioUringRelease(&fdpDevice->asyncIOUring);
     fdpNvmeRelease(fdpDevice->fdpNvme);
@@ -125,6 +150,36 @@ ssize_t fdpDeviceReadSync(FdpDevice *fdpDevice, AlignedBuffer *buf){
         offset += readSize;
         data += readSize;
         remainingSize -= readSize;
+    }
+    return ret;
+}
+
+ssize_t fdpDeviceWriteAsync(FdpDevice *fdpDevice, AlignedBuffer *buf, int placementHandle){
+    assert(isAligned(fdpDevice->fdpNvme, buf));
+
+    int pid = placementHandle;
+    if (pid < 0 && pid >= fdpNvmeGetMaxPIDLength(fdpDevice->fdpNvme)) {
+        pid = -1;
+    }
+
+    size_t remainingSize = buf->size;
+    ssize_t ret = 0;
+    uint8_t *data = (uint8_t *)buf->ptr;
+    off_t offset = buf->offset;
+    while(remainingSize > 0){
+        size_t writeSize = min(fdpDevice->maxIOSize, remainingSize);
+
+        IOUringOp *op = ioUringOpCreate(fdpDevice->asyncIOUring);
+        struct io_uring_sqe *sqe = ioUringOpGetSqe(op);
+
+        fdpNvmePrepWriteUringCmdSqe(fdpDevice->fdpNvme, sqe, data, writeSize, offset, pid);
+        while(!ioUringSubmitOp(fdpDevice->asyncIOUring, op)){};
+        
+        ret += writeSize;
+
+        offset += writeSize;
+        data += writeSize;
+        remainingSize -= writeSize;
     }
     return ret;
 }

@@ -2,6 +2,7 @@
 
 #include <string.h>
 
+#include "atomicvar.h"
 #include "redisassert.h"
 #include "zmalloc.h"
 #include "io_uring.h"
@@ -28,7 +29,7 @@ struct _IoUring{
 
 	IOUringOpOptions options;
 
-	size_t pending;
+	redisAtomic size_t pending;
 	/* solesie: If IOUring handles CQ as ASYNC, vecFd means CQ fd.
 	 * Otherwise(i.e., CQ on SYNC_BASED), pollFd is -1. */
 	int pollFd;
@@ -39,7 +40,7 @@ struct _IoUring{
 /* solesie: The user submits IOUringOp* commands to Linux io_uring, 
  * and receives the same IOUringOp* upon completion.
  *
- * The user must allocate and zfree IOUringOp memory 
+ * The user must allocate and free IOUringOp memory 
  * using ioUringOpCreate() and ioUringOpRelease(). */
 struct _IOUringOp{
     /* solesie: the number of bytes on Complete, and < 0 on failure. */
@@ -143,7 +144,7 @@ static int doWait(
 			
 			memcpy(&op->cqe_, cqe, getCqeSize(&op->options));
 			io_uring_cqe_seen(&ioUring->ioRing, cqe);
-			--ioUring->pending;
+			atomicDecr(ioUring->pending, 1);
 			
 			op->result = cqe->res;
 			vectorPushBack(ioUring->vec, op);
@@ -205,11 +206,15 @@ void ioUringRelease(IOUring **ioUring){
     zfree(*ioUring);
 	*ioUring = NULL;
 }
-
+#include <stdio.h>
 /* solesie: The op is submitted to io_uring. 
- * On success, 1 is returned; 
- * on failure, 0 is returned. */
+ * @return submitted request(i.e., on fail due to busy, return 0). */
 int ioUringSubmitOp(IOUring *ioUring, IOUringOp *op) {
+	size_t pending = 0;
+	atomicGet(ioUring->pending, pending);
+	if(pending >= ioUring->qDepth){
+		return 0;
+	}
 	assert(areOptionsEqual(&ioUring->options, &op->options));
 
 	io_uring_sqe_set_data(&op->sqe_.sqe, op);
@@ -217,15 +222,13 @@ int ioUringSubmitOp(IOUring *ioUring, IOUringOp *op) {
 	assert(sqe);
 	memcpy(sqe, &op->sqe_.sqe, getSqeSize(&op->options));
 
-	assert(ioUring->pending < ioUring->qDepth);
-	++ioUring->pending;
-
 	/* solesie: rc will be 1 */
 	int rc = io_uring_submit(&ioUring->ioRing);
 	if (rc <= 0) {
-		--ioUring->pending;
 		assert(rc == 0);
+		return 0;
 	}
+	atomicIncr(ioUring->pending, 1);
 	return 1;
 }
 
@@ -245,7 +248,9 @@ size_t ioUringWaitOps(IOUring *ioUring, size_t minRequests, IOUringOp ***outComp
 	/* ioUringPollOps() only allowed on SYNC object */
 	assert(ioUring->pollFd == -1);
 
-	int flag = doWait(ioUring, minRequests, ioUring->pending);
+	size_t pending = 0;
+	atomicGet(ioUring->pending, pending);
+	int flag = doWait(ioUring, minRequests, pending);
 	assert(flag);
 	*outCompleted = ioUring->vec->arr;
 	return ioUring->vec->len;
@@ -271,7 +276,9 @@ size_t ioUringPollCQ(IOUring *ioUring, IOUringOp ***outCompleted){
 		return 0;
 	}
 
-	int flag = doWait(ioUring, 0, ioUring->pending);
+	size_t pending = 0;
+	atomicGet(ioUring->pending, pending);
+	int flag = doWait(ioUring, 0, pending);
 	assert(flag);
 	*outCompleted = ioUring->vec->arr;
 	return ioUring->vec->len;
@@ -297,6 +304,10 @@ struct io_uring_sqe *ioUringOpGetSqe(IOUringOp *op){
 
 ssize_t ioUringOpGetResult(IOUringOp *op){
 	return op->result;
+}
+
+void ioUringOpSetUserDefinedData(IOUringOp *op, void *userDefinedData){
+	op->userDefinedData = userDefinedData;
 }
 
 #endif
