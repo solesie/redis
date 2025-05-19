@@ -11,7 +11,6 @@ typedef struct _AlignedBuffer{
     
     off_t offset;
     size_t size;
-    size_t preferredSize;  /* solesie: P9D3a 128KiB */
 } AlignedBuffer;
 
 AlignedBuffer *alignedBufferAllocate(FdpNvme *fdpNvme, off_t offset, size_t size);

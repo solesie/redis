@@ -43,6 +43,7 @@ struct _FdpNvme{
     uint32_t lbaShift;
     uint64_t startLba;
     uint32_t preferredWriteSize; /* Refer NVMe command spec Namespace Preferred Write Granularity */
+    uint32_t maxSegments; /* https://lpc.events/event/16/contributions/1382/attachments/1119/2151/LPC2022_uring-passthru.pdf */
 };
 
 /* solesie: Validates NVMe block-device names using a POSIX regular expression.
@@ -272,7 +273,7 @@ static int nvmeIdNs(
  * On success, return 1.
  * On failure, return 0. */
 static int initNvmeData(FdpNvme *fdpNvme, const char *nsName, const char *partName){
-    char *nsidStr = NULL, *maxTfrSizeStr = NULL, *lbsStr = NULL, *partStartStr = NULL;
+    char *nsidStr = NULL, *maxTfrSizeStr = NULL, *lbsStr = NULL, *partStartStr = NULL, *msStr = NULL;
     char full[PATH_MAX];
     memset(full, 0, sizeof(full));
     snprintf(full, sizeof(full), "%s%s%s",
@@ -283,15 +284,17 @@ static int initNvmeData(FdpNvme *fdpNvme, const char *nsName, const char *partNa
     int nsidFlag = readDevAttr(nsName, "nsid", &nsidStr);
     int maxTfrSizeFlag = readDevAttr(nsName, "queue/max_hw_sectors_kb", &maxTfrSizeStr);
     int lbsFlag = readDevAttr(nsName, "queue/logical_block_size", &lbsStr);
+    int msFlag = readDevAttr(nsName, "queue/max_segments", &msStr);
     int partStartFlag = 1; 
     if(partName && partName[0]){
         partStartFlag = readDevAttr(full, "start", &partStartStr);
     }
-    if(!nsidFlag || !maxTfrSizeFlag || !lbsFlag || !partStartFlag){
+    if(!nsidFlag || !maxTfrSizeFlag || !lbsFlag || !partStartFlag || !msFlag){
         zfree(nsidStr);
         zfree(maxTfrSizeStr);
         zfree(lbsStr);
         zfree(partStartStr);
+        zfree(msStr);
         return 0;
     }
 
@@ -306,11 +309,13 @@ static int initNvmeData(FdpNvme *fdpNvme, const char *nsName, const char *partNa
         partStartBytes = strtoull(partStartStr, NULL, 10) * 512u;
     }
     fdpNvme->startLba = partStartBytes >> shift;
+    fdpNvme->maxSegments = strtoul(msStr, NULL, 10);
 
     zfree(nsidStr);
     zfree(maxTfrSizeStr);
     zfree(lbsStr);
     zfree(partStartStr);
+    zfree(msStr);
 
     struct {
         uint8_t rsvd23[24];
@@ -405,7 +410,7 @@ static int initNvmeFdpStatus(FdpNvme *fdpNvme){
             uint8_t  rsvd0[14];
             uint16_t nruhsd;
         } header;
-        struct RuhStatusDesc *ruhsds;
+        struct RuhStatusDesc ruhsds[1<<16];
     } ruhStatus;
     
     int err;
@@ -422,18 +427,15 @@ static int initNvmeFdpStatus(FdpNvme *fdpNvme){
         return 0;
     }
 
-    ruhStatus.ruhsds = (struct RuhStatusDesc *)zmalloc(ruhStatus.header.nruhsd * sizeof(*ruhStatus.ruhsds));
-
     /* solesie: Second, read descriptor. */
     err = nvmeIOMgmtRecv(
         fdpNvme->fd,
         fdpNvme->nsid,
-        ruhStatus.ruhsds,
-        ruhStatus.header.nruhsd * sizeof(*ruhStatus.ruhsds),
+        &ruhStatus,
+        sizeof(ruhStatus.header) + ruhStatus.header.nruhsd * sizeof(*ruhStatus.ruhsds),
         NVME_IO_MGMT_RECV_RUH_STATUS,
         0);
     if (err) {
-        zfree(ruhStatus.ruhsds);
         return 0;
     }
 
@@ -445,7 +447,6 @@ static int initNvmeFdpStatus(FdpNvme *fdpNvme){
 
     fdpNvme->nextPIDIdx = DEFAULT_PLACEMENT_ID_IDX + 1;
 
-    zfree(ruhStatus.ruhsds);
     return 1;
 }
 
@@ -567,7 +568,8 @@ void fdpNvmePrepWriteUringCmdSqe(
 }
 
 uint32_t fdpNvmeGetMaxIOSize(FdpNvme *fdpNvme){
-    return fdpNvme->maxTfrSize;
+    uint32_t segLimit = fdpNvme->maxSegments * (1 << fdpNvme->lbaShift);
+    return segLimit < fdpNvme->maxTfrSize ? segLimit : fdpNvme->maxTfrSize;
 }
 
 uint16_t fdpNvmeGetMaxPIDLength(FdpNvme *fdpNvme){
