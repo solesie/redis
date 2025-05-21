@@ -8,24 +8,12 @@
 
 typedef struct _FdpDevice FdpDevice;
 
-/* solesie: User-defined request for async operation.
- * For now, not implemented yet. */
-// typedef struct _IOReq{
-//     IOUringOp *op;
-//     uint64_t offset;
-//     size_t size;
-//     void *data;
-//     uint16_t *placementHandle;
-
-//     int is_req_successful;  /* 1 on success, 0 on failure */
-// }IOReq;
-
-FdpDevice *fdpDeviceCreate(FdpNvme *fdpNvme, size_t asyncIOUringQDepth);
+FdpDevice *fdpDeviceCreate(FdpNvme *fdpNvme, uint32_t resubmitLimit, uint32_t qdepth);
 void fdpDeviceRelease(FdpDevice *fdpDevice);
-ssize_t fdpDeviceWriteSync(FdpDevice *fdpDevice, AlignedBuffer *buf, int placementHandle);
-ssize_t fdpDeviceReadSync(FdpDevice *fdpDevice, AlignedBuffer *buf);
-ssize_t fdpDeviceWriteAsync(FdpDevice *fdpDevice, AlignedBuffer *buf, int placementHandle);
-// int handling();
+void fdpDeviceIOWrite(FdpDevice *fdpDevice, AlignedBuffer *buf, int placementHandle);
+void fdpDeviceIORead(FdpDevice *fdpDevice, AlignedBuffer *buf);
+int fdpDeviceIOWait(FdpDevice *fdpDevice);
+
 
 #endif
 #endif

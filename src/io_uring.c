@@ -29,7 +29,8 @@ struct _IoUring{
 
 	IOUringOpOptions options;
 
-	redisAtomic size_t pending;
+	atomic_size_t pending;
+
 	/* solesie: If IOUring handles CQ as ASYNC, vecFd means CQ fd.
 	 * Otherwise(i.e., CQ on SYNC_BASED), pollFd is -1. */
 	int pollFd;
@@ -63,6 +64,8 @@ struct _IOUringOp{
     } cqe_;
 
     IOUringOpOptions options;
+
+	uint32_t resubmitted;
 };
 
 /* http://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerOf2 */
@@ -144,7 +147,7 @@ static int doWait(
 			
 			memcpy(&op->cqe_, cqe, getCqeSize(&op->options));
 			io_uring_cqe_seen(&ioUring->ioRing, cqe);
-			atomicDecr(ioUring->pending, 1);
+			atomic_fetch_sub_explicit(&ioUring->pending, 1, memory_order_acq_rel);
 			
 			op->result = cqe->res;
 			vectorPushBack(ioUring->vec, op);
@@ -161,10 +164,8 @@ static int doWait(
 
 /* solesie: Create a Linux io_uring wrapper object that can be used for general purposes.
  * @param is_fdp Indicates whether the io_uring will be created for NVMe Flexible Data Placement.
- * @param cqHandlingMode Specifies how the user will handle the io_uring completion queue.
- * @param qDepth Represents the size of the io_uring submission/completion queue. 
- * @param vec Must not be NULL. */
-IOUring *ioUringCreate(int is_fdp, CQHandlingMode cqHandlingMode, uint32_t qDepth){
+ * @param qDepth Represents the size of the io_uring submission/completion queue. */
+IOUring *ioUringCreate(int is_fdp, uint32_t qDepth){
     IOUring *ioUring = (IOUring*)zcalloc(sizeof(*ioUring));
 
 	ioUring->qDepth = qDepth;
@@ -184,10 +185,7 @@ IOUring *ioUringCreate(int is_fdp, CQHandlingMode cqHandlingMode, uint32_t qDept
         roundUpToNextPowerOfTwo(qDepth), &ioUring->ioRing, &ioUring->params);
 	assert(rc >= 0);
 
-	ioUring->pollFd = -1;
-	if(cqHandlingMode == CQ_ASYNC){
-		ioUring->pollFd = ioUring->ioRing.ring_fd;
-	}
+	ioUring->pollFd = ioUring->ioRing.ring_fd;
 	
 	ioUring->vec = vectorCreate();
 	vectorReserve(ioUring->vec, qDepth);
@@ -206,12 +204,11 @@ void ioUringRelease(IOUring **ioUring){
     zfree(*ioUring);
 	*ioUring = NULL;
 }
-#include <stdio.h>
+
 /* solesie: The op is submitted to io_uring. 
  * @return submitted request(i.e., on fail due to busy, return 0). */
 int ioUringSubmitOp(IOUring *ioUring, IOUringOp *op) {
-	size_t pending = 0;
-	atomicGet(ioUring->pending, pending);
+	size_t pending = atomic_load_explicit(&ioUring->pending, memory_order_acquire);
 	if(pending >= ioUring->qDepth){
 		return 0;
 	}
@@ -228,33 +225,33 @@ int ioUringSubmitOp(IOUring *ioUring, IOUringOp *op) {
 		assert(rc == 0);
 		return 0;
 	}
-	atomicIncr(ioUring->pending, 1);
+	atomic_fetch_add_explicit(&ioUring->pending, 1, memory_order_acq_rel);
 	return 1;
 }
 
-/* solesie: Waits synchronously until at least minRequests operations are completed.
- * (Only valid when running in the SYNC completion-queue mode, i.e. pollFd == -1)
+// /* solesie: Waits synchronously until at least minRequests operations are completed.
+//  * (Only valid when running in the SYNC completion-queue mode, i.e. pollFd == -1)
 
- * @param ioUring       The io_uring instance (must be in SYNC mode).
- * @param minRequests   Minimum number of completions to wait for.
- * @param outCompleted  Output: on return, *outCompleted points to an array
- *                      of IOUringOp* entries that have completed.
- * 
- * @return The number of completed requests (length of *outCompleted)
- * 
- * @note While the user may be responsible for freeing the memory of an IOUringOp* created via IOUringOpCreate(), 
- * manipulation of the internal array(i.e., IOUringOp**) is prohibited. */
-size_t ioUringWaitOps(IOUring *ioUring, size_t minRequests, IOUringOp ***outCompleted){
-	/* ioUringPollOps() only allowed on SYNC object */
-	assert(ioUring->pollFd == -1);
+//  * @param ioUring       The io_uring instance (must be in SYNC mode).
+//  * @param minRequests   Minimum number of completions to wait for.
+//  * @param outCompleted  Output: on return, *outCompleted points to an array
+//  *                      of IOUringOp* entries that have completed.
+//  * 
+//  * @return The number of completed requests (length of *outCompleted)
+//  * 
+//  * @note While the user may be responsible for freeing the memory of an IOUringOp* created via IOUringOpCreate(), 
+//  * manipulation of the internal array(i.e., IOUringOp**) is prohibited. */
+// size_t ioUringWaitOps(IOUring *ioUring, size_t minRequests, IOUringOp ***outCompleted){
+// 	/* ioUringPollOps() only allowed on SYNC object */
+// 	assert(ioUring->pollFd == -1);
 
-	size_t pending = 0;
-	atomicGet(ioUring->pending, pending);
-	int flag = doWait(ioUring, minRequests, pending);
-	assert(flag);
-	*outCompleted = ioUring->vec->arr;
-	return ioUring->vec->len;
-}
+// 	size_t pending = 0;
+// 	atomicGet(ioUring->pending, pending);
+// 	int flag = doWait(ioUring, minRequests, pending);
+// 	assert(flag);
+// 	*outCompleted = ioUring->vec->arr;
+// 	return ioUring->vec->len;
+// }
 
 /* solesie: Polls for completed IOUring operations in ASYNC Completion Queue mode.
  * (Only to be used in the ASYNC Completion Queue mode)
@@ -276,9 +273,7 @@ size_t ioUringPollCQ(IOUring *ioUring, IOUringOp ***outCompleted){
 		return 0;
 	}
 
-	size_t pending = 0;
-	atomicGet(ioUring->pending, pending);
-	int flag = doWait(ioUring, 0, pending);
+	int flag = doWait(ioUring, 0, atomic_load_explicit(&ioUring->pending, memory_order_seq_cst));
 	assert(flag);
 	*outCompleted = ioUring->vec->arr;
 	return ioUring->vec->len;
@@ -308,6 +303,14 @@ ssize_t ioUringOpGetResult(IOUringOp *op){
 
 void ioUringOpSetUserDefinedData(IOUringOp *op, void *userDefinedData){
 	op->userDefinedData = userDefinedData;
+}
+
+uint32_t ioUringOpGetResubmitted(IOUringOp *op){
+	return op->resubmitted;
+}
+
+void ioUringOpIncreaseResubmitted(IOUringOp *op){
+	op->resubmitted++;
 }
 
 #endif
