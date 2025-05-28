@@ -86,11 +86,16 @@ static int rioBufferFlush(rio *r) {
     return 1; /* Nothing to do, our write just appends to the buffer. */
 }
 
+static int rioBufferWait(void) {
+    return 1;
+}
+
 static const rio rioBufferIO = {
     rioBufferRead,
     rioBufferWrite,
     rioBufferTell,
     rioBufferFlush,
+    rioBufferWait,
     NULL,           /* update_checksum */
     0,              /* current checksum */
     0,              /* flags */
@@ -183,11 +188,16 @@ static int rioFileFlush(rio *r) {
     return (fflush(r->io.file.fp) == 0) ? 1 : 0;
 }
 
+static int rioFileWait(void) {
+    return 1;
+}
+
 static const rio rioFileIO = {
     rioFileRead,
     rioFileWrite,
     rioFileTell,
     rioFileFlush,
+    rioFileWait,
     NULL,           /* update_checksum */
     0,              /* current checksum */
     0,              /* flags */
@@ -203,6 +213,60 @@ void rioInitWithFile(rio *r, FILE *fp) {
     r->io.file.autosync = 0;
     r->io.file.reclaim_cache = 0;
 }
+
+/* ---------- NVMe Flexible Data Placement implementation ---------- */
+
+#ifndef REDIS_IOURING_DISABLE
+
+/* Returns 1 or 0 for success/failure. */
+static size_t rioFdpUfsWrite(rio *r, const void *buf, size_t len) {
+    fdpUfsIOWrite(buf, len, r->io.ufs.pld, r->io.ufs.type);
+    return 1;
+}
+
+/* Returns 1 or 0 for success/failure. */
+static size_t rioFdpUfsRead(rio *r, void *buf, size_t len) {
+    fdpUfsIORead(buf, len, r->io.ufs.type);
+    return 1;
+}
+
+/* Returns read/write position in file. */
+static off_t rioFdpUfsTell(rio *r) {
+    UNUSED(r);
+    return 0;
+}
+
+/* solesie: Direct IO, so NOUSED */
+static int rioFdpUfsFlush(rio *r) {
+    UNUSED(r);
+    return 1;
+}
+
+static int rioFdpUfsWait(void) {
+    return fdpUfsIOWait(server.fdp_ufs);
+}
+
+static const rio rioFdpUfsIO = {
+    rioFdpUfsRead,
+    rioFdpUfsWrite,
+    rioFdpUfsTell,
+    rioFdpUfsFlush,
+    rioFdpUfsWait,
+    NULL,           /* update_checksum */
+    0,              /* current checksum */
+    0,              /* flags */
+    0,              /* bytes read or written */
+    0,              /* read/write chunk size */
+    { { NULL, 0 } } /* union for io-specific vars */
+};
+
+void rioInitWithFdpUfs(rio *r, int placement_handle, fdpUfsDataType type) {
+    *r = rioFdpUfsIO;
+    r->io.ufs.pld = placement_handle;
+    r->io.ufs.type = type;
+}
+
+#endif /* REDIS_IOURING_DISABLE */
 
 /* ------------------- Connection implementation -------------------
  * We use this RIO implementation when reading an RDB file directly from
@@ -285,11 +349,16 @@ static int rioConnFlush(rio *r) {
     return rioConnWrite(r,NULL,0);
 }
 
+static int rioConnWait(void) {
+    return 1;
+}
+
 static const rio rioConnIO = {
     rioConnRead,
     rioConnWrite,
     rioConnTell,
     rioConnFlush,
+    rioConnWait,
     NULL,           /* update_checksum */
     0,              /* current checksum */
     0,              /* flags */
@@ -404,11 +473,16 @@ static int rioFdFlush(rio *r) {
     return rioFdWrite(r,NULL,0);
 }
 
+static int rioFdWait(void) {
+    return 1;
+}
+
 static const rio rioFdIO = {
     rioFdRead,
     rioFdWrite,
     rioFdTell,
     rioFdFlush,
+    rioFdWait,
     NULL,           /* update_checksum */
     0,              /* current checksum */
     0,              /* flags */

@@ -30,26 +30,27 @@ enum nvme_io_opcode {
     nvme_cmd_io_mgmt_send = 0x1d,
 };
 
-struct _FdpNvme{
+struct _fdpNvme{
     int fd;
-    uint16_t maxPIDLength;
-    /* solesie: length of placementIDs == maxPIDLength */
-    uint16_t *placementIDs;
-    uint16_t nextPIDIdx;
+    uint16_t max_pid_len;
+    /* solesie: length of placement_id_arr == max_pid_len */
+    uint16_t *placement_id_arr;
+    uint16_t next_pid_idx;
 
     /* NVMe Data */
     int nsid;
-    uint32_t maxTfrSize;
-    uint32_t lbaShift;
-    uint64_t startLba;
-    uint32_t preferredWriteSize; /* Refer NVMe command spec Namespace Preferred Write Granularity */
-    uint32_t maxSegments; /* https://lpc.events/event/16/contributions/1382/attachments/1119/2151/LPC2022_uring-passthru.pdf */
+    uint32_t max_tfr_size;
+    uint32_t lba_shift;
+    uint64_t start_lba;
+    uint64_t end_lba;
+    uint32_t preferred_write_size; /* Refer NVMe command spec Namespace Preferred Write Granularity */
+    uint32_t max_segments; /* https://lpc.events/event/16/contributions/1382/attachments/1119/2151/LPC2022_uring-passthru.pdf */
 };
 
 /* solesie: Validates NVMe block-device names using a POSIX regular expression.
  * On success, return 1
  * On failure, return 0 */
-static int isValidNvmeDevice(const char* bdevName) {
+static int isValidNvmeDevice(const char* bdev_name) {
     regex_t regex;
     int ret;
     /* ^/dev/nvme\\d+n\\d+(p\\d+)?$ */
@@ -60,7 +61,7 @@ static int isValidNvmeDevice(const char* bdevName) {
     }
 
     /* Execute regex match */
-    ret = regexec(&regex, bdevName, 0, NULL, 0);
+    ret = regexec(&regex, bdev_name, 0, NULL, 0);
     regfree(&regex);
     if(ret == 0){
         return 1;
@@ -71,33 +72,33 @@ static int isValidNvmeDevice(const char* bdevName) {
 /* solesie:  Extracts the NVMe char device path from a block-device name.
  * On failure, return NULL.
  * Refer the paper "NVMe IO Passthru" */
-static char* getNvmeCharDevice(const char *bdevName) {
-    const char* p = bdevName;
+static char* getNvmeCharDevice(const char *bdev_name) {
+    const char* p = bdev_name;
     while (*p && !isdigit((unsigned char)*p)) {
         p++;
     }
     if (!*p) {
         return NULL;
     }
-    const char* devPos = p;
+    const char* dev_pos = p;
 
     /* Find the 'p' that marks the partition, if any */
-    const char* pPos = strchr(devPos, 'p');
-    size_t idLen = pPos ? (size_t)(pPos - devPos) : strlen(devPos);
+    const char* p_pos = strchr(dev_pos, 'p');
+    size_t id_len = p_pos ? (size_t)(p_pos - dev_pos) : strlen(dev_pos);
 
     const char* prefix = "/dev/ng";
-    size_t prefixLen = strlen(prefix);
+    size_t prefix_len = strlen(prefix);
     /* +1 for '\0' */
-    size_t totalLen = prefixLen + idLen + 1;
-    char* cdev = (char*)zmalloc(totalLen);
+    size_t total_len = prefix_len + id_len + 1;
+    char* cdev = (char*)zmalloc(total_len);
     if (!cdev) {
         return NULL;
     }
 
     /* Build the char device path */
-    memcpy(cdev, prefix, prefixLen);
-    memcpy(cdev + prefixLen, devPos, idLen);
-    cdev[prefixLen + idLen] = '\0';
+    memcpy(cdev, prefix, prefix_len);
+    memcpy(cdev + prefix_len, dev_pos, id_len);
+    cdev[prefix_len + id_len] = '\0';
 
     return cdev;
 }
@@ -105,12 +106,12 @@ static char* getNvmeCharDevice(const char *bdevName) {
 /* solesie: Opens the NVMe character device corresponding to the given block-device.
  * On success, returns a non-negative file descriptor.
  * On failure, returns 0. */
-static int openNvmeCharFile(const char* bdevName) {
-    if (!isValidNvmeDevice(bdevName)) {
+static int openNvmeCharFile(const char* bdev_name) {
+    if (!isValidNvmeDevice(bdev_name)) {
         return 0;
     }
 
-    char* cdevName = getNvmeCharDevice(bdevName);
+    char* cdevName = getNvmeCharDevice(bdev_name);
     if (!cdevName) {
         return 0;
     }
@@ -122,18 +123,18 @@ static int openNvmeCharFile(const char* bdevName) {
 
 /* On success, returns 1.
  * On failure, returns 0. */
-static int readFull(int fd, void *buf, size_t count, size_t *readSize) {
-    *readSize = 0;
+static int readFull(int fd, void *buf, size_t count, size_t *read_size) {
+    *read_size = 0;
     char *p = buf;
     while (count > 0) {
-        ssize_t n = read(fd, p + *readSize, count);
+        ssize_t n = read(fd, p + *read_size, count);
         if (n < 0) {
             return 0;
         }
         if (n == 0) {
             break;  /* EOF */
         }
-        *readSize += n;
+        *read_size += n;
         count -= n;
     }
     return 1;
@@ -141,10 +142,10 @@ static int readFull(int fd, void *buf, size_t count, size_t *readSize) {
 
 /* On success, return 1.
  * On failure, return 0. */
-static int readFile(int fd, char **out, size_t *outSize,
-               size_t numBytes /* = SIZE_MAX */) 
+static int readFile(int fd, char **out, size_t *out_size,
+               size_t num_bytes /* = SIZE_MAX */) 
 {
-    const size_t initialAlloc = 1024 * 4;
+    const size_t initial_alloc = 1024 * 4;
     struct stat st;
     size_t cap;
     char *buf = NULL;
@@ -156,9 +157,9 @@ static int readFile(int fd, char **out, size_t *outSize,
 
     if (st.st_size > 0) {
         cap = (size_t)st.st_size + 1;
-        if (cap > numBytes) cap = numBytes;
+        if (cap > num_bytes) cap = num_bytes;
     } else {
-        cap = initialAlloc;
+        cap = initial_alloc;
     }
 
     buf = (char*)zmalloc(cap);
@@ -176,7 +177,7 @@ static int readFile(int fd, char **out, size_t *outSize,
         }
         
         size_t next = cap * 3 / 2;
-        if (next > numBytes) next = numBytes;
+        if (next > num_bytes) next = num_bytes;
         if (next <= cap) {
             break;
         }
@@ -193,7 +194,7 @@ static int readFile(int fd, char **out, size_t *outSize,
     buf[used] = '\0';
 
     *out = buf;
-    *outSize = used;
+    *out_size = used;
     return 1;
 }
 
@@ -272,97 +273,105 @@ static int nvmeIdNs(
 /* solesie: Initialize data of NVMe Device.
  * On success, return 1.
  * On failure, return 0. */
-static int initNvmeData(FdpNvme *fdpNvme, const char *nsName, const char *partName){
-    char *nsidStr = NULL, *maxTfrSizeStr = NULL, *lbsStr = NULL, *partStartStr = NULL, *msStr = NULL;
+static int initNvmeData(fdpNvme *fdp_nvme, const char *ns_name, const char *part_name){
+    char *nsid_str = NULL, *max_tfr_size_str = NULL, *lbs_str = NULL, *part_start_str = NULL
+        , *ms_str = NULL, *size_str;
     char full[PATH_MAX];
     memset(full, 0, sizeof(full));
     snprintf(full, sizeof(full), "%s%s%s",
-         nsName, (partName && partName[0]) ? "/" : "",
-         (partName && partName[0]) ? partName : "");
+         ns_name, (part_name && part_name[0]) ? "/" : "",
+         (part_name && part_name[0]) ? part_name : "");
 
 
-    int nsidFlag = readDevAttr(nsName, "nsid", &nsidStr);
-    int maxTfrSizeFlag = readDevAttr(nsName, "queue/max_hw_sectors_kb", &maxTfrSizeStr);
-    int lbsFlag = readDevAttr(nsName, "queue/logical_block_size", &lbsStr);
-    int msFlag = readDevAttr(nsName, "queue/max_segments", &msStr);
-    int partStartFlag = 1; 
-    if(partName && partName[0]){
-        partStartFlag = readDevAttr(full, "start", &partStartStr);
+    int nsid_flag = readDevAttr(ns_name, "nsid", &nsid_str);
+    int max_tfr_size_flag = readDevAttr(ns_name, "queue/max_hw_sectors_kb", &max_tfr_size_str);
+    int lba_flag = readDevAttr(ns_name, "queue/logical_block_size", &lbs_str);
+    int ms_flag = readDevAttr(ns_name, "queue/max_segments", &ms_str);
+    int part_start_flag, size_flag;
+    if(part_name && part_name[0]){
+        part_start_flag = readDevAttr(full, "start", &part_start_str);
+        size_flag = readDevAttr(full, "size", &size_str);
+    } else{
+        part_start_flag = 1;
+        size_flag = readDevAttr(full, "size", &size_str);
     }
-    if(!nsidFlag || !maxTfrSizeFlag || !lbsFlag || !partStartFlag || !msFlag){
-        zfree(nsidStr);
-        zfree(maxTfrSizeStr);
-        zfree(lbsStr);
-        zfree(partStartStr);
-        zfree(msStr);
+    if(!nsid_flag || !max_tfr_size_flag || !lba_flag || !part_start_flag || !ms_flag || !size_flag){
+        zfree(nsid_str);
+        zfree(max_tfr_size_str);
+        zfree(lbs_str);
+        zfree(part_start_str);
+        zfree(ms_str);
+        zfree(size_str);
         return 0;
     }
 
-    fdpNvme->nsid = atoi(nsidStr);
-    fdpNvme->maxTfrSize = strtoul(maxTfrSizeStr, NULL, 10) * 1024u;
-    uint32_t lbs = strtoul(lbsStr, NULL, 10);
+    fdp_nvme->nsid = atoi(nsid_str);
+    fdp_nvme->max_tfr_size = strtoul(max_tfr_size_str, NULL, 10) * 1024u;
+    uint32_t lbs = strtoul(lbs_str, NULL, 10);
     uint32_t shift = 0;
     while ((1U << shift) < lbs) ++shift;
-    fdpNvme->lbaShift = shift;
-    uint64_t partStartBytes = 0; 
-    if(partName && partName[0]){
-        partStartBytes = strtoull(partStartStr, NULL, 10) * 512u;
+    fdp_nvme->lba_shift = shift;
+    uint64_t part_start_bytes = 0; 
+    if(part_name && part_name[0]){
+        part_start_bytes = strtoull(part_start_str, NULL, 10) * 512u;
     }
-    fdpNvme->startLba = partStartBytes >> shift;
-    fdpNvme->maxSegments = strtoul(msStr, NULL, 10);
+    fdp_nvme->start_lba = part_start_bytes >> shift;
+    fdp_nvme->end_lba = (strtoull(size_str, NULL, 10) * 512u) >> shift;
+    fdp_nvme->max_segments = strtoul(ms_str, NULL, 10);
 
-    zfree(nsidStr);
-    zfree(maxTfrSizeStr);
-    zfree(lbsStr);
-    zfree(partStartStr);
-    zfree(msStr);
+    zfree(nsid_str);
+    zfree(max_tfr_size_str);
+    zfree(lbs_str);
+    zfree(part_start_str);
+    zfree(ms_str);
+    zfree(size_str);
 
     struct {
         uint8_t rsvd23[24];
         uint8_t nsfeat;
         uint8_t rsvd64[39];
         uint16_t npwg;
-    } idNsData;
+    } id_ns_data;
     int err = nvmeIdNs(
-        fdpNvme->fd,
-        fdpNvme->nsid,
-        &idNsData,
-        sizeof(idNsData));
+        fdp_nvme->fd,
+        fdp_nvme->nsid,
+        &id_ns_data,
+        sizeof(id_ns_data));
     if (err) {
         return 0;
     }
-    fdpNvme->preferredWriteSize = lbs;
-    if(idNsData.nsfeat & (1 << 4)){
-        fdpNvme->preferredWriteSize = (idNsData.npwg + 1) * lbs;
+    fdp_nvme->preferred_write_size = lbs;
+    if(id_ns_data.nsfeat & (1 << 4)){
+        fdp_nvme->preferred_write_size = (id_ns_data.npwg + 1) * lbs;
     }
 
     return 1;
 }
 
-/* It returns nsName = "nvme0n1" for both "/dev/nvme0n1" and "/dev/nvme0n1p1".
- * Also partName = "nvme0n1p1" for partition, and "" otherwise.
+/* It returns ns_name = "nvme0n1" for both "/dev/nvme0n1" and "/dev/nvme0n1p1".
+ * Also part_name = "nvme0n1p1" for partition, and "" otherwise.
  * 
  * On success, return 1.
  * On failure, return 0 */
 static int getNsAndPartition(
-    const char* bdevName,
-    char* nsName,
-    char* partName) {
+    const char* bdev_name,
+    char* ns_name,
+    char* part_name) {
 
-    const char* base = strrchr(bdevName, '/');
+    const char* base = strrchr(bdev_name, '/');
     if (!base) {
         return 0;
     }
     base++;
     const char* p = strrchr(base, 'p');
     if (!p) {
-        strcpy(nsName, base);
-        partName[0] = '\0';
+        strcpy(ns_name, base);
+        part_name[0] = '\0';
     } else {
         size_t len = p - base;
-        strncpy(nsName, base, len);
-        nsName[len] = '\0';
-        strcpy(partName, base);
+        strncpy(ns_name, base, len);
+        ns_name[len] = '\0';
+        strcpy(part_name, base);
     }
     return 1;
 }
@@ -370,34 +379,34 @@ static int getNsAndPartition(
 /* solesie: Initialize the NVMe related info from a valid NVMe device path.
  * On success, return 1.
  * On failure, return 0. */
-static int initNvmeInfo(FdpNvme *fdpNvme, const char *bdevName) {
-    char *nsName = zcalloc(PATH_MAX);
-    char *partName = zcalloc(PATH_MAX);
-    int flag = getNsAndPartition(bdevName, nsName, partName);
+static int initNvmeInfo(fdpNvme *fdp_nvme, const char *bdev_name) {
+    char *ns_name = zcalloc(PATH_MAX);
+    char *part_name = zcalloc(PATH_MAX);
+    int flag = getNsAndPartition(bdev_name, ns_name, part_name);
     if(!flag){
         goto error;
     }
 
-    flag = initNvmeData(fdpNvme, nsName, partName);
+    flag = initNvmeData(fdp_nvme, ns_name, part_name);
     if(!flag){
         goto error;
     }
 
-    zfree(nsName);
-    zfree(partName);
+    zfree(ns_name);
+    zfree(part_name);
     return 1;
 
 error:
-    zfree(nsName);
-    zfree(partName);
+    zfree(ns_name);
+    zfree(part_name);
     return 0;
 }
 
 /* solesie: Initialize the FDP specific information (i.e., Placment ID).
  * On success, return 1.
  * On failure, return 0. */
-static int initNvmeFdpStatus(FdpNvme *fdpNvme){
-    struct RuhStatusDesc {
+static int initNvmeFdpStatus(fdpNvme *fdp_nvme){
+    struct ruhStatusDesc {
         uint16_t pid;
         uint16_t ruhid;
         uint32_t earutr;
@@ -410,17 +419,17 @@ static int initNvmeFdpStatus(FdpNvme *fdpNvme){
             uint8_t  rsvd0[14];
             uint16_t nruhsd;
         } header;
-        struct RuhStatusDesc ruhsds[1<<16];
-    } ruhStatus;
+        struct ruhStatusDesc ruhsds[1<<16];
+    } ruh_status;
     
     int err;
 
     /* solesie: First, read header. */
     err = nvmeIOMgmtRecv(
-        fdpNvme->fd,
-        fdpNvme->nsid, 
-        &ruhStatus.header, 
-        sizeof(ruhStatus.header), 
+        fdp_nvme->fd,
+        fdp_nvme->nsid, 
+        &ruh_status.header, 
+        sizeof(ruh_status.header), 
         NVME_IO_MGMT_RECV_RUH_STATUS, 
         0);
     if (err) {
@@ -429,23 +438,23 @@ static int initNvmeFdpStatus(FdpNvme *fdpNvme){
 
     /* solesie: Second, read descriptor. */
     err = nvmeIOMgmtRecv(
-        fdpNvme->fd,
-        fdpNvme->nsid,
-        &ruhStatus,
-        sizeof(ruhStatus.header) + ruhStatus.header.nruhsd * sizeof(*ruhStatus.ruhsds),
+        fdp_nvme->fd,
+        fdp_nvme->nsid,
+        &ruh_status,
+        sizeof(ruh_status.header) + ruh_status.header.nruhsd * sizeof(*ruh_status.ruhsds),
         NVME_IO_MGMT_RECV_RUH_STATUS,
         0);
     if (err) {
         return 0;
     }
 
-    fdpNvme->maxPIDLength = ruhStatus.header.nruhsd;
-    fdpNvme->placementIDs = (uint16_t*)zmalloc(fdpNvme->maxPIDLength * sizeof(*fdpNvme->placementIDs));
-    for (int i = 0; i < fdpNvme->maxPIDLength; ++i) {
-        fdpNvme->placementIDs[i] = ruhStatus.ruhsds[i].pid;
+    fdp_nvme->max_pid_len = ruh_status.header.nruhsd;
+    fdp_nvme->placement_id_arr = (uint16_t*)zmalloc(fdp_nvme->max_pid_len * sizeof(*fdp_nvme->placement_id_arr));
+    for (int i = 0; i < fdp_nvme->max_pid_len; ++i) {
+        fdp_nvme->placement_id_arr[i] = ruh_status.ruhsds[i].pid;
     }
 
-    fdpNvme->nextPIDIdx = DEFAULT_PLACEMENT_ID_IDX + 1;
+    fdp_nvme->next_pid_idx = DEFAULT_PLACEMENT_ID_IDX + 1;
 
     return 1;
 }
@@ -454,42 +463,42 @@ static int initNvmeFdpStatus(FdpNvme *fdpNvme){
  * using io_uring in accordance with the NVMe Flexible Data Placement protocol. 
  * Additionally, the host is responsible for directly retrieving information from the FDP SSD.
  * 
- * Creates an FdpNvme object that contains helper functions for constructing NVMe commands for data I/O, 
+ * Creates an fdpNvme object that contains helper functions for constructing NVMe commands for data I/O, 
  * and automatically retrieves the FDP SSD's information upon creation.
  * 
  * @param bdevNvme Must follow the format (e.g., /dev/nvme0n1, /dev/nvme0n1p1). */
-FdpNvme *fdpNvmeCreate(const char *bdevName){
-    FdpNvme *fdpNvme = zcalloc(sizeof(*fdpNvme));
+fdpNvme *fdpNvmeCreate(const char *bdev_name){
+    fdpNvme *fdp_nvme = zcalloc(sizeof(*fdp_nvme));
 
-    int fd = openNvmeCharFile(bdevName);
+    int fd = openNvmeCharFile(bdev_name);
     assert(fd > 0);
-    fdpNvme->fd = fd;
+    fdp_nvme->fd = fd;
 
-    int flag = initNvmeInfo(fdpNvme, bdevName);
+    int flag = initNvmeInfo(fdp_nvme, bdev_name);
     assert(flag);
 
-    flag = initNvmeFdpStatus(fdpNvme);
+    flag = initNvmeFdpStatus(fdp_nvme);
     assert(flag);
 
-    return fdpNvme;
+    return fdp_nvme;
 }
 
-void fdpNvmeRelease(FdpNvme *fdpNvme){
-    close(fdpNvme->fd);
-    zfree(fdpNvme->placementIDs);
-    zfree(fdpNvme);
+void fdpNvmeRelease(fdpNvme *fdp_nvme){
+    close(fdp_nvme->fd);
+    zfree(fdp_nvme->placement_id_arr);
+    zfree(fdp_nvme);
 }
 
 /* Allocates an FDP specific placement handle. 
  * This handle will be interpreted by the device for data placement.
  
  * @return The allocated FDP specific Placement Handle. */
-int fdpNvmeAllocateFdpHandle(FdpNvme *fdpNvme) {
+int fdpNvmeAllocateFdpHandle(fdpNvme *fdp_nvme) {
     uint16_t phndl;
 
     /* Get NS specific Fdp Placement Handle(PHNDL) */
-    if (fdpNvme->nextPIDIdx < fdpNvme->maxPIDLength) {
-        phndl = fdpNvme->nextPIDIdx++;
+    if (fdp_nvme->next_pid_idx < fdp_nvme->max_pid_len) {
+        phndl = fdp_nvme->next_pid_idx++;
     } else {
         phndl = DEFAULT_PLACEMENT_ID_IDX;
     }
@@ -498,7 +507,7 @@ int fdpNvmeAllocateFdpHandle(FdpNvme *fdpNvme) {
 }
 
 static void prepFdpUringCmdSqe(
-    FdpNvme *fdpNvme,
+    fdpNvme *fdp_nvme,
     struct io_uring_sqe *sqe,
     const void *buf,
     size_t size,
@@ -507,11 +516,11 @@ static void prepFdpUringCmdSqe(
     uint8_t dtype,
     uint16_t dspec) {
     
-    assert((fdpNvme->maxTfrSize == 0) || (size <= fdpNvme->maxTfrSize));
+    assert((fdp_nvme->max_tfr_size == 0) || (size <= fdp_nvme->max_tfr_size));
     /* Clear the SQE entry to avoid some arbitrary flags being set. */
     memset(sqe, 0, sizeof(*sqe));
 
-    sqe->fd = fdpNvme->fd;
+    sqe->fd = fdp_nvme->fd;
     sqe->opcode = IORING_OP_URING_CMD;
     sqe->cmd_op = NVME_URING_CMD_IO;
 
@@ -521,33 +530,33 @@ static void prepFdpUringCmdSqe(
     cmd->opcode = opcode;
 
     /* start LBA of the IO = Req_start (offset in partition) + Partition_start */
-    uint64_t sLba = (start >> fdpNvme->lbaShift) + fdpNvme->startLba;
-    uint32_t nLb = (size >> fdpNvme->lbaShift) - 1; /* nLb is 0 based */
+    uint64_t slba = (start >> fdp_nvme->lba_shift) + fdp_nvme->start_lba;
+    uint32_t nlb = (size >> fdp_nvme->lba_shift) - 1; /* nlb is 0 based */
 
     /* cdw10 and cdw11 represent starting lba */
-    cmd->cdw10 = sLba & 0xffffffff;
-    cmd->cdw11 = sLba >> 32;
+    cmd->cdw10 = slba & 0xffffffff;
+    cmd->cdw11 = slba >> 32;
     /* cdw12 represent number of lba's for read/write */
-    cmd->cdw12 = (dtype & 0xFF) << 20 | nLb;
+    cmd->cdw12 = (dtype & 0xFF) << 20 | nlb;
     cmd->cdw13 = (dspec << 16);
     cmd->addr = (uint64_t)buf;
     cmd->data_len = size;
 
-    cmd->nsid = fdpNvme->nsid;
+    cmd->nsid = fdp_nvme->nsid;
 }
 
 void fdpNvmePrepReadUringCmdSqe(
-    FdpNvme *fdpNvme,
+    fdpNvme *fdp_nvme,
     struct io_uring_sqe *sqe,
     void *buf,
     size_t size,
     off_t start) {
     
-    prepFdpUringCmdSqe(fdpNvme, sqe, buf, size, start, nvme_cmd_read, 0, 0);
+    prepFdpUringCmdSqe(fdp_nvme, sqe, buf, size, start, nvme_cmd_read, 0, 0);
 }
 
 void fdpNvmePrepWriteUringCmdSqe(
-    FdpNvme *fdpNvme,
+    fdpNvme *fdp_nvme,
     struct io_uring_sqe *sqe,
     const void *buf, 
     size_t size, 
@@ -557,31 +566,43 @@ void fdpNvmePrepWriteUringCmdSqe(
     uint16_t pid;
 
     if (handle == -1) {
-        pid = fdpNvme->placementIDs[DEFAULT_PLACEMENT_ID_IDX]; /* Use the default stream */
-    } else if (handle >= 0 && handle < fdpNvme->maxPIDLength) {
-        pid = fdpNvme->placementIDs[handle];
+        pid = fdp_nvme->placement_id_arr[DEFAULT_PLACEMENT_ID_IDX]; /* Use the default stream */
+    } else if (handle >= 0 && handle < fdp_nvme->max_pid_len) {
+        pid = fdp_nvme->placement_id_arr[handle];
     } else {
         assert(false);
     }
     /* solesie: As Flexible Data Placement Specification, DTYPE should be 2. */
-    prepFdpUringCmdSqe(fdpNvme, sqe, buf, size, start, nvme_cmd_write, 2, pid);
+    prepFdpUringCmdSqe(fdp_nvme, sqe, buf, size, start, nvme_cmd_write, 2, pid);
 }
 
-uint32_t fdpNvmeGetMaxIOSize(FdpNvme *fdpNvme){
-    uint32_t segLimit = fdpNvme->maxSegments * (1 << fdpNvme->lbaShift);
-    return segLimit < fdpNvme->maxTfrSize ? segLimit : fdpNvme->maxTfrSize;
+uint32_t fdpNvmeGetMaxIOSize(fdpNvme *fdp_nvme){
+    uint32_t segLimit = fdp_nvme->max_segments * (1 << fdp_nvme->lba_shift);
+    return segLimit < fdp_nvme->max_tfr_size ? segLimit : fdp_nvme->max_tfr_size;
 }
 
-uint16_t fdpNvmeGetMaxPIDLength(FdpNvme *fdpNvme){
-    return fdpNvme->maxPIDLength;
+uint16_t fdpNvmeGetMaxPIDLength(fdpNvme *fdp_nvme){
+    return fdp_nvme->max_pid_len;
 }
 
-uint32_t fdpNvmeGetPreferredWriteSize(FdpNvme *fdpNvme){
-    return fdpNvme->preferredWriteSize;
+uint32_t fdpNvmeGetPreferredWriteSize(fdpNvme *fdp_nvme){
+    return fdp_nvme->preferred_write_size;
 }
 
-uint32_t fdpNvmeGetLbSize(FdpNvme *fdpNvme){
-    return 1 << fdpNvme->lbaShift ;
+uint32_t fdpNvmeGetLbSize(fdpNvme *fdp_nvme){
+    return 1 << fdp_nvme->lba_shift;
+}
+
+uint32_t fdpNvmeGetLbaShift(fdpNvme *fdp_nvme){
+    return fdp_nvme->lba_shift;
+}
+
+uint64_t fdpNvmeGetStartLba(fdpNvme *fdp_nvme){
+    return fdp_nvme->start_lba;
+}
+
+uint64_t fdpNvmeGetEndLba(fdpNvme *fdp_nvme){
+    return fdp_nvme->end_lba;
 }
 
 #endif

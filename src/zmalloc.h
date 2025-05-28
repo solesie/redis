@@ -84,6 +84,7 @@
  * bug[https://gcc.gnu.org/bugzilla/show_bug.cgi?id=96503] is fixed. */
 __attribute__((malloc,alloc_size(1),noinline)) void *zmalloc(size_t size);
 __attribute__((malloc,alloc_size(1),noinline)) void *zcalloc(size_t size);
+__attribute__((malloc,alloc_size(2),noinline)) void *zcalloc_aligned(uint32_t aligned, size_t aligned_size);
 __attribute__((malloc,alloc_size(1,2),noinline)) void *zcalloc_num(size_t num, size_t size);
 __attribute__((alloc_size(2),noinline)) void *zrealloc(void *ptr, size_t size);
 __attribute__((malloc,alloc_size(1),noinline)) void *ztrymalloc(size_t size);

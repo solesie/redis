@@ -2,17 +2,31 @@
 #define __REDIS_FDP_DEVICE_H
 
 #ifndef REDIS_IOURING_DISABLE
-#include "aligned_buffer.h"
 #include "fdp_nvme.h"
 #include "io_uring.h"
 
-typedef struct _FdpDevice FdpDevice;
+typedef struct _fdpDevice fdpDevice;
 
-FdpDevice *fdpDeviceCreate(FdpNvme *fdpNvme, uint32_t resubmitLimit, uint32_t qdepth);
-void fdpDeviceRelease(FdpDevice *fdpDevice);
-void fdpDeviceIOWrite(FdpDevice *fdpDevice, AlignedBuffer *buf, int placementHandle);
-void fdpDeviceIORead(FdpDevice *fdpDevice, AlignedBuffer *buf);
-int fdpDeviceIOWait(FdpDevice *fdpDevice);
+fdpDevice *fdpDeviceCreate(
+    fdpNvme *fdp_nvme, 
+    uint32_t resubmit_limit, 
+    uint32_t qdepth,
+    void (*success_cb)(void *arg));
+void fdpDeviceRelease(fdpDevice *fdp_device);
+void fdpDeviceIOWrite(
+    fdpDevice *fdp_device, 
+    void *aligned_buf, 
+    size_t aligned_len, 
+    off_t aligned_offt,
+    int placement_handle,
+    void *success_cb_arg);
+void fdpDeviceIORead(
+    fdpDevice *fdp_device, 
+    void *aligned_buf, 
+    size_t aligned_len,
+    off_t aligned_offt,
+    void *success_cb_arg);
+int fdpDeviceIOWait(fdpDevice *fdp_device);
 
 
 #endif

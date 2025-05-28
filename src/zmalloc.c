@@ -234,6 +234,30 @@ static inline void *ztrycalloc_usable_internal(size_t size, size_t *usable) {
 #endif
 }
 
+/* Try allocating memory and zero it, and return NULL if failed.
+ * '*usable' is set to the usable size if non NULL. */
+static inline void *ztrycalloc_aligned_usable_internal(uint32_t aligned, size_t aligned_size, size_t *usable) {
+    /* Possible overflow, return NULL, so that the caller can panic or handle a failed allocation. */
+    if (aligned_size >= SIZE_MAX/2) return NULL;
+    if (aligned_size % aligned != 0) return NULL;
+    void *ptr;
+    int err = je_posix_memalign(&ptr, aligned, aligned_size);
+    if(err != 0) return NULL;
+    memset(ptr, 0, aligned_size);
+
+#ifdef HAVE_MALLOC_SIZE
+    aligned_size = zmalloc_size(ptr);;
+    if (usable) *usable = aligned_size;
+    return ptr;
+#else
+    size = MALLOC_MIN_SIZE(size);
+    *((size_t*)ptr) = size;
+    update_zmalloc_stat_alloc(size+PREFIX_SIZE);
+    if (usable) *usable = size;
+    return (char*)ptr+PREFIX_SIZE;
+#endif
+}
+
 void *ztrycalloc_usable(size_t size, size_t *usable) {
     size_t usable_size = 0;
     void *ptr = ztrycalloc_usable_internal(size, &usable_size);
@@ -262,6 +286,14 @@ void *zcalloc_num(size_t num, size_t size) {
 void *zcalloc(size_t size) {
     void *ptr = ztrycalloc_usable_internal(size, NULL);
     if (!ptr) zmalloc_oom_handler(size);
+    return ptr;
+}
+
+/* Allocate memory and zero it or panic
+ * solesie: for Direct IO */
+void *zcalloc_aligned(uint32_t aligned, size_t aligned_size) {
+    void *ptr = ztrycalloc_aligned_usable_internal(aligned, aligned_size, NULL);
+    if (!ptr) zmalloc_oom_handler(aligned_size);
     return ptr;
 }
 
