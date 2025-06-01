@@ -26,6 +26,7 @@ enum nvme_io_opcode {
     nvme_cmd_write = 0x01,
     nvme_cmd_read = 0x02,
     nvme_cmd_id_ns = 0x06,
+    nvme_cmd_dsm = 0x09,
     nvme_cmd_io_mgmt_recv = 0x12,
     nvme_cmd_io_mgmt_send = 0x1d,
 };
@@ -42,7 +43,7 @@ struct _fdpNvme{
     uint32_t max_tfr_size;
     uint32_t lba_shift;
     uint64_t start_lba;
-    uint64_t end_lba;
+    uint64_t device_size;
     uint32_t preferred_write_size; /* Refer NVMe command spec Namespace Preferred Write Granularity */
     uint32_t max_segments; /* https://lpc.events/event/16/contributions/1382/attachments/1119/2151/LPC2022_uring-passthru.pdf */
 };
@@ -221,6 +222,27 @@ static int readDevAttr(const char *bname, const char *attr, char **out) {
     return 1;
 }
 
+static int nvmeDsm(
+    int fd,
+    uint32_t nsid,
+    void *data,
+    uint32_t data_len){
+
+    uint32_t cdw11 = (1 << 2);
+
+    struct nvme_passthru_cmd cmd = {
+        .opcode = nvme_cmd_dsm,
+        .nsid = nsid,
+        .addr = (uint64_t)(uintptr_t)data,
+        .data_len = data_len,
+        .cdw10 = 0, /* solesie: range = 1 */
+        .cdw11 = cdw11,
+        .timeout_ms = NVME_DEFAULT_IOCTL_TIMEOUT,
+    };
+
+    return ioctl(fd, NVME_IOCTL_IO_CMD, &cmd);
+}
+
 /* NVMe IO Management Receive for specific config reading */
 static int nvmeIOMgmtRecv(
     int fd,
@@ -316,7 +338,7 @@ static int initNvmeData(fdpNvme *fdp_nvme, const char *ns_name, const char *part
         part_start_bytes = strtoull(part_start_str, NULL, 10) * 512u;
     }
     fdp_nvme->start_lba = part_start_bytes >> shift;
-    fdp_nvme->end_lba = (strtoull(size_str, NULL, 10) * 512u) >> shift;
+    fdp_nvme->device_size = (strtoull(size_str, NULL, 10) * 512u);
     fdp_nvme->max_segments = strtoul(ms_str, NULL, 10);
 
     zfree(nsid_str);
@@ -489,6 +511,20 @@ void fdpNvmeRelease(fdpNvme *fdp_nvme){
     zfree(fdp_nvme);
 }
 
+int fdpNvmeDeallocateLba(fdpNvme *fdp_nvme, uint64_t slba, uint32_t nlb){
+    struct dsmRange{
+        uint32_t cattr;
+        uint32_t nlb;
+        uint64_t slba;
+    } range = {.cattr = 0, .nlb = nlb - 1, .slba = slba + fdp_nvme->start_lba};
+
+    int err = nvmeDsm(fdp_nvme->fd, fdp_nvme->nsid, &range, sizeof(range));
+    if(err){
+        return 0;
+    }
+    return 1;
+}
+
 /* Allocates an FDP specific placement handle. 
  * This handle will be interpreted by the device for data placement.
  
@@ -511,7 +547,7 @@ static void prepFdpUringCmdSqe(
     struct io_uring_sqe *sqe,
     const void *buf,
     size_t size,
-    off_t start,
+    uint64_t start,
     uint8_t opcode,
     uint8_t dtype,
     uint16_t dspec) {
@@ -550,7 +586,7 @@ void fdpNvmePrepReadUringCmdSqe(
     struct io_uring_sqe *sqe,
     void *buf,
     size_t size,
-    off_t start) {
+    uint64_t start) {
     
     prepFdpUringCmdSqe(fdp_nvme, sqe, buf, size, start, nvme_cmd_read, 0, 0);
 }
@@ -560,7 +596,7 @@ void fdpNvmePrepWriteUringCmdSqe(
     struct io_uring_sqe *sqe,
     const void *buf, 
     size_t size, 
-    off_t start, 
+    uint64_t start, 
     int handle) {
     
     uint16_t pid;
@@ -597,12 +633,8 @@ uint32_t fdpNvmeGetLbaShift(fdpNvme *fdp_nvme){
     return fdp_nvme->lba_shift;
 }
 
-uint64_t fdpNvmeGetStartLba(fdpNvme *fdp_nvme){
-    return fdp_nvme->start_lba;
-}
-
-uint64_t fdpNvmeGetEndLba(fdpNvme *fdp_nvme){
-    return fdp_nvme->end_lba;
+uint64_t fdpNvmeGetDeviceSize(fdpNvme *fdp_nvme){
+    return fdp_nvme->device_size;
 }
 
 #endif
