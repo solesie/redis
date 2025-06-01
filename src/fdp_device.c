@@ -45,7 +45,7 @@ struct _fdpDevice{
 };
 
 /* solesie: check whether user change buf member of not */
-static inline int isAligned(fdpNvme *fdp_nvme, void *buf, size_t len, off_t offt){
+static inline int isAligned(fdpNvme *fdp_nvme, void *buf, size_t len, uint64_t offt){
     size_t lbs = fdpNvmeGetLbSize(fdp_nvme);
     if(offt % lbs != 0 || len % lbs != 0 || (uintptr_t)buf % lbs != 0 ){
         return 0;
@@ -86,6 +86,7 @@ static void *handling(void *arg){
             if(fdp_device->cur_success_cnt == fdp_device->cur_submitted_cnt){
                 fdp_device->cur_io_res = 1;
             } else{
+                printf("success: %ld != submitted: %ld\n", fdp_device->cur_success_cnt, fdp_device->cur_submitted_cnt);
                 assert(fdp_device->cur_io_res < 0);
             }
             atomic_store_explicit(&fdp_device->wait_called, 0, memory_order_release);
@@ -136,7 +137,7 @@ void fdpDeviceIORead(
     fdpDevice *fdp_device, 
     void *aligned_buf, 
     size_t aligned_len,
-    off_t aligned_offt,
+    uint64_t aligned_offt,
     void *success_cb_arg){
     
     assert(isAligned(fdp_device->fdp_nvme, aligned_buf, aligned_len, aligned_offt));
@@ -158,7 +159,7 @@ void fdpDeviceIOWrite(
     fdpDevice *fdp_device, 
     void *aligned_buf, 
     size_t aligned_len, 
-    off_t aligned_offt,
+    uint64_t aligned_offt,
     int placement_handle,
     void *success_cb_arg){
     

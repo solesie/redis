@@ -220,7 +220,7 @@ void rioInitWithFile(rio *r, FILE *fp) {
 
 /* Returns 1 or 0 for success/failure. */
 static size_t rioFdpUfsWrite(rio *r, const void *buf, size_t len) {
-    fdpUfsIOWrite(buf, len, r->io.ufs.pld, r->io.ufs.type);
+    fdpUfsIOWrite(buf, len, r->io.ufs.type);
     return 1;
 }
 
@@ -236,14 +236,13 @@ static off_t rioFdpUfsTell(rio *r) {
     return 0;
 }
 
-/* solesie: Direct IO, so NOUSED */
 static int rioFdpUfsFlush(rio *r) {
-    UNUSED(r);
+    fdpUfsIOFlush(r->io.ufs.type);
     return 1;
 }
 
 static int rioFdpUfsWait(void) {
-    return fdpUfsIOWait(server.fdp_ufs);
+    return fdpUfsIOWait();
 }
 
 static const rio rioFdpUfsIO = {
@@ -260,9 +259,8 @@ static const rio rioFdpUfsIO = {
     { { NULL, 0 } } /* union for io-specific vars */
 };
 
-void rioInitWithFdpUfs(rio *r, int placement_handle, fdpUfsDataType type) {
+void rioInitWithFdpUfs(rio *r, fdpUfsDataType type) {
     *r = rioFdpUfsIO;
-    r->io.ufs.pld = placement_handle;
     r->io.ufs.type = type;
 }
 

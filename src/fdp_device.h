@@ -17,14 +17,14 @@ void fdpDeviceIOWrite(
     fdpDevice *fdp_device, 
     void *aligned_buf, 
     size_t aligned_len, 
-    off_t aligned_offt,
+    uint64_t aligned_offt,
     int placement_handle,
     void *success_cb_arg);
 void fdpDeviceIORead(
     fdpDevice *fdp_device, 
     void *aligned_buf, 
     size_t aligned_len,
-    off_t aligned_offt,
+    uint64_t aligned_offt,
     void *success_cb_arg);
 int fdpDeviceIOWait(fdpDevice *fdp_device);
 

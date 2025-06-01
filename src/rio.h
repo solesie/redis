@@ -87,7 +87,6 @@ struct _rio {
         } file;
         /* solesie: FDP UFS */
         struct{
-            int pld;
             fdpUfsDataType type;
         } ufs;
         /* Connection object (used to read from socket) */
@@ -126,7 +125,7 @@ static inline size_t rioWrite(rio *r, const void *buf, size_t len) {
         len -= bytes_to_write;
         r->processed_bytes += bytes_to_write;
     }
-    return r->wait();
+    return 1;
 }
 
 static inline size_t rioRead(rio *r, void *buf, size_t len) {
@@ -142,7 +141,7 @@ static inline size_t rioRead(rio *r, void *buf, size_t len) {
         len -= bytes_to_read;
         r->processed_bytes += bytes_to_read;
     }
-    return r->wait();
+    return 1;
 }
 
 static inline off_t rioTell(rio *r) {
