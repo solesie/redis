@@ -6914,7 +6914,94 @@ redisTestProc *getTestProcByName(const char *name) {
 }
 #endif
 
+static void loadManifestFromDisk(void){
+    if(server.fdp_enabled){
+        fdpPersistencyLoadManifestFromDisk();
+        return;
+    }
+    aofLoadManifestFromDisk();
+    return;
+}
+
+static inline uint64_t timespec_to_ns(const struct timespec *ts) {
+    return (uint64_t)ts->tv_sec * 1000000000ULL + ts->tv_nsec;
+}
+
 int main(int argc, char **argv) {
+    // crc64_init();
+    // server.fdp_enabled = 1;
+    // server.fdp_device_file = "/dev/nvme0n1";
+    // fdpPersistencyInit();
+
+    // fdpUfsResetData(FDP_UFS_AOF_BASE);
+    // fdpUfsResetData(FDP_UFS_AOF_INCR);
+    // fdpUfsResetData(FDP_UFS_RDB);
+    // loadManifestFromDisk();
+
+    // #define TOTAL_BYTES    (3ULL * 1024 * 1024 * 1024) 
+    // #define CHUNK_SIZE     (4 * 1024)
+    // #define ITERATIONS     (TOTAL_BYTES / CHUNK_SIZE)
+
+
+    // fdpNvme *fn = server.fdp_ufs->fdp_nvme;
+    // fdpModule *fd = server.fdp_ufs->fdp_module;
+    
+    // struct timespec t0, t1;
+    // uint64_t total_with_ns;
+
+    // char *buf = (char*)zcalloc(TOTAL_BYTES);
+    // for(int i = 0; i < TOTAL_BYTES/6; ++i){
+    //     buf[i] = 65 + i % 26;
+    // }
+
+    // // clock_gettime(CLOCK_MONOTONIC, &t0);
+    // for(int i = 0; i < ITERATIONS; ++i){
+    //     fdpUfsIOWrite(buf, CHUNK_SIZE, FDP_UFS_AOF_BASE);
+    //     fdpUfsIOWrite(buf, CHUNK_SIZE, FDP_UFS_AOF_INCR);
+    // }
+    // fdpUfsIOFlush(FDP_UFS_AOF_BASE);
+    // fdpUfsIOFlush(FDP_UFS_AOF_INCR);
+    // fdpUfsIOWait(FDP_UFS_AOF_BASE);
+    // fdpUfsIOWait(FDP_UFS_AOF_INCR);
+    // clock_gettime(CLOCK_MONOTONIC, &t1);
+    // total_with_ns = timespec_to_ns(&t1) - timespec_to_ns(&t0);
+    // printf("io_uring=%.3fs\n", total_with_ns/1e9);
+
+    // fdpUfsIORead(buf, TOTAL_BYTES, FDP_UFS_AOF_BASE);
+    // fdpUfsIOWait();
+    // for(int i = 0; i < 100; ++i){
+    //     printf("%c", buf[i]);
+    // }
+
+    // // fdpUfsIOWrite(buf, TOTAL_BYTES, 1, FDP_UFS_MANIFEST);
+    // // printf("submission completed\n");
+    // // fflush(stdout);
+    // // // int ret = fdpUfsIOWait();
+    // // clock_gettime(CLOCK_MONOTONIC, &t1);
+    // // uint64_t total_with_ns = timespec_to_ns(&t1) - timespec_to_ns(&t0);
+    // // printf("io_uring=%.3fs\n", total_with_ns/1e9);
+
+    // // clock_gettime(CLOCK_MONOTONIC, &t0);
+    // // filed = open("/home/solesie/mnt/test", O_RDWR);
+    // // ssize_t remaining = TOTAL_BYTES;
+    // // off_t offset = 0;
+    // // while(remaining> 0){
+    // //     size_t write_len = pwrite(filed, buf, TOTAL_BYTES, offset);
+
+    // //     remaining -= write_len;
+    // //     buf += write_len;
+    // //     offset += write_len;
+    // // }
+    // // fsync(fd);
+    // // clock_gettime(CLOCK_MONOTONIC, &t1);
+    // // uint64_t total_with_ns = timespec_to_ns(&t1) - timespec_to_ns(&t0);
+    // // printf("fs=%.3fs\n", total_with_ns/1e9);
+
+
+    // return 0;
+
+
+
     struct timeval tv;
     int j;
     char config_from_stdin = 0;
@@ -7203,12 +7290,16 @@ int main(int argc, char **argv) {
     if (server.cluster_enabled) {
         clusterInitLast();
     }
+
+    if(!server.sentinel_mode && server.fdp_enabled){
+        fdpPersistencyInit();
+    }
     InitServerLast();
 
     if (!server.sentinel_mode) {
         /* Things not needed when running in Sentinel mode. */
         serverLog(LL_NOTICE,"Server initialized");
-        aofLoadManifestFromDisk();
+        loadManifestFromDisk();
         loadDataFromDisk();
         aofOpenIfNeededOnServerStart();
         aofDelHistoryFiles();

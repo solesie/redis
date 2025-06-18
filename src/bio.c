@@ -58,6 +58,7 @@ static char* bio_worker_title[] = {
 static unsigned int bio_job_to_worker[] = {
     [BIO_CLOSE_FILE] = 0,
     [BIO_AOF_FSYNC] = 1,
+    [BIO_FDP_PERSISTENCY_AOF_INCR_SAVE] = 1,
     [BIO_CLOSE_AOF] = 1,
     [BIO_LAZY_FREE] = 2,
     [BIO_COMP_RQ_CLOSE_FILE] = 0,
@@ -250,6 +251,12 @@ void bioCreateFsyncJob(int fd, long long offset, int need_reclaim_cache) {
     bioSubmitJob(BIO_AOF_FSYNC, job);
 }
 
+void bioCreateFdpPersistencyAofIncrSaveJob(void){
+    bio_job *job = zmalloc(sizeof(*job));
+
+    bioSubmitJob(BIO_FDP_PERSISTENCY_AOF_INCR_SAVE, job);
+}
+
 void *bioProcessBackgroundJobs(void *arg) {
     bio_job *job;
     unsigned long worker = (unsigned long) arg;
@@ -304,6 +311,11 @@ void *bioProcessBackgroundJobs(void *arg) {
                 }
             }
             close(job->fd_args.fd);
+        } else if(job_type == BIO_FDP_PERSISTENCY_AOF_INCR_SAVE){
+            fdpPersistencyAofIncrFsync();
+
+            atomicSet(server.aof_bio_fsync_status,C_OK);
+            atomicSet(server.fsynced_reploff_pending, job->fd_args.offset);
         } else if (job_type == BIO_AOF_FSYNC || job_type == BIO_CLOSE_AOF) {
             /* The fd may be closed by main thread and reused for another
              * socket, pipe, or file. We just ignore these errno because
@@ -329,8 +341,9 @@ void *bioProcessBackgroundJobs(void *arg) {
                     serverLog(LL_NOTICE,"Unable to reclaim page cache: %s", strerror(errno));
                 }
             }
-            if (job_type == BIO_CLOSE_AOF)
+            if (job_type == BIO_CLOSE_AOF){
                 close(job->fd_args.fd);
+            }
         } else if (job_type == BIO_LAZY_FREE) {
             job->free_args.free_fn(job->free_args.free_args);
         } else if ((job_type == BIO_COMP_RQ_CLOSE_FILE) ||

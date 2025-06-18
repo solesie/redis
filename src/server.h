@@ -509,7 +509,9 @@ typedef enum {
 #define SUPERVISED_UPSTART 3
 
 /* Anti-warning macro... */
+#ifndef UNUSED
 #define UNUSED(V) ((void) V)
+#endif
 
 #define ZSKIPLIST_MAXLEVEL 32 /* Should be enough for 2^64 elements */
 #define ZSKIPLIST_P 0.25      /* Skiplist P = 1/4 */
@@ -519,6 +521,7 @@ typedef enum {
 #define AOF_FSYNC_NO 0
 #define AOF_FSYNC_ALWAYS 1
 #define AOF_FSYNC_EVERYSEC 2
+#define AOF_FSYNC_ALWAYS_FDP_DIRECT_IO 3
 
 /* Replication diskless load defines */
 #define REPL_DISKLESS_LOAD_DISABLED 0
@@ -1843,6 +1846,12 @@ struct redisServer {
     int key_load_delay;             /* Delay in microseconds between keys while
                                      * loading aof or rdb. (for testings). negative
                                      * value means fractions of microseconds (on average). */
+
+    /* solesie: Flexible Data Placement */
+    int fdp_enabled;
+    char *fdp_device_file;
+    fdpUfs *fdp_ufs;
+
     /* Pipe and data structures for child -> parent info sharing. */
     int child_info_pipe[2];         /* Pipe used to write the child_info_data. */
     int child_info_nread;           /* Num of bytes of the last read from pipe */
@@ -2891,6 +2900,10 @@ int allPersistenceDisabled(void);
 int writeCommandsDeniedByDiskError(void);
 sds writeCommandsGetDiskErrorMessage(int);
 
+/* solesie: Flexible Data Placement */
+#include "fdp_redis_ufs.h"
+#include "fdp_redis_persistency.h"
+
 /* RDB persistence */
 #include "rdb.h"
 void killRDBChild(void);
@@ -2912,6 +2925,7 @@ void aofOpenIfNeededOnServerStart(void);
 void aofManifestFree(aofManifest *am);
 int aofDelHistoryFiles(void);
 int aofRewriteLimited(void);
+struct client *createAOFClient(void);
 
 /* Child info */
 void openChildInfoPipe(void);

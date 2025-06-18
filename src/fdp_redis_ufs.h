@@ -2,7 +2,7 @@
 #define __REDIS_FDP_REDIS_UFS_H
 
 #ifndef REDIS_IOURING_DISABLE
-#include "fdp_device.h"
+#include "fdp_module.h"
 #include <stdint.h>
 
 // #define GET_OFFT(addr)  ( (uint64_t)(addr) & ((1ULL << (server.fdp_ufs->manifest.lba_shift)) - 1) )
@@ -13,8 +13,10 @@
 // }
 
 typedef enum{
-    FDP_UFS_MANIFEST,
+    FDP_UFS_MANIFEST_RIO,
+    FDP_UFS_MANIFEST_BIO,
     FDP_UFS_AOF_BASE,
+    FDP_UFS_AOF_INCR,
     FDP_UFS_RDB
 } fdpUfsDataType;
 
@@ -22,26 +24,40 @@ typedef enum{
  * solesie: FDP io_uring Direct IO manifest definition
  *----------------------------------------------------------------------------*/
 typedef struct {
-    int         dirty;                /* 1 Indicates that the ufs manifest in the memory is inconsistent with
-                                         disk, we need to persist it immediately. */
-    int         manifest_phd;
-    uint64_t    aof_base_start_lba;
-    uint64_t    aof_base_cur_offt;
-    uint64_t    aof_base_cur_offt_aligned;
-    int         aof_phd;               /* solesie: == 0 because incr uses file system */
-    uint64_t    rdb_start_lba;
-    uint64_t    rdb_cur_offt;
-    uint64_t    rdb_cur_offt_aligned;
-    int         rdb_phd;
+    struct {
+        uint64_t    manifest_rio_start_lba;
+        int         manifest_rio_phd;
 
-    
+        uint64_t    aof_base_start_lba;
+        uint64_t    aof_base_cur_offt;
+        uint64_t    aof_base_cur_offt_aligned;
+        int         aof_base_phd;
+
+        uint64_t    rdb_start_lba;
+        uint64_t    rdb_cur_offt;
+        uint64_t    rdb_cur_offt_aligned;
+        int         rdb_phd;
+    } rio;
+
+    struct {
+        uint64_t    manifest_bio_start_lba;
+        int         manifest_bio_phd;
+
+        uint64_t    aof_incr_start_lba;
+        uint64_t    aof_incr_cur_offt;
+        uint64_t    aof_incr_cur_offt_aligned;
+        int         aof_incr_phd;
+    } bio;
 } fdpUfsManifest;
 
 typedef struct _fdpUfs{
     /* solesie: metadata */
     fdpUfsManifest manifest;
 
-    fdpDevice *fdp_device;
+    /* solesie: redis bulk IO (rio) */
+    fdpModule *fdp_module_rio;
+    /* solesie: redis tiny(e.g., manifest, fsync) IO (bio) */
+    fdpModule *fdp_module_bio;
     fdpNvme *fdp_nvme;
     /* solesie: should be smaller than max io size supported by device */
     uint32_t device_default_io_size;
@@ -53,6 +69,13 @@ typedef struct _fdpUfs{
     /* solesie: size should be aligned with lba size */
     size_t aof_base_wbuf_size;
     size_t aof_base_wbuf_len;
+
+    /* solesie: aof_incr write buffer */
+    void *aof_incr_wbuf;
+    /* solesie: size should be aligned with lba size */
+    size_t aof_incr_wbuf_size;
+    size_t aof_incr_wbuf_len;
+
     /* solesie: rdb write buffer */
     void *rdb_wbuf;
     /* solesie: size should be aligned with lba size */
@@ -62,18 +85,22 @@ typedef struct _fdpUfs{
     /* solesie: no need to save read pointer in manifest */
     uint64_t aof_base_rofft;
     uint64_t aof_base_rofft_aligned;
-    /* solesie: no need to save read pointer in manifest */
+    uint64_t aof_incr_rofft;
+    uint64_t aof_incr_rofft_aligned;
     uint64_t rdb_rofft;
     uint64_t rdb_rofft_aligned;
 } fdpUfs;
 
 void fdpUfsSuccessCb(void *arg);
 void fdpUfsInit(void);
-void fdpUfsIOWrite(const void *buf, size_t len, fdpUfsDataType type);
+void fdpUfsActivateRio(void);
+void fdpUfsDeactivateRio(void);
+void fdpUfsIOWrite(const void *buf, uint64_t len, fdpUfsDataType type);
 void fdpUfsIOFlush(fdpUfsDataType type);
-void fdpUfsIORead(void *buf, size_t len, fdpUfsDataType type);
+void fdpUfsIORead(void *buf, uint64_t len, fdpUfsDataType type);
 void fdpUfsResetData(fdpUfsDataType type);
-int fdpUfsIOWait(void);
+void fdpUfsResetReadPointer(fdpUfsDataType type);
+int fdpUfsIOWait(fdpUfsDataType type);
 
 #endif
 #endif

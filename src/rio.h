@@ -54,7 +54,7 @@ struct _rio {
     size_t (*write)(struct _rio *, const void *buf, size_t len);
     off_t (*tell)(struct _rio *);
     int (*flush)(struct _rio *);
-    int (*wait)(void);
+    int (*wait)(struct _rio *);
     /* The update_cksum method if not NULL is used to compute the checksum of
      * all the data that was read or written so far. The method should be
      * designed so that can be called with the current checksum, and the buf
@@ -141,7 +141,7 @@ static inline size_t rioRead(rio *r, void *buf, size_t len) {
         len -= bytes_to_read;
         r->processed_bytes += bytes_to_read;
     }
-    return 1;
+    return r->wait(r);
 }
 
 static inline off_t rioTell(rio *r) {
@@ -150,6 +150,10 @@ static inline off_t rioTell(rio *r) {
 
 static inline int rioFlush(rio *r) {
     return r->flush(r);
+}
+
+static inline int rioWait(rio *r){
+    return r->wait(r);
 }
 
 /* This function allows to know if there was a read error in any past
@@ -172,6 +176,7 @@ void rioInitWithFile(rio *r, FILE *fp);
 void rioInitWithBuffer(rio *r, sds s);
 void rioInitWithConn(rio *r, connection *conn, size_t read_limit);
 void rioInitWithFd(rio *r, int fd);
+void rioInitWithFdpUfs(rio *r, fdpUfsDataType type);
 
 void rioFreeFd(rio *r);
 void rioFreeConn(rio *r, sds* out_remainingBufferedData);

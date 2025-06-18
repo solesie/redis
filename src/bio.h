@@ -9,6 +9,9 @@
 #ifndef __BIO_H
 #define __BIO_H
 
+#include <stdint.h>
+#include "sds.h"
+
 typedef void lazy_free_fn(void *args[]);
 typedef void comp_fn(uint64_t user_data);
 
@@ -23,6 +26,7 @@ typedef enum bio_worker_t {
 typedef enum bio_job_type_t {
     BIO_CLOSE_FILE = 0,     /* Deferred close(2) syscall. */
     BIO_AOF_FSYNC,          /* Deferred AOF fsync. */
+    BIO_FDP_PERSISTENCY_AOF_INCR_SAVE,
     BIO_LAZY_FREE,          /* Deferred objects freeing. */
     BIO_CLOSE_AOF,
     BIO_COMP_RQ_CLOSE_FILE,  /* Job completion request, registered on close-file worker's queue */
@@ -39,6 +43,7 @@ void bioKillThreads(void);
 void bioCreateCloseJob(int fd, int need_fsync, int need_reclaim_cache);
 void bioCreateCloseAofJob(int fd, long long offset, int need_reclaim_cache);
 void bioCreateFsyncJob(int fd, long long offset, int need_reclaim_cache);
+void bioCreateFdpPersistencyAofIncrSaveJob(void);
 void bioCreateLazyFreeJob(lazy_free_fn free_fn, int arg_count, ...);
 void bioCreateCompRq(bio_worker_t assigned_worker, comp_fn *func, uint64_t user_data);
 

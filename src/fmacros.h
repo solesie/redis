@@ -13,7 +13,9 @@
 
 #if defined(__linux__)
 #define _GNU_SOURCE
+#ifndef _DEFAULT_SOURCE
 #define _DEFAULT_SOURCE
+#endif
 #endif
 
 #if defined(_AIX)
@@ -34,7 +36,9 @@
 #define _POSIX_C_SOURCE 199506L
 #endif
 
+#ifndef _LARGEFILE_SOURCE
 #define _LARGEFILE_SOURCE
+#endif
 #define _FILE_OFFSET_BITS 64
 
 /* deprecate unsafe functions

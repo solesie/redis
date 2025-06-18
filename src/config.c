@@ -77,6 +77,7 @@ configEnum aof_fsync_enum[] = {
     {"everysec", AOF_FSYNC_EVERYSEC},
     {"always", AOF_FSYNC_ALWAYS},
     {"no", AOF_FSYNC_NO},
+    {"fdp-direct-io", AOF_FSYNC_ALWAYS_FDP_DIRECT_IO},
     {NULL, 0}
 };
 
@@ -2354,14 +2355,14 @@ static int isValidAOFfilename(char *val, const char **err) {
 }
 
 static int isValidAOFdirname(char *val, const char **err) {
-    if (!strcmp(val, "")) {
-        *err = "appenddirname can't be empty";
-        return 0;
-    }
-    if (!pathIsBaseName(val)) {
-        *err = "appenddirname can't be a path, just a dirname";
-        return 0;
-    }
+    // if (!strcmp(val, "")) {
+    //     *err = "appenddirname can't be empty";
+    //     return 0;
+    // }
+    // if (!pathIsBaseName(val)) {
+    //     *err = "appenddirname can't be a path, just a dirname";
+    //     return 0;
+    // }
     return 1;
 }
 

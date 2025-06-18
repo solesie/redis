@@ -86,7 +86,8 @@ static int rioBufferFlush(rio *r) {
     return 1; /* Nothing to do, our write just appends to the buffer. */
 }
 
-static int rioBufferWait(void) {
+static int rioBufferWait(rio *r) {
+    UNUSED(r);
     return 1;
 }
 
@@ -188,7 +189,8 @@ static int rioFileFlush(rio *r) {
     return (fflush(r->io.file.fp) == 0) ? 1 : 0;
 }
 
-static int rioFileWait(void) {
+static int rioFileWait(rio *r) {
+    UNUSED(r);
     return 1;
 }
 
@@ -241,8 +243,8 @@ static int rioFdpUfsFlush(rio *r) {
     return 1;
 }
 
-static int rioFdpUfsWait(void) {
-    return fdpUfsIOWait();
+static int rioFdpUfsWait(rio *r) {
+    return fdpUfsIOWait(r->io.ufs.type);
 }
 
 static const rio rioFdpUfsIO = {
@@ -347,7 +349,8 @@ static int rioConnFlush(rio *r) {
     return rioConnWrite(r,NULL,0);
 }
 
-static int rioConnWait(void) {
+static int rioConnWait(rio *r) {
+    UNUSED(r);
     return 1;
 }
 
@@ -471,7 +474,8 @@ static int rioFdFlush(rio *r) {
     return rioFdWrite(r,NULL,0);
 }
 
-static int rioFdWait(void) {
+static int rioFdWait(rio *r) {
+    UNUSED(r);
     return 1;
 }
 

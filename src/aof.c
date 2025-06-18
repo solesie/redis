@@ -692,6 +692,11 @@ void aofDelTempIncrAofFile(void) {
  * If any of the above steps fails, the redis process will exit.
  */
 void aofOpenIfNeededOnServerStart(void) {
+    if(server.fdp_enabled){
+        /* solesie: will apply direct io */
+        return;
+    }
+
     if (server.aof_state != AOF_ON) {
         return;
     }
@@ -1079,13 +1084,18 @@ void flushAppendOnlyFile(int force) {
         }
     }
 
-    if (server.aof_fsync == AOF_FSYNC_EVERYSEC)
+    if (server.aof_fsync == AOF_FSYNC_EVERYSEC){
         sync_in_progress = aofFsyncInProgress();
+    } else if (server.aof_fsync == AOF_FSYNC_ALWAYS_FDP_DIRECT_IO){
+        sync_in_progress = fdpPersistencyAofIncrFsyncInProgress();
+    }
 
-    if (server.aof_fsync == AOF_FSYNC_EVERYSEC && !force) {
+    if ((server.aof_fsync == AOF_FSYNC_EVERYSEC || 
+        server.aof_fsync == AOF_FSYNC_ALWAYS_FDP_DIRECT_IO) && !force) {
         /* With this append fsync policy we do background fsyncing.
          * If the fsync is still in progress we can try to delay
          * the write for a couple of seconds. */
+        /* solesie: For AOF_FSYNC_ALWAYS_FDP_DIRECT_IO, should prevent race condition. */
         if (sync_in_progress) {
             if (server.aof_flush_postponed_start == 0) {
                 /* No previous write postponing, remember that we are
@@ -1097,6 +1107,12 @@ void flushAppendOnlyFile(int force) {
                  * than two seconds this is still ok. Postpone again. */
                 return;
             }
+
+            if(server.fdp_enabled) {
+                serverLog(LL_NOTICE, "solesie: fdp sync in process? may race condition happen, so delay fsync");
+                return;
+            }
+
             /* Otherwise fall through, and go write since we can't wait
              * over two seconds. */
             server.aof_delayed_fsync++;
@@ -1114,7 +1130,12 @@ void flushAppendOnlyFile(int force) {
     }
 
     latencyStartMonitor(latency);
-    nwritten = aofWrite(server.aof_fd,server.aof_buf,sdslen(server.aof_buf));
+    if(server.fdp_enabled){
+        nwritten = sdslen(server.aof_buf);
+        fdpPersistencySaveAofIncr(server.aof_buf, sdslen(server.aof_buf));
+    } else{
+        nwritten = aofWrite(server.aof_fd,server.aof_buf,sdslen(server.aof_buf));
+    }
     latencyEndMonitor(latency);
     /* We want to capture different events for delayed writes:
      * when the delay happens with a pending fsync, or with a saving child
@@ -1153,18 +1174,18 @@ void flushAppendOnlyFile(int force) {
         } else {
             if (can_log) {
                 serverLog(LL_WARNING,"Short write while writing to "
-                                       "the AOF file: (nwritten=%lld, "
-                                       "expected=%lld)",
-                                       (long long)nwritten,
-                                       (long long)sdslen(server.aof_buf));
+                                        "the AOF file: (nwritten=%lld, "
+                                        "expected=%lld)",
+                                        (long long)nwritten,
+                                        (long long)sdslen(server.aof_buf));
             }
 
             if (ftruncate(server.aof_fd, server.aof_last_incr_size) == -1) {
                 if (can_log) {
                     serverLog(LL_WARNING, "Could not remove short write "
-                             "from the append-only file.  Redis may refuse "
-                             "to load the AOF the next time it starts.  "
-                             "ftruncate: %s", strerror(errno));
+                                "from the append-only file.  Redis may refuse "
+                                "to load the AOF the next time it starts.  "
+                                "ftruncate: %s", strerror(errno));
                 }
             } else {
                 /* If the ftruncate() succeeded we can set nwritten to
@@ -1249,6 +1270,14 @@ try_fsync:
             aof_background_fsync(server.aof_fd);
             server.aof_last_incr_fsync_offset = server.aof_last_incr_size;
         }
+        server.aof_last_fsync = server.mstime;
+    } else if (server.aof_fsync == AOF_FSYNC_ALWAYS_FDP_DIRECT_IO) {
+        serverAssert(!sync_in_progress);
+        latencyStartMonitor(latency);
+        fdpPersistencyAofIncrFsync();
+        latencyEndMonitor(latency);
+        latencyAddSampleIfNeeded("aof-fsync-always",latency);
+        server.aof_last_incr_fsync_offset = server.aof_last_incr_size;
         server.aof_last_fsync = server.mstime;
     }
 }
@@ -1635,6 +1664,10 @@ cleanup:
 
 /* Load the AOF files according the aofManifest pointed by am. */
 int loadAppendOnlyFiles(aofManifest *am) {
+    if(server.fdp_enabled){
+        return fdpPersistencyLoadAof();
+    }
+
     serverAssert(am != NULL);
     int status, ret = AOF_OK;
     long long start;
@@ -2355,6 +2388,10 @@ werr:
  * and ZADD. However at max AOF_REWRITE_ITEMS_PER_CMD items per time
  * are inserted using a single command. */
 int rewriteAppendOnlyFile(char *filename) {
+    if(server.fdp_enabled){
+        return fdpPersistencyBackgroundRewriteAof();
+    }
+    
     rio aof;
     FILE *fp = NULL;
     char tmpfile[256];
@@ -2435,6 +2472,10 @@ werr:
  *    4e) Delete the history files use bio
  */
 int rewriteAppendOnlyFileBackground(void) {
+    if(server.fdp_enabled){
+        return fdpPersistencyBackgroundRewriteAof();
+    }
+    
     pid_t childpid;
 
     if (hasActiveChildProcess()) return C_ERR;
@@ -2592,10 +2633,16 @@ int getBaseAndIncrAppendOnlyFilesNum(aofManifest *am) {
 /* A background append only file rewriting (BGREWRITEAOF) terminated its work.
  * Handle this. */
 void backgroundRewriteDoneHandler(int exitcode, int bysignal) {
+    if(server.fdp_enabled){
+        fdpPersistencyBackgroundRewriteDoneHandler(exitcode, bysignal);
+        return;
+    }
+
     if (!bysignal && exitcode == 0) {
         char tmpfile[256];
         long long now = ustime();
         sds new_base_filepath = NULL;
+        sds new_base_filename = NULL;
         sds new_incr_filepath = NULL;
         aofManifest *temp_am;
         mstime_t latency;
@@ -2613,7 +2660,7 @@ void backgroundRewriteDoneHandler(int exitcode, int bysignal) {
 
         /* Get a new BASE file name and mark the previous (if we have)
          * as the HISTORY type. */
-        sds new_base_filename = getNewBaseFileNameAndMarkPreAsHistory(temp_am);
+        new_base_filename = getNewBaseFileNameAndMarkPreAsHistory(temp_am);
         serverAssert(new_base_filename != NULL);
         new_base_filepath = makePath(server.aof_dirname, new_base_filename);
 

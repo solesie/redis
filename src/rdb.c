@@ -1482,6 +1482,7 @@ int rdbSaveRio(int req, rio *rdb, int *error, int rdbflags, rdbSaveInfo *rsi) {
     cksum = rdb->cksum;
     memrev64ifbe(&cksum);
     if (rioWrite(rdb,&cksum,8) == 0) goto werr;
+
     return C_OK;
 
 werr:
@@ -1591,6 +1592,10 @@ int rdbSaveToFile(const char *filename) {
 
 /* Save the DB on disk. Return C_ERR on error, C_OK on success. */
 int rdbSave(int req, char *filename, rdbSaveInfo *rsi, int rdbflags) {
+    if(server.fdp_enabled){
+        return fdpPersistencySaveRdb(req, rsi, rdbflags);
+    }
+    
     char tmpfile[256];
     char cwd[MAXPATHLEN]; /* Current working dir path for error messages. */
 
@@ -1648,8 +1653,8 @@ int rdbSaveBackground(int req, char *filename, rdbSaveInfo *rsi, int rdbflags) {
         /* Child */
         redisSetProcTitle("redis-rdb-bgsave");
         redisSetCpuAffinity(server.bgsave_cpulist);
-        retval = rdbSave(req, filename,rsi,rdbflags);
-        if (retval == C_OK) {
+        
+        if (rdbSave(req, filename, rsi, rdbflags) == C_OK) {
             sendChildCowInfo(CHILD_INFO_TYPE_RDB_COW_SIZE, "RDB");
         }
         exitFromChild((retval == C_OK) ? 0 : 1);
@@ -3761,6 +3766,7 @@ static void backgroundSaveDoneHandlerDisk(int exitcode, int bysignal, time_t sav
 
         serverLog(LL_WARNING,
             "Background saving terminated by signal %d", bysignal);
+        
         latencyStartMonitor(latency);
         rdbRemoveTempFile(server.child_pid, 0);
         latencyEndMonitor(latency);
