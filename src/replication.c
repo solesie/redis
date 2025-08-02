@@ -92,7 +92,8 @@ int bg_unlink(const char *filename) {
             errno = old_errno;
             return -1;
         }
-        bioCreateCloseJob(fd, 0, 0);
+        close(fd);
+        // bioCreateCloseJob(fd, 0, 0);
         return 0; /* Success. */
     }
 }

@@ -1,0 +1,30 @@
+330531:C 15 Jul 2025 18:29:31.734 # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+330531:C 15 Jul 2025 18:29:31.734 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+330531:C 15 Jul 2025 18:29:31.734 * Redis version=7.4.2, bits=64, commit=46f1bac7, modified=1, pid=330531, just started
+330531:C 15 Jul 2025 18:29:31.734 * Configuration loaded
+330531:M 15 Jul 2025 18:29:31.735 * Increased maximum number of open files to 10032 (it was originally set to 1024).
+330531:M 15 Jul 2025 18:29:31.735 * monotonic clock: POSIX clock_gettime
+330531:M 15 Jul 2025 18:29:31.739 * Running mode=standalone, port=6379.
+330531:M 15 Jul 2025 18:29:31.788 * Server initialized
+330531:M 15 Jul 2025 18:29:31.790 * DB loaded from append only file: 0.000 seconds
+330531:M 15 Jul 2025 18:29:31.790 * Ready to accept connections tcp
+330531:M 15 Jul 2025 18:43:56.706 * Starting automatic rewriting of AOF on 5755425321000% growth
+330531:M 15 Jul 2025 18:43:56.706 * solesie: incr 초기화, 남은 lb: 628733
+330531:M 15 Jul 2025 18:43:58.088 * Background append only file rewriting started by pid 344331
+344331:C 15 Jul 2025 18:47:44.780 * Successfully created the temporary AOF base
+344331:C 15 Jul 2025 18:47:45.012 * Fork CoW for AOF rewrite: current 14153 MB, peak 14153 MB, average 8973 MB
+330531:M 15 Jul 2025 18:47:45.904 * Background AOF rewrite terminated with success
+330531:M 15 Jul 2025 18:47:45.904 * Background AOF rewrite finished successfully
+330531:M 15 Jul 2025 18:57:15.304 * Starting automatic rewriting of AOF on 5755445337900% growth
+330531:M 15 Jul 2025 18:57:15.304 * solesie: incr 초기화, 남은 lb: 628684
+330531:M 15 Jul 2025 18:57:17.059 * Background append only file rewriting started by pid 363709
+363709:C 15 Jul 2025 19:01:10.195 * Successfully created the temporary AOF base
+363709:C 15 Jul 2025 19:01:10.668 * Fork CoW for AOF rewrite: current 14356 MB, peak 14356 MB, average 9184 MB
+330531:M 15 Jul 2025 19:01:12.191 * Background AOF rewrite terminated with success
+330531:M 15 Jul 2025 19:01:12.191 * Background AOF rewrite finished successfully
+330531:signal-handler (1752606279) Received SIGTERM scheduling shutdown...
+330531:M 15 Jul 2025 19:04:39.892 * User requested shutdown...
+330531:M 15 Jul 2025 19:04:39.892 * Calling fsync() on the AOF file.
+330531:M 15 Jul 2025 19:04:39.892 # Fail to fsync the AOF file: Bad file descriptor.
+330531:M 15 Jul 2025 19:04:39.892 * Removing the pid file.
+330531:M 15 Jul 2025 19:04:39.893 # Redis is now ready to exit, bye bye...

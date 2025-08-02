@@ -1,0 +1,22 @@
+1643:C 30 Jul 2025 09:33:47.268 # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+1643:C 30 Jul 2025 09:33:47.269 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+1643:C 30 Jul 2025 09:33:47.269 * Redis version=7.4.2, bits=64, commit=46f1bac7, modified=1, pid=1643, just started
+1643:C 30 Jul 2025 09:33:47.269 * Configuration loaded
+1643:M 30 Jul 2025 09:33:47.270 * Increased maximum number of open files to 10032 (it was originally set to 1024).
+1643:M 30 Jul 2025 09:33:47.270 * monotonic clock: POSIX clock_gettime
+1643:M 30 Jul 2025 09:33:47.273 * Running mode=standalone, port=6379.
+1643:M 30 Jul 2025 09:33:47.327 * Server initialized
+1643:M 30 Jul 2025 09:33:47.329 * DB loaded from append only file: 0.000 seconds
+1643:M 30 Jul 2025 09:33:47.329 * Ready to accept connections tcp
+1643:M 30 Jul 2025 09:36:22.748 * solesie: incr 초기화, 남은 lb: 3920090
+1643:M 30 Jul 2025 09:36:23.785 * Background append only file rewriting started by pid 1749
+1749:C 30 Jul 2025 09:37:44.962 * Successfully created the temporary AOF base
+1749:C 30 Jul 2025 09:37:45.087 * Fork CoW for AOF rewrite: current 7 MB, peak 7 MB, average 6 MB
+1643:M 30 Jul 2025 09:37:45.253 * Background AOF rewrite terminated with success
+1643:M 30 Jul 2025 09:37:45.253 * Background AOF rewrite finished successfully
+1643:M 01 Aug 2025 05:52:21.879 * solesie: incr 초기화, 남은 lb: 1428864
+1643:M 01 Aug 2025 05:52:23.167 * Background append only file rewriting started by pid 18620
+18620:C 01 Aug 2025 05:54:00.990 * Successfully created the temporary AOF base
+18620:C 01 Aug 2025 05:54:01.148 * Fork CoW for AOF rewrite: current 4 MB, peak 5 MB, average 4 MB
+1643:M 01 Aug 2025 05:54:01.416 * Background AOF rewrite terminated with success
+1643:M 01 Aug 2025 05:54:01.416 * Background AOF rewrite finished successfully

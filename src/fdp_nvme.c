@@ -597,7 +597,8 @@ void fdpNvmePrepWriteUringCmdSqe(
     const void *buf, 
     size_t size, 
     uint64_t start, 
-    int handle) {
+    int handle,
+    int reclaim_group) {
     
     uint16_t pid;
 
@@ -608,13 +609,16 @@ void fdpNvmePrepWriteUringCmdSqe(
     } else {
         assert(false);
     }
+
+    uint16_t dspec = (reclaim_group << 8) | pid;
     /* solesie: As Flexible Data Placement Specification, DTYPE should be 2. */
-    prepFdpUringCmdSqe(fdp_nvme, sqe, buf, size, start, nvme_cmd_write, 2, pid);
+    prepFdpUringCmdSqe(fdp_nvme, sqe, buf, size, start, nvme_cmd_write, 2, dspec);
 }
 
 uint32_t fdpNvmeGetMaxIOSize(fdpNvme *fdp_nvme){
     uint32_t segLimit = fdp_nvme->max_segments * (1 << fdp_nvme->lba_shift);
     return segLimit < fdp_nvme->max_tfr_size ? segLimit : fdp_nvme->max_tfr_size;
+    // return 4096*10;
 }
 
 uint16_t fdpNvmeGetMaxPIDLength(fdpNvme *fdp_nvme){
@@ -635,6 +639,10 @@ uint32_t fdpNvmeGetLbaShift(fdpNvme *fdp_nvme){
 
 uint64_t fdpNvmeGetDeviceSize(fdpNvme *fdp_nvme){
     return fdp_nvme->device_size;
+}
+
+uint64_t fdpNvmeGetStartLba(fdpNvme *fdp_nvme){
+    return fdp_nvme->start_lba;
 }
 
 #endif

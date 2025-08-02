@@ -1436,6 +1436,7 @@ int serverCron(struct aeEventLoop *eventLoop, long long id, void *clientData) {
         {
             long long base = server.aof_rewrite_base_size ?
                 server.aof_rewrite_base_size : 1;
+            // serverLog(LL_NOTICE, "solesie: base: %lld, incr: %lld\r", base, server.aof_current_size - base);
             long long growth = (server.aof_current_size*100/base) - 100;
             if (growth >= server.aof_rewrite_perc && !aofRewriteLimited()) {
                 serverLog(LL_NOTICE,"Starting automatic rewriting of AOF on %lld%% growth",growth);
@@ -6928,6 +6929,11 @@ static inline uint64_t timespec_to_ns(const struct timespec *ts) {
 }
 
 int main(int argc, char **argv) {
+    /* solesie: 테스트용 */
+    // fdpNvme *fn = fdpNvmeCreate("/dev/nvme0n1p2");
+    // fdpNvmeDeallocateLba(fn, fdpNvmeGetStartLba(fn), fdpNvmeGetDeviceSize(fn) >> fdpNvmeGetLbaShift(fn));
+    // fdpNvmeRelease(fn);
+
     // crc64_init();
     // server.fdp_enabled = 1;
     // server.fdp_device_file = "/dev/nvme0n1";

@@ -1,0 +1,16 @@
+376304:C 15 Jul 2025 19:05:13.960 # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+376304:C 15 Jul 2025 19:05:13.961 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+376304:C 15 Jul 2025 19:05:13.961 * Redis version=7.4.2, bits=64, commit=46f1bac7, modified=1, pid=376304, just started
+376304:C 15 Jul 2025 19:05:13.961 * Configuration loaded
+376304:M 15 Jul 2025 19:05:13.962 * Increased maximum number of open files to 10032 (it was originally set to 1024).
+376304:M 15 Jul 2025 19:05:13.962 * monotonic clock: POSIX clock_gettime
+376304:M 15 Jul 2025 19:05:13.965 * Running mode=standalone, port=6379.
+376304:M 15 Jul 2025 19:05:14.013 * Server initialized
+376304:M 15 Jul 2025 19:05:14.015 * DB loaded from append only file: 0.000 seconds
+376304:M 15 Jul 2025 19:05:14.015 * Ready to accept connections tcp
+376304:signal-handler (1752608211) Received SIGTERM scheduling shutdown...
+376304:M 15 Jul 2025 19:36:51.877 * User requested shutdown...
+376304:M 15 Jul 2025 19:36:51.877 * Calling fsync() on the AOF file.
+376304:M 15 Jul 2025 19:36:51.877 # Fail to fsync the AOF file: Bad file descriptor.
+376304:M 15 Jul 2025 19:36:51.877 * Removing the pid file.
+376304:M 15 Jul 2025 19:36:51.877 # Redis is now ready to exit, bye bye...

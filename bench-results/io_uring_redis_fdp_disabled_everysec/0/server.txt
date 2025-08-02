@@ -1,0 +1,423 @@
+92491:C 11 Jul 2025 08:27:06.234 # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+92491:C 11 Jul 2025 08:27:06.234 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+92491:C 11 Jul 2025 08:27:06.234 * Redis version=7.4.2, bits=64, commit=46f1bac7, modified=1, pid=92491, just started
+92491:C 11 Jul 2025 08:27:06.234 * Configuration loaded
+92491:M 11 Jul 2025 08:27:06.235 * Increased maximum number of open files to 10032 (it was originally set to 1024).
+92491:M 11 Jul 2025 08:27:06.235 * monotonic clock: POSIX clock_gettime
+92491:M 11 Jul 2025 08:27:06.237 * Running mode=standalone, port=6379.
+92491:M 11 Jul 2025 08:27:06.292 * Server initialized
+92491:M 11 Jul 2025 08:27:06.293 * DB loaded from append only file: 0.000 seconds
+92491:M 11 Jul 2025 08:27:06.294 * Ready to accept connections tcp
+92491:M 11 Jul 2025 08:28:34.570 * solesie: incr 초기화, 남은 lb: 9300077
+92491:M 11 Jul 2025 08:28:35.337 * Background append only file rewriting started by pid 92585
+92585:C 11 Jul 2025 08:29:38.697 * Successfully created the temporary AOF base
+92585:C 11 Jul 2025 08:29:38.825 * Fork CoW for AOF rewrite: current 564 MB, peak 564 MB, average 119 MB
+92491:M 11 Jul 2025 08:29:39.063 * Background AOF rewrite terminated with success
+92491:M 11 Jul 2025 08:29:39.064 * Background AOF rewrite finished successfully
+92491:M 11 Jul 2025 08:29:39.241 * Background saving started by pid 92805
+92805:C 11 Jul 2025 08:30:47.691 * DB saved on disk
+92805:C 11 Jul 2025 08:30:47.826 * Fork CoW for RDB: current 7065 MB, peak 7065 MB, average 4593 MB
+92491:M 11 Jul 2025 08:30:48.348 * Background saving terminated with success
+92491:M 11 Jul 2025 08:33:10.511 * Starting automatic rewriting of AOF on 5757842271500% growth
+92491:M 11 Jul 2025 08:33:10.511 * solesie: incr 초기화, 남은 lb: 622832
+92491:M 11 Jul 2025 08:33:12.538 * Background append only file rewriting started by pid 98182
+98182:C 11 Jul 2025 08:34:53.274 * Successfully created the temporary AOF base
+98182:C 11 Jul 2025 08:34:53.612 * Fork CoW for AOF rewrite: current 12890 MB, peak 12890 MB, average 8050 MB
+92491:M 11 Jul 2025 08:34:55.036 * Background AOF rewrite terminated with success
+92491:M 11 Jul 2025 08:34:55.036 * Background AOF rewrite finished successfully
+92491:M 11 Jul 2025 08:37:12.824 * Starting automatic rewriting of AOF on 5755469892600% growth
+92491:M 11 Jul 2025 08:37:12.824 * solesie: incr 초기화, 남은 lb: 628624
+92491:M 11 Jul 2025 08:37:14.801 * Background append only file rewriting started by pid 104235
+104235:C 11 Jul 2025 08:38:58.447 * Successfully created the temporary AOF base
+104235:C 11 Jul 2025 08:38:58.900 * Fork CoW for AOF rewrite: current 12611 MB, peak 12611 MB, average 8202 MB
+92491:M 11 Jul 2025 08:39:00.433 * Background AOF rewrite terminated with success
+92491:M 11 Jul 2025 08:39:00.433 * Background AOF rewrite finished successfully
+92491:M 11 Jul 2025 08:39:01.255 * Background saving started by pid 106999
+106999:C 11 Jul 2025 08:40:43.073 * DB saved on disk
+106999:C 11 Jul 2025 08:40:43.452 * Fork CoW for RDB: current 12719 MB, peak 12719 MB, average 8442 MB
+92491:M 11 Jul 2025 08:40:45.089 * Background saving terminated with success
+92491:M 11 Jul 2025 08:42:02.491 * Starting automatic rewriting of AOF on 5756270762000% growth
+92491:M 11 Jul 2025 08:42:02.491 * solesie: incr 초기화, 남은 lb: 626669
+92491:M 11 Jul 2025 08:42:04.584 * Background append only file rewriting started by pid 111577
+111577:C 11 Jul 2025 08:43:48.818 * Successfully created the temporary AOF base
+111577:C 11 Jul 2025 08:43:49.202 * Fork CoW for AOF rewrite: current 13633 MB, peak 13633 MB, average 9051 MB
+92491:M 11 Jul 2025 08:43:51.001 * Background AOF rewrite terminated with success
+92491:M 11 Jul 2025 08:43:51.001 * Background AOF rewrite finished successfully
+92491:M 11 Jul 2025 08:46:52.076 * Starting automatic rewriting of AOF on 5756981357600% growth
+92491:M 11 Jul 2025 08:46:52.076 * solesie: incr 초기화, 남은 lb: 624934
+92491:M 11 Jul 2025 08:46:54.553 * Background append only file rewriting started by pid 118843
+118843:C 11 Jul 2025 08:48:37.673 * Successfully created the temporary AOF base
+118843:C 11 Jul 2025 08:48:38.053 * Fork CoW for AOF rewrite: current 13240 MB, peak 13240 MB, average 8876 MB
+92491:M 11 Jul 2025 08:48:39.803 * Background AOF rewrite terminated with success
+92491:M 11 Jul 2025 08:48:39.803 * Background AOF rewrite finished successfully
+92491:M 11 Jul 2025 08:48:40.811 * Background saving started by pid 121697
+121697:C 11 Jul 2025 08:50:23.264 * DB saved on disk
+121697:C 11 Jul 2025 08:50:23.643 * Fork CoW for RDB: current 12840 MB, peak 12840 MB, average 8536 MB
+92491:M 11 Jul 2025 08:50:25.332 * Background saving terminated with success
+92491:M 11 Jul 2025 08:51:28.680 * Starting automatic rewriting of AOF on 5758875865100% growth
+92491:M 11 Jul 2025 08:51:28.680 * solesie: incr 초기화, 남은 lb: 620309
+92491:M 11 Jul 2025 08:51:30.875 * Background append only file rewriting started by pid 126457
+126457:C 11 Jul 2025 08:53:15.145 * Successfully created the temporary AOF base
+126457:C 11 Jul 2025 08:53:15.545 * Fork CoW for AOF rewrite: current 13175 MB, peak 13175 MB, average 8836 MB
+92491:M 11 Jul 2025 08:53:17.395 * Background AOF rewrite terminated with success
+92491:M 11 Jul 2025 08:53:17.395 * Background AOF rewrite finished successfully
+92491:M 11 Jul 2025 08:56:17.197 * Starting automatic rewriting of AOF on 5758872552300% growth
+92491:M 11 Jul 2025 08:56:17.197 * solesie: incr 초기화, 남은 lb: 620317
+92491:M 11 Jul 2025 08:56:19.243 * Background append only file rewriting started by pid 134531
+134531:C 11 Jul 2025 08:58:07.386 * Successfully created the temporary AOF base
+134531:C 11 Jul 2025 08:58:07.794 * Fork CoW for AOF rewrite: current 13484 MB, peak 13484 MB, average 8953 MB
+92491:M 11 Jul 2025 08:58:09.711 * Background AOF rewrite terminated with success
+92491:M 11 Jul 2025 08:58:09.711 * Background AOF rewrite finished successfully
+92491:M 11 Jul 2025 08:58:10.723 * Background saving started by pid 137647
+137647:C 11 Jul 2025 08:59:55.199 * DB saved on disk
+137647:C 11 Jul 2025 08:59:55.600 * Fork CoW for RDB: current 13381 MB, peak 13381 MB, average 8953 MB
+92491:M 11 Jul 2025 08:59:57.433 * Background saving terminated with success
+92491:M 11 Jul 2025 09:00:53.840 * Starting automatic rewriting of AOF on 5757491114700% growth
+92491:M 11 Jul 2025 09:00:53.840 * solesie: incr 초기화, 남은 lb: 623690
+92491:M 11 Jul 2025 09:00:56.037 * Background append only file rewriting started by pid 142321
+142321:C 11 Jul 2025 09:02:41.613 * Successfully created the temporary AOF base
+142321:C 11 Jul 2025 09:02:42.018 * Fork CoW for AOF rewrite: current 13138 MB, peak 13138 MB, average 8803 MB
+92491:M 11 Jul 2025 09:02:43.847 * Background AOF rewrite terminated with success
+92491:M 11 Jul 2025 09:02:43.847 * Background AOF rewrite finished successfully
+92491:M 11 Jul 2025 09:05:46.710 * Starting automatic rewriting of AOF on 5755360984300% growth
+92491:M 11 Jul 2025 09:05:46.710 * solesie: incr 초기화, 남은 lb: 628890
+92491:M 11 Jul 2025 09:05:49.147 * Background append only file rewriting started by pid 150578
+150578:C 11 Jul 2025 09:07:33.905 * Successfully created the temporary AOF base
+150578:C 11 Jul 2025 09:07:34.308 * Fork CoW for AOF rewrite: current 12997 MB, peak 12997 MB, average 8667 MB
+92491:M 11 Jul 2025 09:07:36.090 * Background AOF rewrite terminated with success
+92491:M 11 Jul 2025 09:07:36.090 * Background AOF rewrite finished successfully
+92491:M 11 Jul 2025 09:07:37.106 * Background saving started by pid 153726
+153726:C 11 Jul 2025 09:09:21.449 * DB saved on disk
+153726:C 11 Jul 2025 09:09:21.850 * Fork CoW for RDB: current 13380 MB, peak 13380 MB, average 8972 MB
+92491:M 11 Jul 2025 09:09:23.699 * Background saving terminated with success
+92491:M 11 Jul 2025 09:10:26.234 * Starting automatic rewriting of AOF on 5757913082600% growth
+92491:M 11 Jul 2025 09:10:26.234 * solesie: incr 초기화, 남은 lb: 622660
+92491:M 11 Jul 2025 09:10:28.390 * Background append only file rewriting started by pid 158543
+158543:C 11 Jul 2025 09:12:12.459 * Successfully created the temporary AOF base
+158543:C 11 Jul 2025 09:12:12.835 * Fork CoW for AOF rewrite: current 13198 MB, peak 13198 MB, average 8837 MB
+92491:M 11 Jul 2025 09:12:14.629 * Background AOF rewrite terminated with success
+92491:M 11 Jul 2025 09:12:14.630 * Background AOF rewrite finished successfully
+92491:M 11 Jul 2025 09:15:28.391 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.391 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.391 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.391 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.391 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.391 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.391 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.391 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.391 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.391 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.392 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.392 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.392 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.392 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.392 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.392 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.393 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.393 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.393 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.393 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.393 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.393 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.394 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.394 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.394 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.394 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.395 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.395 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.395 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.395 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.395 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.395 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.395 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.396 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.396 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.396 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.396 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.396 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.396 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.397 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.397 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.397 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.397 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.397 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.397 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.398 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.398 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.398 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.398 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.398 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.398 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.399 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.399 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.399 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.399 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.399 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.399 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.399 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.400 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.400 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.400 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.400 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.400 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.401 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.401 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.401 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.402 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.402 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.402 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.403 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.403 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.403 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.404 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.404 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.405 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.405 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.405 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.406 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.406 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.406 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.407 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.407 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.408 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.408 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.408 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.409 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.409 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.410 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.410 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.410 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.410 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.411 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.411 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.411 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.412 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.412 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.413 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.413 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.413 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.414 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.414 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.414 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.415 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.415 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.416 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.416 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.416 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.417 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.417 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.417 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.418 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.418 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.418 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.419 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.419 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.420 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.420 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.420 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.421 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.421 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.421 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.422 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.422 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.423 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.423 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.423 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.424 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.424 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.424 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.425 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.425 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.426 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.426 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.426 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.427 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.427 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.427 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.428 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.428 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.429 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.429 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.429 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.430 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.430 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.430 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.431 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.431 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.432 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.432 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.432 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.433 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.433 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.433 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.434 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.434 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.434 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.435 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.435 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.436 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.436 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.436 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.437 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.437 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.437 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.438 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.438 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.439 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.439 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.439 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.440 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.440 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.440 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.441 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.441 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.441 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.442 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.442 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.443 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.443 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.443 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.444 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.444 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.444 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.445 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.445 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.445 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.446 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.446 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.447 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.447 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.447 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.448 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.448 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.448 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.449 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.449 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.450 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.450 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.450 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.451 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.451 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.451 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.452 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.452 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.453 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.453 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.453 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.454 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.454 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.454 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.455 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.455 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.456 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.456 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.456 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.457 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.457 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.457 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.458 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.458 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.459 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.459 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.459 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.460 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.460 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.460 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.461 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.461 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.462 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.462 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.462 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.463 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.463 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.463 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.464 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.464 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.464 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.465 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.465 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.465 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.466 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.466 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.467 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.467 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.467 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.468 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.468 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.468 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.469 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.469 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.470 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.470 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.470 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.471 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.471 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.471 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.472 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.472 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.472 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.473 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.473 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.474 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.474 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.474 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.475 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.475 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.475 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.476 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.476 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.476 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.477 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.477 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.478 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.478 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.478 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.479 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.479 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.479 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.480 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.480 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.481 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.481 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:28.481 * solesie: fdp sync in process? may race condition happen, so delay fsync
+92491:M 11 Jul 2025 09:15:30.707 * Starting automatic rewriting of AOF on 5787390791100% growth
+92491:M 11 Jul 2025 09:15:30.707 * solesie: incr 초기화, 남은 lb: 550692
+92491:M 11 Jul 2025 09:15:32.806 * Background append only file rewriting started by pid 167111
+167111:C 11 Jul 2025 09:17:19.236 * Successfully created the temporary AOF base
+167111:C 11 Jul 2025 09:17:19.645 * Fork CoW for AOF rewrite: current 13097 MB, peak 13097 MB, average 8730 MB
+92491:M 11 Jul 2025 09:17:21.473 * Background AOF rewrite terminated with success
+92491:M 11 Jul 2025 09:17:21.473 * Background AOF rewrite finished successfully
+92491:signal-handler (1752225506) Received SIGTERM scheduling shutdown...
+92491:M 11 Jul 2025 09:18:26.762 * User requested shutdown...
+92491:M 11 Jul 2025 09:18:26.762 * Calling fsync() on the AOF file.
+92491:M 11 Jul 2025 09:18:26.762 # Fail to fsync the AOF file: Bad file descriptor.
+92491:M 11 Jul 2025 09:18:26.762 * Removing the pid file.
+92491:M 11 Jul 2025 09:18:26.763 # Redis is now ready to exit, bye bye...
+
+RG 0 channel 0-7 / lun 0-7
+print_sungjin(wpp->written) : {24595}
+print_sungjin(wpp->written) : {217167329}
+print_sungjin(wpp->written) : {2}
+print_sungjin(wpp->written) : {2}
+print_sungjin(wpp->written) : {2}
+print_sungjin(wpp->written) : {2}
+print_sungjin(wpp->written) : {2}
+print_sungjin(wpp->written) : {2}
+print_sungjin(ssd->sungjin_stat.block_erased) : {51328}
+print_sungjin(ssd->sungjin_stat.copied) : {17024275}
+print_sungjin(ssd->sungjin_stat.discard) : {131526263}
+print_sungjin(ssd->sungjin_stat.discard_ignored) : {82383267}
+print_sungjin(ssd->sungjin_stat.invalidated) : {70473299}
+print_sungjin(sum_written) : {0}
+print_sungjin(ssd->sungjin_stat.write_io_n) : {1700772}
+print_sungjin(ssd->sungjin_stat.read_io_n) : {175}
+print_sungjin(ssd->sungjin_stat.read_sum) : {1743}
+INITIALIZED current time: Fri Jul 11 18:18:44 2025
+NVME_CMD_IO_MGMT_SEND sungjin
+print_sungjin(nvme_io_mgmt_sungjin) : {94732028832144}
+print_sungjin(end_lba) : {26214400}
+msssd_io_mgmt_send_sungjin
+print_sungjin(spp->blks_per_line) : {64}
+print_sungjin(spp->pgs_per_line) : {262144}
+
+WAF: 1.09

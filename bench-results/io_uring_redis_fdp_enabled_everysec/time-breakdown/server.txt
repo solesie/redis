@@ -1,0 +1,175 @@
+3836:C 25 Jul 2025 15:21:26.314 # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+3836:C 25 Jul 2025 15:21:26.314 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+3836:C 25 Jul 2025 15:21:26.314 * Redis version=7.4.2, bits=64, commit=46f1bac7, modified=1, pid=3836, just started
+3836:C 25 Jul 2025 15:21:26.314 * Configuration loaded
+3836:M 25 Jul 2025 15:21:26.315 * Increased maximum number of open files to 10032 (it was originally set to 1024).
+3836:M 25 Jul 2025 15:21:26.315 * monotonic clock: POSIX clock_gettime
+3836:M 25 Jul 2025 15:21:26.320 * Running mode=standalone, port=6379.
+3836:M 25 Jul 2025 15:21:26.367 * Server initialized
+3836:M 25 Jul 2025 15:21:26.370 * DB loaded from append only file: 0.000 seconds
+3836:M 25 Jul 2025 15:21:26.370 * Ready to accept connections tcp
+3836:M 25 Jul 2025 15:22:37.627 * solesie: incr 초기화, 남은 lb: 9300077
+3836:M 25 Jul 2025 15:22:38.261 * Background append only file rewriting started by pid 3936
+3936:C 25 Jul 2025 15:23:39.231 * Successfully created the temporary AOF base
+3936:C 25 Jul 2025 15:23:39.328 * Fork CoW for AOF rewrite: current 116 MB, peak 116 MB, average 24 MB
+3836:M 25 Jul 2025 15:23:39.551 * Background AOF rewrite terminated with success
+3836:M 25 Jul 2025 15:23:39.551 * Background AOF rewrite finished successfully
+3836:M 25 Jul 2025 15:23:39.671 * Background saving started by pid 4072
+4072:C 25 Jul 2025 15:24:46.631 * DB saved on disk
+4072:C 25 Jul 2025 15:24:46.723 * Fork CoW for RDB: current 7430 MB, peak 7430 MB, average 5122 MB
+3836:M 25 Jul 2025 15:24:47.164 * Background saving terminated with success
+3836:M 25 Jul 2025 15:27:24.346 * Starting automatic rewriting of AOF on 5757086124900% growth
+3836:M 25 Jul 2025 15:27:24.346 * solesie: incr 초기화, 남은 lb: 624678
+3836:M 25 Jul 2025 15:27:26.092 * Background append only file rewriting started by pid 9813
+9813:C 25 Jul 2025 15:29:11.978 * Successfully created the temporary AOF base
+9813:C 25 Jul 2025 15:29:12.317 * Fork CoW for AOF rewrite: current 12585 MB, peak 12585 MB, average 7899 MB
+3836:M 25 Jul 2025 15:29:13.757 * Background AOF rewrite terminated with success
+3836:M 25 Jul 2025 15:29:13.757 * Background AOF rewrite finished successfully
+3836:M 25 Jul 2025 15:31:37.958 * Starting automatic rewriting of AOF on 5757021525300% growth
+3836:M 25 Jul 2025 15:31:37.958 * solesie: incr 초기화, 남은 lb: 624836
+3836:M 25 Jul 2025 15:31:40.304 * Background append only file rewriting started by pid 16201
+16201:C 25 Jul 2025 15:33:20.552 * Successfully created the temporary AOF base
+16201:C 25 Jul 2025 15:33:20.937 * Fork CoW for AOF rewrite: current 13053 MB, peak 13053 MB, average 8420 MB
+3836:M 25 Jul 2025 15:33:22.596 * Background AOF rewrite terminated with success
+3836:M 25 Jul 2025 15:33:22.596 * Background AOF rewrite finished successfully
+3836:M 25 Jul 2025 15:33:23.397 * Background saving started by pid 18903
+18903:C 25 Jul 2025 15:35:07.378 * DB saved on disk
+18903:C 25 Jul 2025 15:35:07.792 * Fork CoW for RDB: current 12869 MB, peak 12869 MB, average 8532 MB
+3836:M 25 Jul 2025 15:35:09.642 * Background saving terminated with success
+3836:M 25 Jul 2025 15:36:16.388 * Starting automatic rewriting of AOF on 5756838079000% growth
+3836:M 25 Jul 2025 15:36:16.388 * solesie: incr 초기화, 남은 lb: 625284
+3836:M 25 Jul 2025 15:36:18.820 * Background append only file rewriting started by pid 23314
+23314:C 25 Jul 2025 15:38:05.764 * Successfully created the temporary AOF base
+23314:C 25 Jul 2025 15:38:06.162 * Fork CoW for AOF rewrite: current 12978 MB, peak 12978 MB, average 8596 MB
+3836:M 25 Jul 2025 15:38:07.965 * Background AOF rewrite terminated with success
+3836:M 25 Jul 2025 15:38:07.965 * Background AOF rewrite finished successfully
+3836:M 25 Jul 2025 15:41:09.747 * Starting automatic rewriting of AOF on 5756903920900% growth
+3836:M 25 Jul 2025 15:41:09.747 * solesie: incr 초기화, 남은 lb: 625123
+3836:M 25 Jul 2025 15:41:12.161 * Background append only file rewriting started by pid 30713
+30713:C 25 Jul 2025 15:42:56.573 * Successfully created the temporary AOF base
+30713:C 25 Jul 2025 15:42:57.065 * Fork CoW for AOF rewrite: current 13097 MB, peak 13097 MB, average 8767 MB
+3836:M 25 Jul 2025 15:42:58.798 * Background AOF rewrite terminated with success
+3836:M 25 Jul 2025 15:42:58.799 * Background AOF rewrite finished successfully
+3836:M 25 Jul 2025 15:42:59.796 * Background saving started by pid 33521
+33521:C 25 Jul 2025 15:44:44.579 * DB saved on disk
+33521:C 25 Jul 2025 15:44:45.076 * Fork CoW for RDB: current 12835 MB, peak 12835 MB, average 8546 MB
+3836:M 25 Jul 2025 15:44:46.853 * Background saving terminated with success
+3836:M 25 Jul 2025 15:46:00.473 * Starting automatic rewriting of AOF on 5756609909900% growth
+3836:M 25 Jul 2025 15:46:00.473 * solesie: incr 초기화, 남은 lb: 625841
+3836:M 25 Jul 2025 15:46:02.765 * Background append only file rewriting started by pid 38108
+38108:C 25 Jul 2025 15:47:44.783 * Successfully created the temporary AOF base
+38108:C 25 Jul 2025 15:47:45.169 * Fork CoW for AOF rewrite: current 12636 MB, peak 12636 MB, average 8319 MB
+3836:M 25 Jul 2025 15:47:46.909 * Background AOF rewrite terminated with success
+3836:M 25 Jul 2025 15:47:46.909 * Background AOF rewrite finished successfully
+3836:M 25 Jul 2025 15:51:02.868 * Starting automatic rewriting of AOF on 5757381378200% growth
+3836:M 25 Jul 2025 15:51:02.868 * solesie: incr 초기화, 남은 lb: 623958
+3836:M 25 Jul 2025 15:51:05.258 * Background append only file rewriting started by pid 45694
+45694:C 25 Jul 2025 15:52:53.399 * Successfully created the temporary AOF base
+45694:C 25 Jul 2025 15:52:53.794 * Fork CoW for AOF rewrite: current 13169 MB, peak 13169 MB, average 8775 MB
+3836:M 25 Jul 2025 15:52:55.641 * Background AOF rewrite terminated with success
+3836:M 25 Jul 2025 15:52:55.641 * Background AOF rewrite finished successfully
+3836:M 25 Jul 2025 15:52:56.673 * Background saving started by pid 48597
+48597:C 25 Jul 2025 15:54:42.049 * DB saved on disk
+48597:C 25 Jul 2025 15:54:42.449 * Fork CoW for RDB: current 13433 MB, peak 13433 MB, average 8978 MB
+3836:M 25 Jul 2025 15:54:44.342 * Background saving terminated with success
+
+
+=== REDIS BUG REPORT START: Cut & paste starting from here ===
+3836:M 25 Jul 2025 15:55:16.679 # Redis 7.4.2 crashed by signal: 11, si_code: 1
+3836:M 25 Jul 2025 15:55:16.679 # Accessing address: 0x4b
+3836:M 25 Jul 2025 15:55:16.679 # Crashed running the instruction at: 0x56ded61e3224
+
+------ STACK TRACE ------
+EIP:
+./src/redis-server 127.0.0.1:6379(+0x2b4224)[0x56ded61e3224]
+
+3838 redis-server
+./src/redis-server 127.0.0.1:6379(ioUringPollCQ+0xc)[0x56ded6140bdc]
+./src/redis-server 127.0.0.1:6379(+0x211ed2)[0x56ded6140ed2]
+/lib/x86_64-linux-gnu/libc.so.6(+0x9caa4)[0x7a573449caa4]
+/lib/x86_64-linux-gnu/libc.so.6(+0x129c3c)[0x7a5734529c3c]
+
+3836 redis-server
+/lib/x86_64-linux-gnu/libc.so.6(+0x198a9f)[0x7a5734598a9f]
+./src/redis-server 127.0.0.1:6379(sdscatlen+0x6f)[0x56ded5fe7a6f]
+./src/redis-server 127.0.0.1:6379(feedAppendOnlyFile+0x132)[0x56ded6069d52]
+./src/redis-server 127.0.0.1:6379(+0xa7423)[0x56ded5fd6423]
+./src/redis-server 127.0.0.1:6379(+0xa757e)[0x56ded5fd657e]
+./src/redis-server 127.0.0.1:6379(afterCommand+0x52)[0x56ded5fd6be2]
+./src/redis-server 127.0.0.1:6379(call+0x524)[0x56ded5fd71f4]
+./src/redis-server 127.0.0.1:6379(processCommand+0xa54)[0x56ded5fd9534]
+./src/redis-server 127.0.0.1:6379(processInputBuffer+0xfe)[0x56ded5ffef3e]
+./src/redis-server 127.0.0.1:6379(readQueryFromClient+0x388)[0x56ded5fff4a8]
+./src/redis-server 127.0.0.1:6379(+0x1f5354)[0x56ded6124354]
+./src/redis-server 127.0.0.1:6379(aeMain+0xf9)[0x56ded5fc2dc9]
+./src/redis-server 127.0.0.1:6379(main+0x491)[0x56ded5fb76a1]
+/lib/x86_64-linux-gnu/libc.so.6(+0x2a1ca)[0x7a573442a1ca]
+/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x8b)[0x7a573442a28b]
+./src/redis-server 127.0.0.1:6379(_start+0x25)[0x56ded5fb7e75]
+
+3839 bio_close_file
+/lib/x86_64-linux-gnu/libc.so.6(+0x98d71)[0x7a5734498d71]
+/lib/x86_64-linux-gnu/libc.so.6(pthread_cond_wait+0x20d)[0x7a573449b7ed]
+./src/redis-server 127.0.0.1:6379(bioProcessBackgroundJobs+0x1fa)[0x56ded60a77ea]
+/lib/x86_64-linux-gnu/libc.so.6(+0x9caa4)[0x7a573449caa4]
+/lib/x86_64-linux-gnu/libc.so.6(+0x129c3c)[0x7a5734529c3c]
+
+3841 bio_lazy_free
+/lib/x86_64-linux-gnu/libc.so.6(+0x98d71)[0x7a5734498d71]
+/lib/x86_64-linux-gnu/libc.so.6(pthread_cond_wait+0x20d)[0x7a573449b7ed]
+./src/redis-server 127.0.0.1:6379(bioProcessBackgroundJobs+0x1fa)[0x56ded60a77ea]
+/lib/x86_64-linux-gnu/libc.so.6(+0x9caa4)[0x7a573449caa4]
+/lib/x86_64-linux-gnu/libc.so.6(+0x129c3c)[0x7a5734529c3c]
+
+3840 bio_aof *
+/lib/x86_64-linux-gnu/libc.so.6(+0x45330)[0x7a5734445330]
+./src/redis-server 127.0.0.1:6379(+0x2b4224)[0x56ded61e3224]
+./src/redis-server 127.0.0.1:6379(+0x2b806f)[0x56ded61e706f]
+./src/redis-server 127.0.0.1:6379(+0x2b837d)[0x56ded61e737d]
+./src/redis-server 127.0.0.1:6379(+0x2c368d)[0x56ded61f268d]
+./src/redis-server 127.0.0.1:6379(+0x2c3b46)[0x56ded61f2b46]
+./src/redis-server 127.0.0.1:6379(+0x2c2850)[0x56ded61f1850]
+./src/redis-server 127.0.0.1:6379(+0x267af3)[0x56ded6196af3]
+./src/redis-server 127.0.0.1:6379(+0x2c062f)[0x56ded61ef62f]
+./src/redis-server 127.0.0.1:6379(je_posix_memalign+0x116)[0x56ded618c566]
+./src/redis-server 127.0.0.1:6379(zcalloc_aligned+0x47)[0x56ded5fe3b77]
+./src/redis-server 127.0.0.1:6379(+0x212383)[0x56ded6141383]
+./src/redis-server 127.0.0.1:6379(fdpPersistencyAofIncrFsync+0xa4)[0x56ded61423f4]
+./src/redis-server 127.0.0.1:6379(bioProcessBackgroundJobs+0x2a5)[0x56ded60a7895]
+/lib/x86_64-linux-gnu/libc.so.6(+0x9caa4)[0x7a573449caa4]
+/lib/x86_64-linux-gnu/libc.so.6(+0x129c3c)[0x7a5734529c3c]
+
+5/5 expected stacktraces.
+
+------ STACK TRACE DONE ------
+
+------ REGISTERS ------
+3836:M 25 Jul 2025 15:55:16.691 # 
+RAX:00007a572e617401 RBX:00007a572e617400
+RCX:0000000000000003 RDX:00007a572e605300
+RDI:00007a572e617400 RSI:00007a572e617400
+RBP:00007a572e603a98 RSP:00007a57319fee80
+R8 :0000000000000000 R9 :0000000000000000
+R10:00007a572d62b000 R11:00007a572d601000
+R12:0000000000003000 R13:00007a572e603af8
+R14:0000000000000000 R15:0000000000000002
+RIP:000056ded61e3224 EFL:0000000000010206
+CSGSFS:002b000000000033
+3836:M 25 Jul 2025 15:55:16.691 # (00007a57319fee8f) -> 0000000000000000
+3836:M 25 Jul 2025 15:55:16.691 # (00007a57319fee8e) -> 00007a57319fefa7
+3836:M 25 Jul 2025 15:55:16.691 # (00007a57319fee8d) -> 00007a572e603a68
+3836:M 25 Jul 2025 15:55:16.691 # (00007a57319fee8c) -> 00007a572e603a98
+3836:M 25 Jul 2025 15:55:16.691 # (00007a57319fee8b) -> 00007a572e6000c0
+3836:M 25 Jul 2025 15:55:16.691 # (00007a57319fee8a) -> 0000000000000000
+3836:M 25 Jul 2025 15:55:16.691 # (00007a57319fee89) -> 000056ded61e706f
+3836:M 25 Jul 2025 15:55:16.691 # (00007a57319fee88) -> 00007a572e603a28
+3836:M 25 Jul 2025 15:55:16.691 # (00007a57319fee87) -> 00007a572e617400
+3836:M 25 Jul 2025 15:55:16.691 # (00007a57319fee86) -> 0000000000000000
+3836:M 25 Jul 2025 15:55:16.691 # (00007a57319fee85) -> 000000000001c000
+3836:M 25 Jul 2025 15:55:16.691 # (00007a57319fee84) -> 00007a572e6039f0
+3836:M 25 Jul 2025 15:55:16.691 # (00007a57319fee83) -> 00007a57319ffc20
+3836:M 25 Jul 2025 15:55:16.691 # (00007a57319fee82) -> 0000000000000000
+3836:M 25 Jul 2025 15:55:16.691 # (00007a57319fee81) -> 00007a572d601000
+3836:M 25 Jul 2025 15:55:16.691 # (00007a57319fee80) -> 0000000200000000
+
+------ INFO OUTPUT ------

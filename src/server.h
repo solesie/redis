@@ -522,6 +522,7 @@ typedef enum {
 #define AOF_FSYNC_ALWAYS 1
 #define AOF_FSYNC_EVERYSEC 2
 #define AOF_FSYNC_ALWAYS_FDP_DIRECT_IO 3
+#define AOF_FSYNC_EVERYSEC_FDP_DIRECT_IO 4
 
 /* Replication diskless load defines */
 #define REPL_DISKLESS_LOAD_DISABLED 0
@@ -1778,6 +1779,7 @@ struct redisServer {
     int aof_fsync;                  /* Kind of fsync() policy */
     char *aof_filename;             /* Basename of the AOF file and manifest file */
     char *aof_dirname;              /* Name of the AOF directory */
+    char *aof_base_dirname;         /* solesie: 테스트용 */
     int aof_no_fsync_on_rewrite;    /* Don't fsync if a rewrite is in prog. */
     int aof_rewrite_perc;           /* Rewrite AOF if % growth is > M and... */
     off_t aof_rewrite_min_size;     /* the AOF file is at least N bytes. */
@@ -1851,6 +1853,11 @@ struct redisServer {
     int fdp_enabled;
     char *fdp_device_file;
     fdpUfs *fdp_ufs;
+
+    /* solesie: For TEST */
+    int f2fs_pid_enabled;
+    int pid_enabled;
+    int rg_enabled;
 
     /* Pipe and data structures for child -> parent info sharing. */
     int child_info_pipe[2];         /* Pipe used to write the child_info_data. */

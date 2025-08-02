@@ -1,0 +1,46 @@
+39752:C 18 Jul 2025 06:43:34.112 # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+39752:C 18 Jul 2025 06:43:34.113 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+39752:C 18 Jul 2025 06:43:34.113 * Redis version=7.4.2, bits=64, commit=46f1bac7, modified=1, pid=39752, just started
+39752:C 18 Jul 2025 06:43:34.113 * Configuration loaded
+39752:M 18 Jul 2025 06:43:34.113 * Increased maximum number of open files to 10032 (it was originally set to 1024).
+39752:M 18 Jul 2025 06:43:34.114 * monotonic clock: POSIX clock_gettime
+39752:M 18 Jul 2025 06:43:34.116 * Running mode=standalone, port=6379.
+39752:M 18 Jul 2025 06:43:34.117 * Server initialized
+39752:M 18 Jul 2025 06:43:34.119 * Creating AOF base file appendonly.aof.1.base.rdb on server start
+39752:M 18 Jul 2025 06:43:34.121 * Creating AOF incr file appendonly.aof.1.incr.aof on server start
+39752:M 18 Jul 2025 06:43:34.121 * Ready to accept connections tcp
+39752:M 18 Jul 2025 06:58:19.039 * Starting automatic rewriting of AOF on 4295493672500% growth
+39752:M 18 Jul 2025 06:58:19.057 * Creating AOF incr file appendonly.aof.2.incr.aof on background rewrite
+39752:M 18 Jul 2025 06:58:19.057 * Removing the history file appendonly.aof.1.base.rdb in the background
+39752:M 18 Jul 2025 06:58:19.057 * Removing the history file appendonly.aof.1.incr.aof in the background
+39752:M 18 Jul 2025 06:58:24.295 * Background append only file rewriting started by pid 49326
+49326:C 18 Jul 2025 07:00:36.221 * Successfully created the temporary AOF base file temp-rewriteaof-bg-49326.aof
+49326:C 18 Jul 2025 07:00:36.430 * Fork CoW for AOF rewrite: current 5575 MB, peak 5575 MB, average 3523 MB
+39752:M 18 Jul 2025 07:00:37.032 * Background AOF rewrite terminated with success
+39752:M 18 Jul 2025 07:00:37.032 * Successfully renamed the temporary AOF base file temp-rewriteaof-bg-49326.aof into appendonly.aof.2.base.rdb
+39752:M 18 Jul 2025 07:00:37.034 * Background AOF rewrite finished successfully
+39752:M 18 Jul 2025 07:09:56.895 * Starting automatic rewriting of AOF on 166% growth
+39752:M 18 Jul 2025 07:09:56.898 * Creating AOF incr file appendonly.aof.3.incr.aof on background rewrite
+39752:M 18 Jul 2025 07:09:56.898 * Removing the history file appendonly.aof.2.base.rdb in the background
+39752:M 18 Jul 2025 07:09:56.901 * Removing the history file appendonly.aof.2.incr.aof in the background
+39752:M 18 Jul 2025 07:10:01.454 * Background append only file rewriting started by pid 65773
+65773:C 18 Jul 2025 07:17:31.235 * Successfully created the temporary AOF base file temp-rewriteaof-bg-65773.aof
+65773:C 18 Jul 2025 07:17:31.616 * Fork CoW for AOF rewrite: current 7259 MB, peak 7259 MB, average 5042 MB
+39752:M 18 Jul 2025 07:17:32.656 * Background AOF rewrite terminated with success
+39752:M 18 Jul 2025 07:17:32.656 * Successfully renamed the temporary AOF base file temp-rewriteaof-bg-65773.aof into appendonly.aof.3.base.rdb
+39752:M 18 Jul 2025 07:17:32.658 * Background AOF rewrite finished successfully
+39752:M 18 Jul 2025 07:34:46.748 * Starting automatic rewriting of AOF on 166% growth
+39752:M 18 Jul 2025 07:34:46.751 * Creating AOF incr file appendonly.aof.4.incr.aof on background rewrite
+39752:M 18 Jul 2025 07:34:46.751 * Removing the history file appendonly.aof.3.base.rdb in the background
+39752:M 18 Jul 2025 07:34:46.755 * Removing the history file appendonly.aof.3.incr.aof in the background
+39752:M 18 Jul 2025 07:34:51.936 * Background append only file rewriting started by pid 87703
+87703:C 18 Jul 2025 07:46:03.667 * Successfully created the temporary AOF base file temp-rewriteaof-bg-87703.aof
+87703:C 18 Jul 2025 07:46:04.128 * Fork CoW for AOF rewrite: current 7415 MB, peak 7415 MB, average 4855 MB
+39752:M 18 Jul 2025 07:46:07.064 * Background AOF rewrite terminated with success
+39752:M 18 Jul 2025 07:46:07.065 * Successfully renamed the temporary AOF base file temp-rewriteaof-bg-87703.aof into appendonly.aof.4.base.rdb
+39752:M 18 Jul 2025 07:46:07.068 * Background AOF rewrite finished successfully
+39752:signal-handler (1753080088) Received SIGTERM scheduling shutdown...
+39752:M 21 Jul 2025 06:41:29.051 * User requested shutdown...
+39752:M 21 Jul 2025 06:41:29.051 * Calling fsync() on the AOF file.
+39752:M 21 Jul 2025 06:41:29.051 * Removing the pid file.
+39752:M 21 Jul 2025 06:41:29.052 # Redis is now ready to exit, bye bye...

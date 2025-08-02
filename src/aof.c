@@ -663,8 +663,11 @@ int aofDelHistoryFiles(void) {
         serverAssert(ai->file_type == AOF_FILE_TYPE_HIST);
         serverLog(LL_NOTICE, "Removing the history file %s in the background", ai->file_name);
         sds aof_filepath = makePath(server.aof_dirname, ai->file_name);
+        sds aof_filepath2 = makePath(server.aof_base_dirname, ai->file_name);
         bg_unlink(aof_filepath);
         sdsfree(aof_filepath);
+        bg_unlink(aof_filepath2);
+        sdsfree(aof_filepath2);
         listDelNode(server.aof_manifest->history_aof_list, ln);
     }
 
@@ -714,7 +717,7 @@ void aofOpenIfNeededOnServerStart(void) {
     size_t incr_aof_len = listLength(server.aof_manifest->incr_aof_list);
     if (!server.aof_manifest->base_aof_info && !incr_aof_len) {
         sds base_name = getNewBaseFileNameAndMarkPreAsHistory(server.aof_manifest);
-        sds base_filepath = makePath(server.aof_dirname, base_name);
+        sds base_filepath = makePath(server.aof_base_dirname, base_name);
         if (rewriteAppendOnlyFile(base_filepath) != C_OK) {
             exit(1);
         }
@@ -818,8 +821,12 @@ int openNewIncrAofForAppend(void) {
      * the fsync as long as we grantee it happens, and in fsync always the file
      * is already synced at this point so fsync doesn't matter. */
     if (server.aof_fd != -1) {
-        aof_background_fsync_and_close(server.aof_fd);
-        server.aof_last_fsync = server.mstime;
+        // markRewrittenIncrAofAsHistory(temp_am); // solesie: FORCE
+        // aof_background_fsync_and_close(server.aof_fd);
+        // server.aof_last_fsync = server.mstime;
+        close(server.aof_fd);
+        markRewrittenIncrAofAsHistory(temp_am);
+        aofDelHistoryFiles();
     }
     server.aof_fd = newfd;
 
@@ -1086,12 +1093,14 @@ void flushAppendOnlyFile(int force) {
 
     if (server.aof_fsync == AOF_FSYNC_EVERYSEC){
         sync_in_progress = aofFsyncInProgress();
-    } else if (server.aof_fsync == AOF_FSYNC_ALWAYS_FDP_DIRECT_IO){
+    } else if (server.aof_fsync == AOF_FSYNC_ALWAYS_FDP_DIRECT_IO || 
+            server.aof_fsync == AOF_FSYNC_EVERYSEC_FDP_DIRECT_IO){
         sync_in_progress = fdpPersistencyAofIncrFsyncInProgress();
     }
 
     if ((server.aof_fsync == AOF_FSYNC_EVERYSEC || 
-        server.aof_fsync == AOF_FSYNC_ALWAYS_FDP_DIRECT_IO) && !force) {
+        server.aof_fsync == AOF_FSYNC_ALWAYS_FDP_DIRECT_IO || 
+        server.aof_fsync == AOF_FSYNC_EVERYSEC_FDP_DIRECT_IO) && !force) {
         /* With this append fsync policy we do background fsyncing.
          * If the fsync is still in progress we can try to delay
          * the write for a couple of seconds. */
@@ -1131,8 +1140,14 @@ void flushAppendOnlyFile(int force) {
 
     latencyStartMonitor(latency);
     if(server.fdp_enabled){
-        nwritten = sdslen(server.aof_buf);
-        fdpPersistencySaveAofIncr(server.aof_buf, sdslen(server.aof_buf));
+        int ret = fdpPersistencySaveAofIncr(server.aof_buf, sdslen(server.aof_buf));
+        // if(ret == 1){
+            nwritten = sdslen(server.aof_buf);
+        // } else{
+        //     /* solesie: AofIncr is full... waiting */
+        //     latencyEndMonitor(latency);
+        //     return;
+        // }
     } else{
         nwritten = aofWrite(server.aof_fd,server.aof_buf,sdslen(server.aof_buf));
     }
@@ -1278,6 +1293,13 @@ try_fsync:
         latencyEndMonitor(latency);
         latencyAddSampleIfNeeded("aof-fsync-always",latency);
         server.aof_last_incr_fsync_offset = server.aof_last_incr_size;
+        server.aof_last_fsync = server.mstime;
+    } else if (server.aof_fsync == AOF_FSYNC_EVERYSEC_FDP_DIRECT_IO &&
+                server.mstime - server.aof_last_fsync >= 1000) {
+        if(!sync_in_progress) {
+            fdpPersistencyAofIncrBackgroundFsync();
+            server.aof_last_incr_fsync_offset = server.aof_last_incr_size;
+        }
         server.aof_last_fsync = server.mstime;
     }
 }
@@ -2398,7 +2420,12 @@ int rewriteAppendOnlyFile(char *filename) {
 
     /* Note that we have to use a different temp name here compared to the
      * one used by rewriteAppendOnlyFileBackground() function. */
-    snprintf(tmpfile,256,"temp-rewriteaof-%d.aof", (int) getpid());
+    if(server.f2fs_pid_enabled){
+        snprintf(tmpfile,256,"%s/temp-rewriteaof-%d.aof", server.aof_base_dirname,(int) getpid());
+        printf("%s\n", tmpfile);
+    } else{
+        snprintf(tmpfile,256,"temp-rewriteaof-%d.aof", (int) getpid());
+    }
     fp = fopen(tmpfile,"w");
     if (!fp) {
         serverLog(LL_WARNING, "Opening the temp file for AOF rewrite in rewriteAppendOnlyFile(): %s", strerror(errno));
@@ -2480,9 +2507,9 @@ int rewriteAppendOnlyFileBackground(void) {
 
     if (hasActiveChildProcess()) return C_ERR;
 
-    if (dirCreateIfMissing(server.aof_dirname) == -1) {
+    if (dirCreateIfMissing(server.aof_base_dirname) == -1) {
         serverLog(LL_WARNING, "Can't open or create append-only dir %s: %s",
-            server.aof_dirname, strerror(errno));
+            server.aof_base_dirname, strerror(errno));
         server.aof_lastbgrewrite_status = C_ERR;
         return C_ERR;
     }
@@ -2512,13 +2539,28 @@ int rewriteAppendOnlyFileBackground(void) {
 
     server.stat_aof_rewrites++;
 
+    /* solesie: remove FORCE policy */
+    mstime_t latency;
+    latencyStartMonitor(latency);
+    server.aof_manifest->base_aof_info->file_type = AOF_FILE_TYPE_HIST;
+    listAddNodeHead(server.aof_manifest->history_aof_list, server.aof_manifest->base_aof_info);
+    aofDelHistoryFiles();
+    server.aof_manifest->base_aof_info = NULL;
+    latencyEndMonitor(latency);
+    latencyAddSampleIfNeeded("aof-rename", latency);
+
     if ((childpid = redisFork(CHILD_TYPE_AOF)) == 0) {
         char tmpfile[256];
 
         /* Child */
         redisSetProcTitle("redis-aof-rewrite");
         redisSetCpuAffinity(server.aof_rewrite_cpulist);
-        snprintf(tmpfile,256,"temp-rewriteaof-bg-%d.aof", (int) getpid());
+        if(server.f2fs_pid_enabled){
+            snprintf(tmpfile,256,"%s/temp-rewriteaof-bg-%d.aof", server.aof_base_dirname,(int) getpid());
+        } else{
+            snprintf(tmpfile,256,"temp-rewriteaof-bg-%d.aof", (int) getpid());
+        }
+
         if (rewriteAppendOnlyFile(tmpfile) == C_OK) {
             serverLog(LL_NOTICE,
                 "Successfully created the temporary AOF base file %s", tmpfile);
@@ -2565,10 +2607,18 @@ void bgrewriteaofCommand(client *c) {
 void aofRemoveTempFile(pid_t childpid) {
     char tmpfile[256];
 
-    snprintf(tmpfile,256,"temp-rewriteaof-bg-%d.aof", (int) childpid);
+    if(server.f2fs_pid_enabled){
+        snprintf(tmpfile,256,"%s/temp-rewriteaof-bg-%d.aof", server.aof_base_dirname,(int) childpid);
+    } else{
+        snprintf(tmpfile,256,"temp-rewriteaof-bg-%d.aof", (int) childpid);
+    }
     bg_unlink(tmpfile);
 
-    snprintf(tmpfile,256,"temp-rewriteaof-%d.aof", (int) childpid);
+    if(server.f2fs_pid_enabled){
+        snprintf(tmpfile,256,"%s/temp-rewriteaof-%d.aof", server.aof_base_dirname,(int) childpid);
+    } else{
+        snprintf(tmpfile,256,"temp-rewriteaof-%d.aof", (int) childpid);
+    }
     bg_unlink(tmpfile);
 }
 
@@ -2581,8 +2631,14 @@ off_t getAppendOnlyFileSize(sds filename, int *status) {
     mstime_t latency;
 
     sds aof_filepath = makePath(server.aof_dirname, filename);
+    sds aof_filepath2 = makePath(server.aof_base_dirname, filename);
     latencyStartMonitor(latency);
-    if (redis_stat(aof_filepath, &sb) == -1) {
+    int res = redis_stat(aof_filepath, &sb);
+    if(res == -1){
+        res = redis_stat(aof_filepath2, &sb);
+    }
+    
+    if (res == -1) {
         if (status) *status = errno == ENOENT ? AOF_NOT_EXIST : AOF_OPEN_ERR;
         serverLog(LL_WARNING, "Unable to obtain the AOF file %s length. stat: %s",
             filename, strerror(errno));
@@ -2594,6 +2650,7 @@ off_t getAppendOnlyFileSize(sds filename, int *status) {
     latencyEndMonitor(latency);
     latencyAddSampleIfNeeded("aof-fstat", latency);
     sdsfree(aof_filepath);
+    sdsfree(aof_filepath2);
     return size;
 }
 
@@ -2650,8 +2707,11 @@ void backgroundRewriteDoneHandler(int exitcode, int bysignal) {
         serverLog(LL_NOTICE,
             "Background AOF rewrite terminated with success");
 
-        snprintf(tmpfile, 256, "temp-rewriteaof-bg-%d.aof",
-            (int)server.child_pid);
+        if(server.f2fs_pid_enabled){
+            snprintf(tmpfile,256,"%s/temp-rewriteaof-bg-%d.aof", server.aof_base_dirname,(int)server.child_pid);
+        } else{
+            snprintf(tmpfile,256,"temp-rewriteaof-bg-%d.aof", (int)server.child_pid);
+        }
 
         serverAssert(server.aof_manifest != NULL);
 
@@ -2662,7 +2722,8 @@ void backgroundRewriteDoneHandler(int exitcode, int bysignal) {
          * as the HISTORY type. */
         new_base_filename = getNewBaseFileNameAndMarkPreAsHistory(temp_am);
         serverAssert(new_base_filename != NULL);
-        new_base_filepath = makePath(server.aof_dirname, new_base_filename);
+        new_base_filepath = makePath(server.aof_base_dirname, new_base_filename);
+        printf("%s\n", new_base_filepath);
 
         /* Rename the temporary aof file to 'new_base_filename'. */
         latencyStartMonitor(latency);
@@ -2742,7 +2803,8 @@ void backgroundRewriteDoneHandler(int exitcode, int bysignal) {
         if (server.aof_state != AOF_OFF) {
             /* AOF enabled. */
             server.aof_current_size = getAppendOnlyFileSize(new_base_filename, NULL) + server.aof_last_incr_size;
-            server.aof_rewrite_base_size = server.aof_current_size;
+            /* solesie: Regard Phase 1 as one day */
+            server.aof_rewrite_base_size = getAppendOnlyFileSize(new_base_filename, NULL);
         }
 
         /* We don't care about the return value of `aofDelHistoryFiles`, because the history

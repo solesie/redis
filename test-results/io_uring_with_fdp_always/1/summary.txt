@@ -1,0 +1,209 @@
+solesie@solesie:~/redis$ sudo sh run_benchmark.sh
+====== SET ======                                                    
+  16000000 requests completed in 580.13 seconds
+  50 parallel clients
+  4096 bytes payload
+  keep alive: 1
+  host configuration "save": 100 100
+  host configuration "appendonly": yes
+  multi-thread: no
+
+Latency by percentile distribution:
+0.000% <= 0.375 milliseconds (cumulative count 1)
+50.000% <= 1.687 milliseconds (cumulative count 8018355)
+75.000% <= 1.975 milliseconds (cumulative count 12079296)
+87.500% <= 2.151 milliseconds (cumulative count 14001607)
+93.750% <= 2.327 milliseconds (cumulative count 15012294)
+96.875% <= 2.503 milliseconds (cumulative count 15502437)
+98.438% <= 2.687 milliseconds (cumulative count 15751348)
+99.219% <= 2.887 milliseconds (cumulative count 15877548)
+99.609% <= 3.087 milliseconds (cumulative count 15937543)
+99.805% <= 3.303 milliseconds (cumulative count 15969361)
+99.902% <= 3.559 milliseconds (cumulative count 15984524)
+99.951% <= 4.679 milliseconds (cumulative count 15992195)
+99.976% <= 6.599 milliseconds (cumulative count 15996096)
+99.988% <= 7.351 milliseconds (cumulative count 15998055)
+99.994% <= 8.519 milliseconds (cumulative count 15999029)
+99.997% <= 246.655 milliseconds (cumulative count 15999517)
+99.998% <= 512.255 milliseconds (cumulative count 15999771)
+99.999% <= 579.071 milliseconds (cumulative count 15999887)
+100.000% <= 582.143 milliseconds (cumulative count 15999941)
+100.000% <= 595.967 milliseconds (cumulative count 15999975)
+100.000% <= 597.503 milliseconds (cumulative count 15999995)
+100.000% <= 598.015 milliseconds (cumulative count 16000000)
+100.000% <= 598.015 milliseconds (cumulative count 16000000)
+
+Cumulative distribution of latencies:
+0.000% <= 0.103 milliseconds (cumulative count 0)
+0.000% <= 0.407 milliseconds (cumulative count 6)
+0.002% <= 0.503 milliseconds (cumulative count 271)
+0.010% <= 0.607 milliseconds (cumulative count 1567)
+0.063% <= 0.703 milliseconds (cumulative count 10029)
+0.993% <= 0.807 milliseconds (cumulative count 158876)
+2.340% <= 0.903 milliseconds (cumulative count 374389)
+5.567% <= 1.007 milliseconds (cumulative count 890728)
+9.652% <= 1.103 milliseconds (cumulative count 1544313)
+16.665% <= 1.207 milliseconds (cumulative count 2666375)
+24.085% <= 1.303 milliseconds (cumulative count 3853657)
+31.233% <= 1.407 milliseconds (cumulative count 4997214)
+37.330% <= 1.503 milliseconds (cumulative count 5972871)
+44.069% <= 1.607 milliseconds (cumulative count 7051115)
+51.423% <= 1.703 milliseconds (cumulative count 8227691)
+60.469% <= 1.807 milliseconds (cumulative count 9675017)
+69.220% <= 1.903 milliseconds (cumulative count 11075166)
+78.099% <= 2.007 milliseconds (cumulative count 12495910)
+84.834% <= 2.103 milliseconds (cumulative count 13573408)
+99.630% <= 3.103 milliseconds (cumulative count 15940859)
+99.939% <= 4.103 milliseconds (cumulative count 15990255)
+99.956% <= 5.103 milliseconds (cumulative count 15993007)
+99.966% <= 6.103 milliseconds (cumulative count 15994633)
+99.984% <= 7.103 milliseconds (cumulative count 15997474)
+99.992% <= 8.103 milliseconds (cumulative count 15998770)
+99.995% <= 9.103 milliseconds (cumulative count 15999207)
+99.996% <= 10.103 milliseconds (cumulative count 15999359)
+99.996% <= 11.103 milliseconds (cumulative count 15999399)
+99.996% <= 12.103 milliseconds (cumulative count 15999400)
+99.996% <= 15.103 milliseconds (cumulative count 15999409)
+99.996% <= 16.103 milliseconds (cumulative count 15999435)
+99.997% <= 17.103 milliseconds (cumulative count 15999484)
+99.997% <= 18.111 milliseconds (cumulative count 15999500)
+99.997% <= 247.167 milliseconds (cumulative count 15999528)
+99.997% <= 248.191 milliseconds (cumulative count 15999543)
+99.997% <= 249.215 milliseconds (cumulative count 15999550)
+99.997% <= 301.311 milliseconds (cumulative count 15999568)
+99.997% <= 302.335 milliseconds (cumulative count 15999579)
+99.997% <= 305.151 milliseconds (cumulative count 15999582)
+99.997% <= 306.175 milliseconds (cumulative count 15999600)
+99.998% <= 387.327 milliseconds (cumulative count 15999606)
+99.998% <= 388.351 milliseconds (cumulative count 15999623)
+99.998% <= 390.143 milliseconds (cumulative count 15999650)
+99.998% <= 393.215 milliseconds (cumulative count 15999651)
+99.998% <= 394.239 milliseconds (cumulative count 15999670)
+99.998% <= 396.287 milliseconds (cumulative count 15999691)
+99.998% <= 397.311 milliseconds (cumulative count 15999700)
+99.998% <= 450.303 milliseconds (cumulative count 15999714)
+99.998% <= 451.327 milliseconds (cumulative count 15999727)
+99.998% <= 452.351 milliseconds (cumulative count 15999749)
+99.998% <= 453.119 milliseconds (cumulative count 15999750)
+99.999% <= 512.255 milliseconds (cumulative count 15999771)
+99.999% <= 513.279 milliseconds (cumulative count 15999778)
+99.999% <= 514.303 milliseconds (cumulative count 15999799)
+99.999% <= 515.327 milliseconds (cumulative count 15999800)
+99.999% <= 568.319 milliseconds (cumulative count 15999824)
+99.999% <= 569.343 milliseconds (cumulative count 15999828)
+99.999% <= 570.367 milliseconds (cumulative count 15999850)
+99.999% <= 577.535 milliseconds (cumulative count 15999877)
+99.999% <= 579.583 milliseconds (cumulative count 15999900)
+100.000% <= 580.607 milliseconds (cumulative count 15999921)
+100.000% <= 581.119 milliseconds (cumulative count 15999929)
+100.000% <= 582.143 milliseconds (cumulative count 15999941)
+100.000% <= 583.167 milliseconds (cumulative count 15999950)
+100.000% <= 595.455 milliseconds (cumulative count 15999965)
+100.000% <= 596.479 milliseconds (cumulative count 15999975)
+100.000% <= 597.503 milliseconds (cumulative count 15999995)
+100.000% <= 598.527 milliseconds (cumulative count 16000000)
+
+Summary:
+  throughput summary: 27579.88 requests per second
+  latency summary (msec):
+          avg       min       p50       p95       p99       max
+        1.687     0.368     1.687     2.383     2.815   598.015
+
+
+400792:M 07 Jul 2025 11:17:20.498 * Server initialized
+400792:M 07 Jul 2025 11:17:20.499 * DB loaded from append only file: 0.000 seconds
+400792:M 07 Jul 2025 11:17:20.499 * Ready to accept connections tcp
+400792:M 07 Jul 2025 11:18:18.857 * Starting automatic rewriting of AOF on 753006481900% growth
+400792:M 07 Jul 2025 11:18:18.857 * solesie: incr 초기화, 남은 lb: 2041234
+400792:M 07 Jul 2025 11:18:19.153 * Background append only file rewriting started by pid 403016
+403016:C 07 Jul 2025 11:18:50.088 * Successfully created the temporary AOF base
+403016:C 07 Jul 2025 11:18:50.182 * Fork CoW for AOF rewrite: current 1991 MB, peak 1991 MB, average 1356 MB
+400792:M 07 Jul 2025 11:18:50.410 * Background AOF rewrite terminated with success
+400792:M 07 Jul 2025 11:18:50.410 * Background AOF rewrite finished successfully
+400792:M 07 Jul 2025 11:19:01.078 * 100 changes in 100 seconds. Saving...
+400792:M 07 Jul 2025 11:19:01.322 * Background saving started by pid 404713
+404713:C 07 Jul 2025 11:19:42.343 * DB saved on disk
+404713:C 07 Jul 2025 11:19:42.481 * Fork CoW for RDB: current 3074 MB, peak 3074 MB, average 1896 MB
+400792:M 07 Jul 2025 11:19:42.962 * Background saving terminated with success
+400792:M 07 Jul 2025 11:19:43.062 * Starting automatic rewriting of AOF on 169% growth
+400792:M 07 Jul 2025 11:19:43.062 * solesie: incr 초기화, 남은 lb: 1566450
+400792:M 07 Jul 2025 11:19:43.510 * Background append only file rewriting started by pid 406466
+406466:C 07 Jul 2025 11:20:28.477 * Successfully created the temporary AOF base
+406466:C 07 Jul 2025 11:20:28.599 * Fork CoW for AOF rewrite: current 3779 MB, peak 3779 MB, average 2321 MB
+400792:M 07 Jul 2025 11:20:29.085 * Background AOF rewrite terminated with success
+400792:M 07 Jul 2025 11:20:29.086 * Background AOF rewrite finished successfully
+400792:M 07 Jul 2025 11:20:47.558 * Starting automatic rewriting of AOF on 50% growth
+400792:M 07 Jul 2025 11:20:47.558 * solesie: incr 초기화, 남은 lb: 2032229
+400792:M 07 Jul 2025 11:20:48.068 * Background append only file rewriting started by pid 409045
+409045:C 07 Jul 2025 11:21:40.158 * Successfully created the temporary AOF base
+409045:C 07 Jul 2025 11:21:40.295 * Fork CoW for AOF rewrite: current 4480 MB, peak 4480 MB, average 2895 MB
+400792:M 07 Jul 2025 11:21:40.797 * Background AOF rewrite terminated with success
+400792:M 07 Jul 2025 11:21:40.798 * Background AOF rewrite finished successfully
+400792:M 07 Jul 2025 11:21:40.898 * 100 changes in 100 seconds. Saving...
+400792:M 07 Jul 2025 11:21:41.283 * Background saving started by pid 411153
+411153:C 07 Jul 2025 11:22:35.583 * DB saved on disk
+411153:C 07 Jul 2025 11:22:35.779 * Fork CoW for RDB: current 4656 MB, peak 4656 MB, average 3046 MB
+400792:M 07 Jul 2025 11:22:36.553 * Background saving terminated with success
+400792:M 07 Jul 2025 11:22:36.654 * Starting automatic rewriting of AOF on 101% growth
+400792:M 07 Jul 2025 11:22:36.654 * solesie: incr 초기화, 남은 lb: 1116466
+400792:M 07 Jul 2025 11:22:37.232 * Background append only file rewriting started by pid 413366
+413366:C 07 Jul 2025 11:23:31.825 * Successfully created the temporary AOF base
+413366:C 07 Jul 2025 11:23:31.978 * Fork CoW for AOF rewrite: current 4794 MB, peak 4794 MB, average 3048 MB
+400792:M 07 Jul 2025 11:23:32.585 * Background AOF rewrite terminated with success
+400792:M 07 Jul 2025 11:23:32.586 * Background AOF rewrite finished successfully
+400792:M 07 Jul 2025 11:23:50.999 * Starting automatic rewriting of AOF on 50% growth
+400792:M 07 Jul 2025 11:23:50.999 * solesie: incr 초기화, 남은 lb: 1772077
+400792:M 07 Jul 2025 11:23:51.565 * Background append only file rewriting started by pid 416309
+416309:C 07 Jul 2025 11:24:47.630 * Successfully created the temporary AOF base
+416309:C 07 Jul 2025 11:24:47.836 * Fork CoW for AOF rewrite: current 4966 MB, peak 4966 MB, average 3257 MB
+400792:M 07 Jul 2025 11:24:48.647 * Background AOF rewrite terminated with success
+400792:M 07 Jul 2025 11:24:48.648 * Background AOF rewrite finished successfully
+400792:M 07 Jul 2025 11:24:48.748 * 100 changes in 100 seconds. Saving...
+400792:M 07 Jul 2025 11:24:49.140 * Background saving started by pid 418600
+418600:C 07 Jul 2025 11:25:44.612 * DB saved on disk
+418600:C 07 Jul 2025 11:25:44.821 * Fork CoW for RDB: current 5022 MB, peak 5022 MB, average 3300 MB
+400792:M 07 Jul 2025 11:25:45.697 * Background saving terminated with success
+400792:M 07 Jul 2025 11:25:45.798 * Starting automatic rewriting of AOF on 102% growth
+400792:M 07 Jul 2025 11:25:45.798 * solesie: incr 초기화, 남은 lb: 902549
+400792:M 07 Jul 2025 11:25:46.391 * Background append only file rewriting started by pid 420846
+420846:C 07 Jul 2025 11:26:43.964 * Successfully created the temporary AOF base
+420846:C 07 Jul 2025 11:26:44.170 * Fork CoW for AOF rewrite: current 5063 MB, peak 5063 MB, average 3319 MB
+400792:M 07 Jul 2025 11:26:44.958 * Background AOF rewrite terminated with success
+400792:M 07 Jul 2025 11:26:44.958 * Background AOF rewrite finished successfully
+400792:M 07 Jul 2025 11:27:06.281 * Starting automatic rewriting of AOF on 50% growth
+400792:M 07 Jul 2025 11:27:06.281 * solesie: incr 초기화, 남은 lb: 1607442
+400792:M 07 Jul 2025 11:27:06.856 * Background append only file rewriting started by pid 424018
+424018:C 07 Jul 2025 11:28:01.621 * Successfully created the temporary AOF base
+424018:C 07 Jul 2025 11:28:01.878 * Fork CoW for AOF rewrite: current 454 MB, peak 470 MB, average 327 MB
+400792:M 07 Jul 2025 11:28:02.156 * Background AOF rewrite terminated with success
+400792:M 07 Jul 2025 11:28:02.157 * Background AOF rewrite finished successfully
+
+
+SSD:
+    RG 0 channel 0-7 / lun 0-7
+    print_sungjin(wpp->written) : {16536851}
+    print_sungjin(wpp->written) : {587576}
+    print_sungjin(wpp->written) : {26991730}
+    print_sungjin(wpp->written) : {8668642}
+    print_sungjin(wpp->written) : {2}
+    print_sungjin(wpp->written) : {2}
+    print_sungjin(wpp->written) : {2}
+    print_sungjin(wpp->written) : {2}
+    print_sungjin(ssd->sungjin_stat.block_erased) : {6976}
+    print_sungjin(ssd->sungjin_stat.copied) : {0}
+    print_sungjin(ssd->sungjin_stat.discard) : {12244208}
+    print_sungjin(ssd->sungjin_stat.discard_ignored) : {34311342}
+    print_sungjin(ssd->sungjin_stat.invalidated) : {19269926}
+    print_sungjin(sum_written) : {0}
+    print_sungjin(ssd->sungjin_stat.write_io_n) : {4283026}
+    print_sungjin(ssd->sungjin_stat.read_io_n) : {163}
+    print_sungjin(ssd->sungjin_stat.read_sum) : {1672}
+    INITIALIZED current time: Mon Jul  7 20:29:46 2025
+    NVME_CMD_IO_MGMT_SEND sungjin
+    print_sungjin(nvme_io_mgmt_sungjin) : {94900665285008}
+    print_sungjin(end_lba) : {26214400}
+    msssd_io_mgmt_send_sungjin
+    print_sungjin(spp->blks_per_line) : {64}
+    print_sungjin(spp->pgs_per_line) : {262144}
+    GC: nan
+    WAF: 1.00

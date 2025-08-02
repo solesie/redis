@@ -1,0 +1,149 @@
+2832:C 12 Jul 2025 10:05:19.141 # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+2832:C 12 Jul 2025 10:05:19.141 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+2832:C 12 Jul 2025 10:05:19.141 * Redis version=7.4.2, bits=64, commit=46f1bac7, modified=1, pid=2832, just started
+2832:C 12 Jul 2025 10:05:19.141 * Configuration loaded
+2832:M 12 Jul 2025 10:05:19.142 * Increased maximum number of open files to 10032 (it was originally set to 1024).
+2832:M 12 Jul 2025 10:05:19.142 * monotonic clock: POSIX clock_gettime
+2832:M 12 Jul 2025 10:05:19.144 * Running mode=standalone, port=6379.
+2832:M 12 Jul 2025 10:05:19.244 * Server initialized
+2832:M 12 Jul 2025 10:05:19.246 * DB loaded from append only file: 0.000 seconds
+2832:M 12 Jul 2025 10:05:19.246 * Ready to accept connections tcp
+2832:M 12 Jul 2025 10:06:39.456 * solesie: incr 초기화, 남은 lb: 23980141
+2832:M 12 Jul 2025 10:06:40.126 * Background append only file rewriting started by pid 2938
+2938:C 12 Jul 2025 10:07:46.357 * Successfully created the temporary AOF base
+2938:C 12 Jul 2025 10:07:46.445 * Fork CoW for AOF rewrite: current 1051 MB, peak 1051 MB, average 183 MB
+2832:M 12 Jul 2025 10:07:46.646 * Background AOF rewrite terminated with success
+2832:M 12 Jul 2025 10:07:46.646 * Background AOF rewrite finished successfully
+2832:M 12 Jul 2025 10:07:46.820 * Background saving started by pid 3254
+3254:C 12 Jul 2025 10:08:58.483 * DB saved on disk
+3254:C 12 Jul 2025 10:08:58.585 * Fork CoW for RDB: current 7254 MB, peak 7254 MB, average 5151 MB
+2832:M 12 Jul 2025 10:08:59.049 * Background saving terminated with success
+2832:M 12 Jul 2025 10:11:29.174 * Starting automatic rewriting of AOF on 5757665864900% growth
+2832:M 12 Jul 2025 10:11:29.174 * solesie: incr 초기화, 남은 lb: 15303327
+2832:M 12 Jul 2025 10:11:30.963 * Background append only file rewriting started by pid 8905
+8905:C 12 Jul 2025 10:13:17.893 * Successfully created the temporary AOF base
+8905:C 12 Jul 2025 10:13:18.185 * Fork CoW for AOF rewrite: current 12786 MB, peak 12786 MB, average 8839 MB
+2832:M 12 Jul 2025 10:13:19.433 * Background AOF rewrite terminated with success
+2832:M 12 Jul 2025 10:13:19.434 * Background AOF rewrite finished successfully
+2832:M 12 Jul 2025 10:15:18.884 * Starting automatic rewriting of AOF on 5758119718500% growth
+2832:M 12 Jul 2025 10:15:18.884 * solesie: incr 초기화, 남은 lb: 15302219
+2832:M 12 Jul 2025 10:15:20.682 * Background append only file rewriting started by pid 14654
+14654:C 12 Jul 2025 10:17:14.995 * Successfully created the temporary AOF base
+14654:C 12 Jul 2025 10:17:15.412 * Fork CoW for AOF rewrite: current 14090 MB, peak 14090 MB, average 9291 MB
+2832:M 12 Jul 2025 10:17:17.342 * Background AOF rewrite terminated with success
+2832:M 12 Jul 2025 10:17:17.343 * Background AOF rewrite finished successfully
+2832:M 12 Jul 2025 10:17:18.281 * Background saving started by pid 17696
+17696:C 12 Jul 2025 10:19:13.068 * DB saved on disk
+17696:C 12 Jul 2025 10:19:13.421 * Fork CoW for RDB: current 13832 MB, peak 13832 MB, average 9037 MB
+2832:M 12 Jul 2025 10:19:15.051 * Background saving terminated with success
+2832:M 12 Jul 2025 10:19:47.771 * Starting automatic rewriting of AOF on 5756855885300% growth
+2832:M 12 Jul 2025 10:19:47.771 * solesie: incr 초기화, 남은 lb: 15305305
+2832:M 12 Jul 2025 10:19:49.829 * Background append only file rewriting started by pid 21490
+21490:C 12 Jul 2025 10:21:42.481 * Successfully created the temporary AOF base
+21490:C 12 Jul 2025 10:21:42.923 * Fork CoW for AOF rewrite: current 13932 MB, peak 13932 MB, average 9322 MB
+2832:M 12 Jul 2025 10:21:44.986 * Background AOF rewrite terminated with success
+2832:M 12 Jul 2025 10:21:44.986 * Background AOF rewrite finished successfully
+2832:M 12 Jul 2025 10:23:28.071 * Starting automatic rewriting of AOF on 5757516374800% growth
+2832:M 12 Jul 2025 10:23:28.071 * solesie: incr 초기화, 남은 lb: 15303692
+2832:M 12 Jul 2025 10:23:30.028 * Background append only file rewriting started by pid 27031
+27031:C 12 Jul 2025 10:25:24.367 * Successfully created the temporary AOF base
+27031:C 12 Jul 2025 10:25:24.795 * Fork CoW for AOF rewrite: current 13795 MB, peak 13799 MB, average 9257 MB
+2832:M 12 Jul 2025 10:25:26.806 * Background AOF rewrite terminated with success
+2832:M 12 Jul 2025 10:25:26.806 * Background AOF rewrite finished successfully
+2832:M 12 Jul 2025 10:25:27.785 * Background saving started by pid 30103
+30103:C 12 Jul 2025 10:27:20.645 * DB saved on disk
+30103:C 12 Jul 2025 10:27:20.995 * Fork CoW for RDB: current 13909 MB, peak 13909 MB, average 9230 MB
+2832:M 12 Jul 2025 10:27:22.655 * Background saving terminated with success
+2832:M 12 Jul 2025 10:27:57.990 * Starting automatic rewriting of AOF on 5756049632600% growth
+2832:M 12 Jul 2025 10:27:57.990 * solesie: incr 초기화, 남은 lb: 15307273
+2832:M 12 Jul 2025 10:28:00.003 * Background append only file rewriting started by pid 33906
+33906:C 12 Jul 2025 10:29:52.514 * Successfully created the temporary AOF base
+33906:C 12 Jul 2025 10:29:52.858 * Fork CoW for AOF rewrite: current 13938 MB, peak 13938 MB, average 9324 MB
+2832:M 12 Jul 2025 10:29:54.562 * Background AOF rewrite terminated with success
+2832:M 12 Jul 2025 10:29:54.563 * Background AOF rewrite finished successfully
+2832:M 12 Jul 2025 10:32:05.947 * Starting automatic rewriting of AOF on 5756222312300% growth
+2832:M 12 Jul 2025 10:32:05.947 * solesie: incr 초기화, 남은 lb: 15306851
+2832:M 12 Jul 2025 10:32:07.696 * Background append only file rewriting started by pid 40107
+40107:C 12 Jul 2025 10:33:58.143 * Successfully created the temporary AOF base
+40107:C 12 Jul 2025 10:33:58.582 * Fork CoW for AOF rewrite: current 13354 MB, peak 13354 MB, average 8961 MB
+2832:M 12 Jul 2025 10:34:00.533 * Background AOF rewrite terminated with success
+2832:M 12 Jul 2025 10:34:00.534 * Background AOF rewrite finished successfully
+2832:M 12 Jul 2025 10:34:01.540 * Background saving started by pid 43081
+43081:C 12 Jul 2025 10:35:54.196 * DB saved on disk
+43081:C 12 Jul 2025 10:35:54.621 * Fork CoW for RDB: current 13906 MB, peak 13906 MB, average 9325 MB
+2832:M 12 Jul 2025 10:35:56.599 * Background saving terminated with success
+2832:M 12 Jul 2025 10:36:45.492 * Starting automatic rewriting of AOF on 5755850864600% growth
+2832:M 12 Jul 2025 10:36:45.492 * solesie: incr 초기화, 남은 lb: 15307758
+2832:M 12 Jul 2025 10:36:47.473 * Background append only file rewriting started by pid 47277
+47277:C 12 Jul 2025 10:38:40.258 * Successfully created the temporary AOF base
+47277:C 12 Jul 2025 10:38:40.688 * Fork CoW for AOF rewrite: current 13693 MB, peak 13693 MB, average 9171 MB
+2832:M 12 Jul 2025 10:38:42.643 * Background AOF rewrite terminated with success
+2832:M 12 Jul 2025 10:38:42.644 * Background AOF rewrite finished successfully
+2832:M 12 Jul 2025 10:40:50.386 * Starting automatic rewriting of AOF on 5756288568300% growth
+2832:M 12 Jul 2025 10:40:50.386 * solesie: incr 초기화, 남은 lb: 15306690
+2832:M 12 Jul 2025 10:40:52.314 * Background append only file rewriting started by pid 53407
+53407:C 12 Jul 2025 10:42:48.387 * Successfully created the temporary AOF base
+53407:C 12 Jul 2025 10:42:48.818 * Fork CoW for AOF rewrite: current 13814 MB, peak 13814 MB, average 8982 MB
+2832:M 12 Jul 2025 10:42:50.887 * Background AOF rewrite terminated with success
+2832:M 12 Jul 2025 10:42:50.888 * Background AOF rewrite finished successfully
+2832:M 12 Jul 2025 10:42:51.875 * Background saving started by pid 56496
+56496:C 12 Jul 2025 10:44:45.330 * DB saved on disk
+56496:C 12 Jul 2025 10:44:45.768 * Fork CoW for RDB: current 14058 MB, peak 14058 MB, average 9413 MB
+2832:M 12 Jul 2025 10:44:47.836 * Background saving terminated with success
+2832:M 12 Jul 2025 10:45:20.459 * Starting automatic rewriting of AOF on 5756493961900% growth
+2832:M 12 Jul 2025 10:45:20.459 * solesie: incr 초기화, 남은 lb: 15306188
+2832:M 12 Jul 2025 10:45:22.444 * Background append only file rewriting started by pid 60280
+60280:C 12 Jul 2025 10:47:16.902 * Successfully created the temporary AOF base
+60280:C 12 Jul 2025 10:47:17.335 * Fork CoW for AOF rewrite: current 14013 MB, peak 14013 MB, average 9370 MB
+2832:M 12 Jul 2025 10:47:19.419 * Background AOF rewrite terminated with success
+2832:M 12 Jul 2025 10:47:19.419 * Background AOF rewrite finished successfully
+2832:M 12 Jul 2025 10:49:22.634 * Starting automatic rewriting of AOF on 5756142805100% growth
+2832:M 12 Jul 2025 10:49:22.634 * solesie: incr 초기화, 남은 lb: 15307045
+2832:M 12 Jul 2025 10:49:24.580 * Background append only file rewriting started by pid 66349
+66349:C 12 Jul 2025 10:51:21.642 * Successfully created the temporary AOF base
+66349:C 12 Jul 2025 10:51:22.074 * Fork CoW for AOF rewrite: current 13676 MB, peak 13676 MB, average 9074 MB
+2832:M 12 Jul 2025 10:51:24.065 * Background AOF rewrite terminated with success
+2832:M 12 Jul 2025 10:51:24.066 * Background AOF rewrite finished successfully
+2832:signal-handler (1752317538) Received SIGTERM scheduling shutdown...
+2832:M 12 Jul 2025 10:52:18.579 * User requested shutdown...
+2832:M 12 Jul 2025 10:52:18.579 * Calling fsync() on the AOF file.
+2832:M 12 Jul 2025 10:52:18.579 # Fail to fsync the AOF file: Bad file descriptor.
+2832:M 12 Jul 2025 10:52:18.579 * Removing the pid file.
+2832:M 12 Jul 2025 10:52:18.579 # Redis is now ready to exit, bye bye...
+
+
+RG 0 channel 0-3 / lun 0-7
+RG 1 channel 4-7 / lun 0-7
+print_sungjin(wpp->written) : {24595}
+print_sungjin(wpp->written) : {2721}
+print_sungjin(wpp->written) : {56425187}
+print_sungjin(wpp->written) : {161617121}
+print_sungjin(wpp->written) : {2}
+print_sungjin(wpp->written) : {2}
+print_sungjin(wpp->written) : {2}
+print_sungjin(wpp->written) : {2}
+print_sungjin(wpp->written) : {2}
+print_sungjin(wpp->written) : {2}
+print_sungjin(wpp->written) : {2}
+print_sungjin(wpp->written) : {2}
+print_sungjin(wpp->written) : {2}
+print_sungjin(wpp->written) : {2}
+print_sungjin(wpp->written) : {2}
+print_sungjin(wpp->written) : {2}
+print_sungjin(ssd->sungjin_stat.block_erased) : {40992}
+print_sungjin(ssd->sungjin_stat.copied) : {0}
+print_sungjin(ssd->sungjin_stat.discard) : {132340433}
+print_sungjin(ssd->sungjin_stat.discard_ignored) : {295478626}
+print_sungjin(ssd->sungjin_stat.invalidated) : {70521087}
+print_sungjin(sum_written) : {0}
+print_sungjin(ssd->sungjin_stat.write_io_n) : {1707434}
+print_sungjin(ssd->sungjin_stat.read_io_n) : {181}
+print_sungjin(ssd->sungjin_stat.read_sum) : {2671}
+INITIALIZED current time: Sat Jul 12 19:52:26 2025
+NVME_CMD_IO_MGMT_SEND sungjin
+print_sungjin(nvme_io_mgmt_sungjin) : {94127950952848}
+print_sungjin(end_lba) : {52428800}
+msssd_io_mgmt_send_sungjin
+print_sungjin(spp->blks_per_line) : {32}
+print_sungjin(spp->pgs_per_line) : {131072}
+WAF: 1.00

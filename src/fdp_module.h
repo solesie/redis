@@ -19,6 +19,7 @@ void fdpModuleIOWrite(
     size_t aligned_len, 
     uint64_t aligned_offt,
     int placement_handle,
+    int reclaim_group,
     void *success_cb_arg);
 void fdpModuleIORead(
     fdpModule *fdp_module, 

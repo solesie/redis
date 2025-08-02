@@ -46,27 +46,33 @@ static void fdpUfsInitManifest(fdpUfs *ufs){
     uint32_t lba_shift = ufs->lba_shift;
 
     /* solesie: devide lba space */ 
-    uint64_t chunk = (ufs->device_size / 3) >> lba_shift;
+    uint64_t unit = (ufs->device_size / 100) >> lba_shift;
+    uint64_t chunk1 = unit * 22;
+    uint64_t chunk2 = unit * 56;
+    // uint64_t chunk3 = unit * 22;
     ufs->manifest.rio.manifest_rio_start_lba = 0;
     ufs->manifest.bio.manifest_bio_start_lba = ufs->manifest.rio.manifest_rio_start_lba + 1;
     ufs->manifest.rio.aof_base_start_lba = ufs->manifest.bio.manifest_bio_start_lba + 1;
-    ufs->manifest.bio.aof_incr_start_lba = ufs->manifest.rio.aof_base_start_lba + chunk;
-    ufs->manifest.rio.rdb_start_lba = ufs->manifest.bio.aof_incr_start_lba + chunk;
+    ufs->manifest.bio.aof_incr_start_lba = ufs->manifest.rio.aof_base_start_lba + chunk1;
+    ufs->manifest.rio.rdb_start_lba = ufs->manifest.bio.aof_incr_start_lba + chunk2;
 
     /* solesie: allocate FDP placement handle */
     int manifest_phd = fdpNvmeAllocateFdpHandle(fn);
     int aof_phd = fdpNvmeAllocateFdpHandle(fn);
     int rdb_phd = fdpNvmeAllocateFdpHandle(fn);
-    ufs->manifest.rio.manifest_rio_phd = manifest_phd;
-    ufs->manifest.rio.aof_base_phd = aof_phd;
-    ufs->manifest.rio.rdb_phd = rdb_phd;
-    ufs->manifest.bio.manifest_bio_phd = manifest_phd;
-    ufs->manifest.bio.aof_incr_phd = aof_phd;
-    // ufs->manifest.rio.manifest_rio_phd = 0;
-    // ufs->manifest.rio.aof_base_phd = 0;
-    // ufs->manifest.rio.rdb_phd = 0;
-    // ufs->manifest.bio.manifest_bio_phd = 0;
-    // ufs->manifest.bio.aof_incr_phd = 0;
+    if(server.pid_enabled){
+        ufs->manifest.rio.manifest_rio_phd = manifest_phd;
+        ufs->manifest.rio.aof_base_phd = aof_phd;
+        ufs->manifest.rio.rdb_phd = rdb_phd;
+        ufs->manifest.bio.manifest_bio_phd = manifest_phd;
+        ufs->manifest.bio.aof_incr_phd = aof_phd;
+    } else{
+        ufs->manifest.rio.manifest_rio_phd = 1;
+        ufs->manifest.rio.aof_base_phd = 1;
+        ufs->manifest.rio.rdb_phd = 1;
+        ufs->manifest.bio.manifest_bio_phd = 1;
+        ufs->manifest.bio.aof_incr_phd = 1;
+    }
 
     /* solesie: init offset */
     ufs->manifest.rio.aof_base_cur_offt = ufs->manifest.rio.aof_base_cur_offt_aligned
@@ -96,12 +102,18 @@ void fdpUfsInit(void){
 
     uint32_t ios = fdpNvmeGetMaxIOSize(fn);
     server.fdp_ufs->device_default_io_size = ios;
-    server.fdp_ufs->aof_base_wbuf = zcalloc(ios * QDEPTH_RIO);
-    server.fdp_ufs->aof_incr_wbuf = zcalloc(ios * QDEPTH_BIO);
-    server.fdp_ufs->rdb_wbuf = zcalloc(ios * QDEPTH_RIO);
-    server.fdp_ufs->aof_base_wbuf_size = ios * QDEPTH_RIO;
-    server.fdp_ufs->aof_incr_wbuf_size = ios * QDEPTH_BIO;
-    server.fdp_ufs->rdb_wbuf_size = ios * QDEPTH_RIO;
+    // server.fdp_ufs->aof_base_wbuf = zcalloc(ios * QDEPTH_RIO);
+    // server.fdp_ufs->aof_incr_wbuf = zcalloc(ios * QDEPTH_BIO);
+    // server.fdp_ufs->rdb_wbuf = zcalloc(ios * QDEPTH_RIO);
+    // server.fdp_ufs->aof_base_wbuf_size = ios * QDEPTH_RIO;
+    // server.fdp_ufs->aof_incr_wbuf_size = ios * QDEPTH_BIO;
+    // server.fdp_ufs->rdb_wbuf_size = ios * QDEPTH_RIO;
+    server.fdp_ufs->aof_base_wbuf = zcalloc(ios);
+    server.fdp_ufs->aof_incr_wbuf = zcalloc(ios);
+    server.fdp_ufs->rdb_wbuf = zcalloc(ios);
+    server.fdp_ufs->aof_base_wbuf_size = ios;
+    server.fdp_ufs->aof_incr_wbuf_size = ios;
+    server.fdp_ufs->rdb_wbuf_size = ios;
 
     /* solesie: 테스트용 */
     fdpNvmeDeallocateLba(fn, 0, server.fdp_ufs->device_size >> server.fdp_ufs->lba_shift);
@@ -121,86 +133,72 @@ void fdpUfsDeactivateRio(void){
     server.fdp_ufs->fdp_module_rio = NULL;
 }
 
-void fdpUfsResetData(fdpUfsDataType type){
+void fdpUfsResetAofBase(void){
     fdpUfs *ufs = server.fdp_ufs;
     uint32_t lba_shift = ufs->lba_shift;
     uint32_t lb_size = 1 << lba_shift;
-    switch (type){
-        case FDP_UFS_MANIFEST_RIO: {
-            fdpNvmeDeallocateLba(ufs->fdp_nvme, 0, 1);
-            break;
-        }
-        case FDP_UFS_MANIFEST_BIO: {
-            fdpNvmeDeallocateLba(ufs->fdp_nvme, 1, 1);
-            break;
-        }
-        case FDP_UFS_AOF_BASE: {
-            uint64_t start_offt = ufs->manifest.rio.aof_base_start_lba << lba_shift;
+    uint64_t start_offt = ufs->manifest.rio.aof_base_start_lba << lba_shift;
 
-            /* solesie: deallocate */
-            uint64_t end_offt_ceiled 
-                = ((ufs->manifest.rio.aof_base_cur_offt + lb_size - 1) / lb_size) * lb_size;
-            uint32_t nlb = (end_offt_ceiled - start_offt) >> lba_shift;
-            if(nlb != 0){
-                fdpNvmeDeallocateLba(ufs->fdp_nvme, ufs->manifest.rio.aof_base_start_lba, nlb);
-            }
-            
-            ufs->manifest.rio.aof_base_cur_offt = ufs->manifest.rio.aof_base_cur_offt_aligned
-                = ufs->aof_base_rofft = ufs->aof_base_rofft_aligned
-                = start_offt;
-            
-            /* solesie: init cache */
-            memset(ufs->aof_base_wbuf, 0, ufs->aof_base_wbuf_size);
-            ufs->aof_base_wbuf_len = 0;
-
-            break;
-        }
-        case FDP_UFS_AOF_INCR: {
-            uint64_t start_offt = ufs->manifest.bio.aof_incr_start_lba << lba_shift;
-            
-            /* solesie: deallocate */
-            uint64_t end_offt_ceiled 
-                = ((ufs->manifest.bio.aof_incr_cur_offt + lb_size - 1) / lb_size) * lb_size;
-            uint32_t nlb = (end_offt_ceiled - start_offt) >> lba_shift;
-            if(nlb != 0){
-                fdpNvmeDeallocateLba(ufs->fdp_nvme, ufs->manifest.bio.aof_incr_start_lba, nlb);
-            }
-            
-            ufs->manifest.bio.aof_incr_cur_offt = ufs->manifest.bio.aof_incr_cur_offt_aligned
-                = ufs->aof_incr_rofft = ufs->aof_incr_rofft_aligned
-                = start_offt;
-
-            /* solesie: init cache */
-            memset(ufs->aof_base_wbuf, 0, ufs->aof_base_wbuf_size);
-            ufs->aof_base_wbuf_len = 0;
-
-            break;
-        }
-        case FDP_UFS_RDB: {
-            uint64_t start_offt = ufs->manifest.rio.rdb_start_lba << lba_shift;
-
-            /* solesie: deallocate */
-            uint64_t end_offt_ceiled 
-                = ((ufs->manifest.rio.rdb_cur_offt + lb_size - 1) / lb_size) * lb_size;
-            uint32_t nlb = (end_offt_ceiled - start_offt) >> lba_shift;
-            if(nlb != 0){
-                fdpNvmeDeallocateLba(ufs->fdp_nvme, ufs->manifest.rio.rdb_start_lba, nlb);
-            }
-
-            ufs->manifest.rio.rdb_cur_offt = ufs->manifest.rio.rdb_cur_offt_aligned
-                = ufs->rdb_rofft = ufs->rdb_rofft_aligned
-                = start_offt;
-            
-            /* solesie: init cache */
-            memset(ufs->rdb_wbuf, 0, ufs->rdb_wbuf_size);
-            ufs->rdb_wbuf_len = 0;
-
-            break;
-        }
-        default:{
-            exit(1);
-        }
+    /* solesie: deallocate */
+    uint64_t end_offt_ceiled 
+        = ((ufs->manifest.rio.aof_base_cur_offt + lb_size - 1) / lb_size) * lb_size;
+    uint32_t nlb = (end_offt_ceiled - start_offt) >> lba_shift;
+    if(nlb != 0){
+        fdpNvmeDeallocateLba(ufs->fdp_nvme, ufs->manifest.rio.aof_base_start_lba, nlb);
     }
+    
+    ufs->manifest.rio.aof_base_cur_offt = ufs->manifest.rio.aof_base_cur_offt_aligned
+        = ufs->aof_base_rofft = ufs->aof_base_rofft_aligned
+        = start_offt;
+    
+    /* solesie: init cache */
+    memset(ufs->aof_base_wbuf, 0, ufs->aof_base_wbuf_size);
+    ufs->aof_base_wbuf_len = 0;
+}
+
+void fdpUfsResetRdb(void){
+    fdpUfs *ufs = server.fdp_ufs;
+    uint32_t lba_shift = ufs->lba_shift;
+    uint32_t lb_size = 1 << lba_shift;
+    uint64_t start_offt = ufs->manifest.rio.rdb_start_lba << lba_shift;
+
+    /* solesie: deallocate */
+    uint64_t end_offt_ceiled 
+        = ((ufs->manifest.rio.rdb_cur_offt + lb_size - 1) / lb_size) * lb_size;
+    uint32_t nlb = (end_offt_ceiled - start_offt) >> lba_shift;
+    if(nlb != 0){
+        fdpNvmeDeallocateLba(ufs->fdp_nvme, ufs->manifest.rio.rdb_start_lba, nlb);
+    }
+
+    ufs->manifest.rio.rdb_cur_offt = ufs->manifest.rio.rdb_cur_offt_aligned
+        = ufs->rdb_rofft = ufs->rdb_rofft_aligned
+        = start_offt;
+    
+    /* solesie: init cache */
+    memset(ufs->rdb_wbuf, 0, ufs->rdb_wbuf_size);
+    ufs->rdb_wbuf_len = 0;
+}
+
+void fdpUfsResetAofIncr(void){
+    fdpUfs *ufs = server.fdp_ufs;
+    uint32_t lba_shift = ufs->lba_shift;
+    uint64_t start_offt = ufs->manifest.bio.aof_incr_start_lba << lba_shift;
+    
+    serverLog(LL_NOTICE, "solesie: incr 초기화, 남은 lb: %ld", ufs->manifest.rio.rdb_start_lba - (ufs->manifest.bio.aof_incr_cur_offt >> lba_shift));
+
+    /* solesie: deallocate */
+    uint32_t nlb = ufs->manifest.rio.rdb_start_lba - ufs->manifest.bio.aof_incr_start_lba;
+    if(nlb != 0){
+        fdpNvmeDeallocateLba(ufs->fdp_nvme, ufs->manifest.bio.aof_incr_start_lba, nlb);
+    }
+    
+    ufs->manifest.bio.aof_incr_cur_offt = ufs->manifest.bio.aof_incr_cur_offt_aligned
+        = ufs->aof_incr_rofft = ufs->aof_incr_rofft_aligned
+        = start_offt;
+
+    /* solesie: init cache */
+    memset(ufs->aof_incr_wbuf, 0, ufs->aof_incr_wbuf_size);
+    ufs->aof_incr_wbuf_len = 0;
 }
 
 void fdpUfsResetReadPointer(fdpUfsDataType type){
@@ -235,7 +233,8 @@ static void writeInternal(
     const void *buf, 
     uint64_t len, 
     uint64_t aligned_offt, 
-    int phd){
+    int phd,
+    int rg){
     
     fdpUfs *ufs = server.fdp_ufs;
     uint32_t lb_size = 1 << ufs->lba_shift;
@@ -253,7 +252,7 @@ static void writeInternal(
         arg->aligned_buf = aligned_buf;
         arg->type = WRITE;
         
-        fdpModuleIOWrite(fm, aligned_buf, write_len, aligned_offt, phd, arg);
+        fdpModuleIOWrite(fm, aligned_buf, write_len, aligned_offt, phd, rg, arg);
 
         data += write_len;
         aligned_len -= write_len;
@@ -295,7 +294,7 @@ static void readInternal(
     }
 }
 
-void fdpUfsIOWrite(const void *buf, uint64_t len, fdpUfsDataType type){
+int fdpUfsIOWrite(const void *buf, uint64_t len, fdpUfsDataType type){
     fdpUfs *ufs = server.fdp_ufs;
 
     /* solesie: Not apply buffer cache */
@@ -305,17 +304,23 @@ void fdpUfsIOWrite(const void *buf, uint64_t len, fdpUfsDataType type){
             buf, 
             len,
             ufs->manifest.rio.manifest_rio_start_lba << ufs->lba_shift,
-            ufs->manifest.rio.manifest_rio_phd);
-        return;
+            ufs->manifest.rio.manifest_rio_phd,
+            0);
+        return 1;
     }
     if(type == FDP_UFS_MANIFEST_BIO){
+        int rg = 0;
+        if(server.rg_enabled){
+            rg = 1;
+        }
         writeInternal(
             ufs->fdp_module_bio, 
             buf, 
             len, 
             ufs->manifest.bio.manifest_bio_start_lba << ufs->lba_shift,
-            ufs->manifest.bio.manifest_bio_phd);
-        return;
+            ufs->manifest.bio.manifest_bio_phd,
+            rg);
+        return 1;
     }
 
     fdpModule *fm = NULL;
@@ -325,6 +330,7 @@ void fdpUfsIOWrite(const void *buf, uint64_t len, fdpUfsDataType type){
     size_t *cache_buf_size = NULL;
     size_t *cache_buf_len = NULL;
     int phd = 0;
+    int rg = 0;
     switch (type){
         case FDP_UFS_AOF_BASE: {
             fm = ufs->fdp_module_rio;
@@ -334,6 +340,9 @@ void fdpUfsIOWrite(const void *buf, uint64_t len, fdpUfsDataType type){
             cache_buf_size = &(ufs->aof_base_wbuf_size);
             cache_buf_len = &(ufs->aof_base_wbuf_len);
             phd = ufs->manifest.rio.aof_base_phd;
+            if(server.rg_enabled){
+                rg = 0;
+            }
 
             serverAssert(*cur_offt + len < (ufs->manifest.bio.aof_incr_start_lba << ufs->lba_shift));
             break;
@@ -346,8 +355,15 @@ void fdpUfsIOWrite(const void *buf, uint64_t len, fdpUfsDataType type){
             cache_buf_size = &(ufs->aof_incr_wbuf_size);
             cache_buf_len = &(ufs->aof_incr_wbuf_len);
             phd = ufs->manifest.bio.aof_incr_phd;
+            if(server.rg_enabled){
+                rg = 1;
+            }
 
-            serverAssert(*cur_offt + len < (ufs->manifest.rio.rdb_start_lba << ufs->lba_shift));
+            if(*cur_offt + len >= (ufs->manifest.rio.rdb_start_lba << ufs->lba_shift)){
+                serverLog(LL_WARNING, "solesie: %lld < %lld", *cur_offt + len, (ufs->manifest.rio.rdb_start_lba << ufs->lba_shift));
+                serverAssert(*cur_offt + len < (ufs->manifest.rio.rdb_start_lba << ufs->lba_shift));
+                /* For the fragmentation issue, real-world Redis deployments may need to adopt region management techniques */
+            }
             break;
         }
         case FDP_UFS_RDB: {
@@ -358,6 +374,9 @@ void fdpUfsIOWrite(const void *buf, uint64_t len, fdpUfsDataType type){
             cache_buf_size = &(ufs->rdb_wbuf_size);
             cache_buf_len = &(ufs->rdb_wbuf_len);
             phd = ufs->manifest.rio.rdb_phd;
+            if(server.rg_enabled){
+                rg = 0;
+            }
 
             serverAssert(*cur_offt + len < ufs->device_size);
             break;
@@ -368,13 +387,13 @@ void fdpUfsIOWrite(const void *buf, uint64_t len, fdpUfsDataType type){
     }
 
     size_t cache_buf_remaining = (*cache_buf_size) - (*cache_buf_len);
-    
+
     /* solesie: caching strategy */
     if(len < cache_buf_remaining){
         memcpy(cache_buf + (*cache_buf_len), buf, len);
         *cur_offt += len;
         *cache_buf_len += len;
-        return;
+        return 1;
     }
 
     uint64_t remaining_len = len;
@@ -382,9 +401,6 @@ void fdpUfsIOWrite(const void *buf, uint64_t len, fdpUfsDataType type){
 
     /* solesie: head of write */
     if(*cache_buf_len > 0){
-        if(type == FDP_UFS_AOF_INCR){
-            serverLog(LL_NOTICE, "solesie: fsync always... too fast input? %ld vs %ld", len, cache_buf_remaining);
-        }
         /* solesie: fill cache */
         size_t write_len = cache_buf_remaining;
         memcpy(cache_buf + (*cache_buf_len), user_buf, write_len);
@@ -394,7 +410,7 @@ void fdpUfsIOWrite(const void *buf, uint64_t len, fdpUfsDataType type){
 
         /* solesie: flush cache */
         assert(*cache_buf_len + write_len == *cache_buf_size);
-        writeInternal(fm, cache_buf, *cache_buf_size, *cur_offt_aligned, phd);
+        writeInternal(fm, cache_buf, *cache_buf_size, *cur_offt_aligned, phd, rg);
         *cur_offt_aligned += *cache_buf_size;
         
         /* solesie: init cache */
@@ -404,11 +420,9 @@ void fdpUfsIOWrite(const void *buf, uint64_t len, fdpUfsDataType type){
 
     /* solesie: body of write */
     if(remaining_len / (*cache_buf_size) > 0){
-        if(type == FDP_UFS_AOF_INCR){
-            serverLog(LL_NOTICE, "solesie: why??");
-        }
         uint64_t write_len = (remaining_len / (*cache_buf_size)) * (*cache_buf_size); /* floor */
-        writeInternal(fm, user_buf, write_len, *cur_offt_aligned, phd);
+
+        writeInternal(fm, user_buf, write_len, *cur_offt_aligned, phd, rg);
         *cur_offt += write_len;
         user_buf += write_len;
         remaining_len -= write_len;
@@ -425,6 +439,7 @@ void fdpUfsIOWrite(const void *buf, uint64_t len, fdpUfsDataType type){
     }
 
     assert(remaining_len == 0);
+    return 1;
 }
 
 void fdpUfsIORead(void *buf, uint64_t len, fdpUfsDataType type){
@@ -490,6 +505,7 @@ void fdpUfsIOFlush(fdpUfsDataType type){
     size_t *cache_buf_len = NULL;
     uint32_t lb_size = 1 << ufs->lba_shift;
     int phd = 0;
+    int rg = 0;
     switch (type){
         case FDP_UFS_MANIFEST_RIO: {
             return;
@@ -504,6 +520,9 @@ void fdpUfsIOFlush(fdpUfsDataType type){
             cache_buf_size = &(ufs->aof_base_wbuf_size);
             cache_buf_len = &(ufs->aof_base_wbuf_len);
             phd = ufs->manifest.rio.aof_base_phd;
+            if(server.rg_enabled){
+                rg = 0;
+            }
             break;
         }
         case FDP_UFS_AOF_INCR: {
@@ -513,6 +532,9 @@ void fdpUfsIOFlush(fdpUfsDataType type){
             cache_buf_size = &(ufs->aof_incr_wbuf_size);
             cache_buf_len = &(ufs->aof_incr_wbuf_len);
             phd = ufs->manifest.bio.aof_incr_phd;
+            if(server.rg_enabled){
+                rg = 1;
+            }
             break;
         }
         case FDP_UFS_RDB: {
@@ -522,6 +544,9 @@ void fdpUfsIOFlush(fdpUfsDataType type){
             cache_buf_size = &(ufs->rdb_wbuf_size);
             cache_buf_len = &(ufs->rdb_wbuf_size);
             phd = ufs->manifest.rio.rdb_phd;
+            if(server.rg_enabled){
+                rg = 0;
+            }
             break;
         }
         default: {
@@ -535,7 +560,7 @@ void fdpUfsIOFlush(fdpUfsDataType type){
         
         size_t write_len_floored = ((*cache_buf_len) / lb_size) * lb_size; /* floor */
         size_t write_len_ceiled = (((*cache_buf_len) + lb_size - 1) / lb_size) * lb_size;
-        writeInternal(fm, cache_buf, write_len_ceiled, *cur_offt_aligned, phd);
+        writeInternal(fm, cache_buf, write_len_ceiled, *cur_offt_aligned, phd, rg);
         *cur_offt_aligned += write_len_floored;
         
         size_t rem = *cache_buf_len - write_len_floored;

@@ -271,10 +271,9 @@ int fdpPersistencyBackgroundRewriteAof(void) {
         int error;
         
         /* solesie: for now, skip temp-rewriteaof.aof logic */
+        fdpUfsResetAofBase();
 
         fdpUfsActivateRio();
-
-        fdpUfsResetData(FDP_UFS_AOF_BASE);
 
         rioInitWithFdpUfs(&r, FDP_UFS_AOF_BASE);
 
@@ -329,10 +328,9 @@ int fdpPersistencySaveRdb(int req, rdbSaveInfo *rsi, int rdbflags) {
     int error = 0;
 
     /* solesie: for now, skip temp.rdb logic */
+    fdpUfsResetRdb();
 
     fdpUfsActivateRio();
-
-    fdpUfsResetData(FDP_UFS_RDB);
 
     rioInitWithFdpUfs(&r, FDP_UFS_RDB);
 
@@ -362,13 +360,17 @@ werr:
     return C_ERR;
 }
 
-void fdpPersistencySaveAofIncr(void *data, uint64_t len){
-    fdpUfsIOWrite(data, len, FDP_UFS_AOF_INCR);
+int fdpPersistencySaveAofIncr(void *data, uint64_t len){
+    return fdpUfsIOWrite(data, len, FDP_UFS_AOF_INCR);
 }
 
 void fdpPersistencyAofIncrFsync(void){
     fdpUfsIOFlush(FDP_UFS_AOF_INCR);
     persistManifestBio();
+}
+
+void fdpPersistencyAofIncrBackgroundFsync(void){
+    bioCreateFdpPersistencyAofIncrSaveJob();
 }
 
 int fdpPersistencyAofIncrFsyncInProgress(void) {
@@ -378,7 +380,7 @@ int fdpPersistencyAofIncrFsyncInProgress(void) {
 void fdpPersistencyOpenNewAofIncr(void){
     /* solesie: for now, skip failure logic */
 
-    fdpUfsResetData(FDP_UFS_AOF_INCR);
+    fdpUfsResetAofIncr();
 
     persistManifestBio();
 
@@ -400,7 +402,8 @@ void fdpPersistencyBackgroundRewriteDoneHandler(int exitcode, int bysignal){
         if (server.aof_state != AOF_OFF) {
             /* AOF enabled. */
             server.aof_current_size = getAofBaseSize() + server.aof_last_incr_size;
-            server.aof_rewrite_base_size = server.aof_current_size;
+            /* solesie: Regard Phase 1 as one day */
+            server.aof_rewrite_base_size = getAofBaseSize();
         }
 
         server.aof_lastbgrewrite_status = C_OK;

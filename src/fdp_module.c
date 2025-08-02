@@ -163,6 +163,7 @@ void fdpModuleIOWrite(
     size_t aligned_len, 
     uint64_t aligned_offt,
     int placement_handle,
+    int reclaim_group,
     void *success_cb_arg){
     
     assert(isAligned(fm->fdp_nvme, aligned_buf, aligned_len, aligned_offt));
@@ -179,7 +180,7 @@ void fdpModuleIOWrite(
     ioUringOpSetUserDefinedData(op, success_cb_arg);
     struct io_uring_sqe *sqe = ioUringOpGetSqe(op);
 
-    fdpNvmePrepWriteUringCmdSqe(fm->fdp_nvme, sqe, aligned_buf, aligned_len, aligned_offt, pid);
+    fdpNvmePrepWriteUringCmdSqe(fm->fdp_nvme, sqe, aligned_buf, aligned_len, aligned_offt, pid, reclaim_group);
     while(!ioUringSubmitOp(fm->uring, op)){};
 
     return;

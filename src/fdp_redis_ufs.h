@@ -95,10 +95,12 @@ void fdpUfsSuccessCb(void *arg);
 void fdpUfsInit(void);
 void fdpUfsActivateRio(void);
 void fdpUfsDeactivateRio(void);
-void fdpUfsIOWrite(const void *buf, uint64_t len, fdpUfsDataType type);
+int fdpUfsIOWrite(const void *buf, uint64_t len, fdpUfsDataType type);
 void fdpUfsIOFlush(fdpUfsDataType type);
 void fdpUfsIORead(void *buf, uint64_t len, fdpUfsDataType type);
-void fdpUfsResetData(fdpUfsDataType type);
+void fdpUfsResetAofIncr(void);
+void fdpUfsResetRdb(void);
+void fdpUfsResetAofBase(void);
 void fdpUfsResetReadPointer(fdpUfsDataType type);
 int fdpUfsIOWait(fdpUfsDataType type);
 

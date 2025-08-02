@@ -78,6 +78,7 @@ configEnum aof_fsync_enum[] = {
     {"always", AOF_FSYNC_ALWAYS},
     {"no", AOF_FSYNC_NO},
     {"fdp-direct-io", AOF_FSYNC_ALWAYS_FDP_DIRECT_IO},
+    {"fdp-direct-io-everysec", AOF_FSYNC_EVERYSEC_FDP_DIRECT_IO},
     {NULL, 0}
 };
 
@@ -3095,6 +3096,9 @@ standardConfig static_configs[] = {
     createBoolConfig("replica-ignore-disk-write-errors", NULL, MODIFIABLE_CONFIG, server.repl_ignore_disk_write_error, 0, NULL, NULL),
     createBoolConfig("hide-user-data-from-log", NULL, MODIFIABLE_CONFIG, server.hide_user_data_from_log, 0, NULL, NULL),
     createBoolConfig("fdp-enabled", NULL, MODIFIABLE_CONFIG, server.fdp_enabled, 0, NULL, NULL),
+    createBoolConfig("f2fs-pid-enabled", NULL, MODIFIABLE_CONFIG, server.f2fs_pid_enabled, 0, NULL, NULL),
+    createBoolConfig("pid-enabled", NULL, MODIFIABLE_CONFIG, server.pid_enabled, 0, NULL, NULL),
+    createBoolConfig("rg-enabled", NULL, MODIFIABLE_CONFIG, server.rg_enabled, 0, NULL, NULL),
 
     /* String Configs */
     createStringConfig("fdp-device-file", NULL, IMMUTABLE_CONFIG, EMPTY_STRING_IS_NULL, server.fdp_device_file, NULL, NULL, NULL),
@@ -3111,6 +3115,7 @@ standardConfig static_configs[] = {
     createStringConfig("dbfilename", NULL, MODIFIABLE_CONFIG | PROTECTED_CONFIG, ALLOW_EMPTY_STRING, server.rdb_filename, "dump.rdb", isValidDBfilename, NULL),
     createStringConfig("appendfilename", NULL, IMMUTABLE_CONFIG, ALLOW_EMPTY_STRING, server.aof_filename, "appendonly.aof", isValidAOFfilename, NULL),
     createStringConfig("appenddirname", NULL, IMMUTABLE_CONFIG, ALLOW_EMPTY_STRING, server.aof_dirname, "appendonlydir", isValidAOFdirname, NULL),
+    createStringConfig("aofbasedirname", NULL, IMMUTABLE_CONFIG, ALLOW_EMPTY_STRING, server.aof_base_dirname, "aofbasedirname", isValidAOFdirname, NULL),
     createStringConfig("server-cpulist", "server_cpulist", IMMUTABLE_CONFIG, EMPTY_STRING_IS_NULL, server.server_cpulist, NULL, NULL, NULL),
     createStringConfig("bio-cpulist", "bio_cpulist", IMMUTABLE_CONFIG, EMPTY_STRING_IS_NULL, server.bio_cpulist, NULL, NULL, NULL),
     createStringConfig("aof-rewrite-cpulist", "aof_rewrite_cpulist", IMMUTABLE_CONFIG, EMPTY_STRING_IS_NULL, server.aof_rewrite_cpulist, NULL, NULL, NULL),

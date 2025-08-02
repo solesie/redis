@@ -1599,6 +1599,8 @@ int rdbSave(int req, char *filename, rdbSaveInfo *rsi, int rdbflags) {
     char tmpfile[256];
     char cwd[MAXPATHLEN]; /* Current working dir path for error messages. */
 
+    unlink(filename);
+
     startSaving(rdbflags);
     snprintf(tmpfile,256,"temp-%d.rdb", (int) getpid());
 

@@ -1,0 +1,101 @@
+====== SET ======
+  28835840 requests completed in 581.50 seconds
+  50 parallel clients
+  4096 bytes payload
+  keep alive: 1
+  host configuration "save": 
+  host configuration "appendonly": yes
+  multi-thread: no
+
+Latency by percentile distribution:
+0.000% <= 0.127 milliseconds (cumulative count 2)
+50.000% <= 0.807 milliseconds (cumulative count 14509808)
+75.000% <= 1.095 milliseconds (cumulative count 21710052)
+87.500% <= 1.335 milliseconds (cumulative count 25269055)
+93.750% <= 1.511 milliseconds (cumulative count 27047207)
+96.875% <= 1.679 milliseconds (cumulative count 27939294)
+98.438% <= 1.879 milliseconds (cumulative count 28387967)
+99.219% <= 2.095 milliseconds (cumulative count 28610767)
+99.609% <= 2.335 milliseconds (cumulative count 28724603)
+99.805% <= 2.599 milliseconds (cumulative count 28780006)
+99.902% <= 2.927 milliseconds (cumulative count 28807920)
+99.951% <= 3.335 milliseconds (cumulative count 28821762)
+99.976% <= 4.047 milliseconds (cumulative count 28828832)
+99.988% <= 5.471 milliseconds (cumulative count 28832331)
+99.994% <= 9.279 milliseconds (cumulative count 28834084)
+99.997% <= 12.911 milliseconds (cumulative count 28834961)
+99.998% <= 20.799 milliseconds (cumulative count 28835400)
+99.999% <= 33.215 milliseconds (cumulative count 28835620)
+100.000% <= 949.247 milliseconds (cumulative count 28835732)
+100.000% <= 2250.751 milliseconds (cumulative count 28835790)
+100.000% <= 2510.847 milliseconds (cumulative count 28835827)
+100.000% <= 2512.895 milliseconds (cumulative count 28835840)
+100.000% <= 2512.895 milliseconds (cumulative count 28835840)
+
+Cumulative distribution of latencies:
+0.000% <= 0.103 milliseconds (cumulative count 0)
+0.019% <= 0.207 milliseconds (cumulative count 5548)
+0.931% <= 0.303 milliseconds (cumulative count 268398)
+6.317% <= 0.407 milliseconds (cumulative count 1821692)
+13.825% <= 0.503 milliseconds (cumulative count 3986579)
+26.416% <= 0.607 milliseconds (cumulative count 7617261)
+38.017% <= 0.703 milliseconds (cumulative count 10962487)
+50.319% <= 0.807 milliseconds (cumulative count 14509808)
+60.644% <= 0.903 milliseconds (cumulative count 17487160)
+69.526% <= 1.007 milliseconds (cumulative count 20048333)
+75.761% <= 1.103 milliseconds (cumulative count 21846415)
+81.467% <= 1.207 milliseconds (cumulative count 23491782)
+86.203% <= 1.303 milliseconds (cumulative count 24857247)
+90.513% <= 1.407 milliseconds (cumulative count 26100265)
+93.584% <= 1.503 milliseconds (cumulative count 26985790)
+95.861% <= 1.607 milliseconds (cumulative count 27642367)
+97.161% <= 1.703 milliseconds (cumulative count 28017049)
+98.027% <= 1.807 milliseconds (cumulative count 28267004)
+98.564% <= 1.903 milliseconds (cumulative count 28421840)
+98.972% <= 2.007 milliseconds (cumulative count 28539528)
+99.239% <= 2.103 milliseconds (cumulative count 28616379)
+99.930% <= 3.103 milliseconds (cumulative count 28815696)
+99.977% <= 4.103 milliseconds (cumulative count 28829079)
+99.986% <= 5.103 milliseconds (cumulative count 28831774)
+99.990% <= 6.103 milliseconds (cumulative count 28832913)
+99.992% <= 7.103 milliseconds (cumulative count 28833492)
+99.993% <= 8.103 milliseconds (cumulative count 28833882)
+99.994% <= 9.103 milliseconds (cumulative count 28834062)
+99.995% <= 10.103 milliseconds (cumulative count 28834286)
+99.996% <= 11.103 milliseconds (cumulative count 28834634)
+99.997% <= 12.103 milliseconds (cumulative count 28834844)
+99.997% <= 13.103 milliseconds (cumulative count 28835004)
+99.997% <= 14.103 milliseconds (cumulative count 28835057)
+99.997% <= 15.103 milliseconds (cumulative count 28835077)
+99.998% <= 16.103 milliseconds (cumulative count 28835176)
+99.998% <= 17.103 milliseconds (cumulative count 28835230)
+99.998% <= 18.111 milliseconds (cumulative count 28835308)
+99.998% <= 20.111 milliseconds (cumulative count 28835331)
+99.999% <= 21.103 milliseconds (cumulative count 28835429)
+99.999% <= 22.111 milliseconds (cumulative count 28835466)
+99.999% <= 23.103 milliseconds (cumulative count 28835507)
+99.999% <= 25.103 milliseconds (cumulative count 28835513)
+99.999% <= 26.111 milliseconds (cumulative count 28835535)
+99.999% <= 27.103 milliseconds (cumulative count 28835557)
+99.999% <= 28.111 milliseconds (cumulative count 28835558)
+99.999% <= 31.103 milliseconds (cumulative count 28835608)
+99.999% <= 33.119 milliseconds (cumulative count 28835610)
+99.999% <= 34.111 milliseconds (cumulative count 28835646)
+99.999% <= 37.119 milliseconds (cumulative count 28835664)
+99.999% <= 39.103 milliseconds (cumulative count 28835690)
+100.000% <= 947.199 milliseconds (cumulative count 28835709)
+100.000% <= 948.223 milliseconds (cumulative count 28835721)
+100.000% <= 949.247 milliseconds (cumulative count 28835732)
+100.000% <= 950.271 milliseconds (cumulative count 28835740)
+100.000% <= 2248.703 milliseconds (cumulative count 28835774)
+100.000% <= 2250.751 milliseconds (cumulative count 28835790)
+100.000% <= 2510.847 milliseconds (cumulative count 28835827)
+100.000% <= 2512.895 milliseconds (cumulative count 28835840)
+100.000% <= 2512.895 milliseconds (cumulative count 28835840)
+
+Summary:
+  throughput summary: 49588.55 requests per second
+  latency summary (msec):
+          avg       min       p50       p95       p99       max
+        0.888     0.120     0.807     1.567     2.023  2512.895
+

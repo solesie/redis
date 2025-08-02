@@ -174,6 +174,7 @@ ioUring *ioUringCreate(int is_fdp, uint32_t qdepth){
 		/* solesie: Please refer to the paper on "NVMe I/O passthrough". */
         uring->params.flags |= IORING_SETUP_SQE128;
         uring->params.flags |= IORING_SETUP_CQE32;
+		uring->params.flags |= IORING_SETUP_SQPOLL;
 		uring->options.is_sqe_128 = 1;
 		uring->options.is_cqe_32 = 1;
     }

@@ -45,10 +45,14 @@
 #define MAX_LATENCY_PRECISION 4
 #define MAX_THREADS 500
 #define CLUSTER_SLOTS 16384
+// #define CONFIG_LATENCY_HISTOGRAM_MIN_VALUE 10L          /* >= 10 usecs */
+// #define CONFIG_LATENCY_HISTOGRAM_MAX_VALUE 3000000L          /* <= 3 secs(us precision) */
+// #define CONFIG_LATENCY_HISTOGRAM_INSTANT_MAX_VALUE 3000000L   /* <= 3 secs(us precision) */
+// #define SHOW_THROUGHPUT_INTERVAL 250  /* 250ms */
 #define CONFIG_LATENCY_HISTOGRAM_MIN_VALUE 10L          /* >= 10 usecs */
-#define CONFIG_LATENCY_HISTOGRAM_MAX_VALUE 3000000L          /* <= 3 secs(us precision) */
-#define CONFIG_LATENCY_HISTOGRAM_INSTANT_MAX_VALUE 3000000L   /* <= 3 secs(us precision) */
-#define SHOW_THROUGHPUT_INTERVAL 250  /* 250ms */
+#define CONFIG_LATENCY_HISTOGRAM_MAX_VALUE 10000000L          /* <= 3 secs(us precision) */ /* solesie: 10초 */
+#define CONFIG_LATENCY_HISTOGRAM_INSTANT_MAX_VALUE 10000000L   /* <= 3 secs(us precision) */ /* solesie: 10초 */
+#define SHOW_THROUGHPUT_INTERVAL 250  /* 250ms */ /* solesie: 10ms */
 
 #define CLIENT_GET_EVENTLOOP(c) \
     (c->thread_id >= 0 ? config.threads[c->thread_id]->el : config.el)
@@ -104,6 +108,7 @@ static struct config {
     pthread_mutex_t liveclients_mutex;
     pthread_mutex_t is_updating_slots_mutex;
     int resp3; /* use RESP3 */
+    FILE *rps_log; /* solesie: client real-time throughput */
 } config;
 
 typedef struct _client {
@@ -836,7 +841,7 @@ static void showLatencyReport(void) {
     const float avg = hdr_mean(config.latency_histogram)/1000.0f;
 
     if (!config.quiet && !config.csv) {
-        printf("%*s\r", config.last_printed_bytes, " "); // ensure there is a clean line
+        // printf("%*s\r", config.last_printed_bytes, " "); // ensure there is a clean line
         printf("====== %s ======\n", config.title);
         printf("  %d requests completed in %.2f seconds\n", config.requests_finished,
             (float)config.totlatency/1000);
@@ -913,7 +918,7 @@ static void showLatencyReport(void) {
     } else if (config.csv) {
         printf("\"%s\",\"%.2f\",\"%.3f\",\"%.3f\",\"%.3f\",\"%.3f\",\"%.3f\",\"%.3f\"\n", config.title, reqpersec, avg, p0, p50, p95, p99, p100);
     } else {
-        printf("%*s\r", config.last_printed_bytes, " "); // ensure there is a clean line
+        // printf("%*s\r", config.last_printed_bytes, " "); // ensure there is a clean line
         printf("%s: %.2f requests per second, p50=%.3f msec\n", config.title, reqpersec, p50);
     }
 }
@@ -1492,6 +1497,14 @@ int parseOptions(int argc, char **argv) {
             config.cluster_mode = 1;
         } else if (!strcmp(argv[i],"--enable-tracking")) {
             config.enable_tracking = 1;
+        } else if (!strcmp(argv[i],"--rps-filename")) {
+            if (lastarg) goto invalid;
+            config.rps_log = fopen(argv[++i], "w");
+            if (!config.rps_log) {
+                perror("Failed to open rps_log.csv");
+                exit(EXIT_FAILURE);
+            }
+            fprintf(config.rps_log, "timestamp_ms,instantaneous_rps\n");
         } else if (!strcmp(argv[i],"--help")) {
             exit_status = 0;
             goto usage;
@@ -1667,11 +1680,17 @@ int showThroughput(struct aeEventLoop *eventLoop, long long id, void *clientData
     const float rps = (float)requests_finished/dt;
     const float instantaneous_dt = (float)(current_tick-config.previous_tick)/1000.0;
     const float instantaneous_rps = (float)(requests_finished-previous_requests_finished)/instantaneous_dt;
+
+    /* solesie: rps log */
+    if (config.rps_log) {
+        fprintf(config.rps_log, "%.2f,%.1f\n", (float)(current_tick - config.start)/1000.0, instantaneous_rps);
+    }
+
     config.previous_tick = current_tick;
     atomicSet(config.previous_requests_finished,requests_finished);
-    printf("%*s\r", config.last_printed_bytes, " "); /* ensure there is a clean line */
-    int printed_bytes = printf("%s: rps=%.1f (overall: %.1f) avg_msec=%.3f (overall: %.3f)\r", config.title, instantaneous_rps, rps, hdr_mean(config.current_sec_latency_histogram)/1000.0f, hdr_mean(config.latency_histogram)/1000.0f);
-    config.last_printed_bytes = printed_bytes;
+    // printf("%*s\r", config.last_printed_bytes, " "); /* ensure there is a clean line */
+    // int printed_bytes = printf("%s: rps=%.1f (overall: %.1f) avg_msec=%.3f (overall: %.3f)\r", config.title, instantaneous_rps, rps, hdr_mean(config.current_sec_latency_histogram)/1000.0f, hdr_mean(config.latency_histogram)/1000.0f);
+    // config.last_printed_bytes = printed_bytes;
     hdr_reset(config.current_sec_latency_histogram);
     fflush(stdout);
     return SHOW_THROUGHPUT_INTERVAL;
@@ -2017,6 +2036,12 @@ int main(int argc, char **argv) {
 
         if (!config.csv) printf("\n");
     } while(config.loop);
+
+    /* solesie: rps log */
+    if (config.rps_log) {
+        fflush(config.rps_log);
+        fclose(config.rps_log);
+    }
 
     zfree(data);
     freeCliConnInfo(config.conn_info);

@@ -1,0 +1,358 @@
+solesie@solesie:~/redis$ sudo sh run_benchmark.sh 
+[sudo] password for solesie: 
+====== SET ======                                                    
+  16000000 requests completed in 543.66 seconds
+  50 parallel clients
+  4096 bytes payload
+  keep alive: 1
+  host configuration "save": 100 100
+  host configuration "appendonly": yes
+  multi-thread: no
+
+Latency by percentile distribution:
+0.000% <= 0.143 milliseconds (cumulative count 1)
+50.000% <= 0.927 milliseconds (cumulative count 8128366)
+75.000% <= 1.151 milliseconds (cumulative count 12023965)
+87.500% <= 1.327 milliseconds (cumulative count 14019382)
+93.750% <= 1.471 milliseconds (cumulative count 15012047)
+96.875% <= 1.607 milliseconds (cumulative count 15508154)
+98.438% <= 1.751 milliseconds (cumulative count 15752464)
+99.219% <= 1.911 milliseconds (cumulative count 15875487)
+99.609% <= 2.119 milliseconds (cumulative count 15939036)
+99.805% <= 2.327 milliseconds (cumulative count 15968894)
+99.902% <= 2.775 milliseconds (cumulative count 15984413)
+99.951% <= 4.647 milliseconds (cumulative count 15992199)
+99.976% <= 1469.439 milliseconds (cumulative count 15996100)
+99.988% <= 2107.391 milliseconds (cumulative count 15998050)
+99.994% <= 2510.847 milliseconds (cumulative count 15999048)
+99.997% <= 2668.543 milliseconds (cumulative count 15999538)
+99.998% <= 2779.135 milliseconds (cumulative count 15999800)
+99.999% <= 2869.247 milliseconds (cumulative count 15999900)
+100.000% <= 2899.967 milliseconds (cumulative count 15999950)
+100.000% <= 3135.487 milliseconds (cumulative count 16000000)
+100.000% <= 3135.487 milliseconds (cumulative count 16000000)
+
+Cumulative distribution of latencies:
+0.000% <= 0.103 milliseconds (cumulative count 0)
+0.001% <= 0.207 milliseconds (cumulative count 194)
+0.050% <= 0.303 milliseconds (cumulative count 7967)
+0.473% <= 0.407 milliseconds (cumulative count 75707)
+2.466% <= 0.503 milliseconds (cumulative count 394517)
+8.416% <= 0.607 milliseconds (cumulative count 1346509)
+19.123% <= 0.703 milliseconds (cumulative count 3059609)
+33.872% <= 0.807 milliseconds (cumulative count 5419485)
+47.571% <= 0.903 milliseconds (cumulative count 7611374)
+60.736% <= 1.007 milliseconds (cumulative count 9717781)
+70.823% <= 1.103 milliseconds (cumulative count 11331630)
+79.699% <= 1.207 milliseconds (cumulative count 12751842)
+86.249% <= 1.303 milliseconds (cumulative count 13799920)
+91.483% <= 1.407 milliseconds (cumulative count 14637248)
+94.764% <= 1.503 milliseconds (cumulative count 15162231)
+96.926% <= 1.607 milliseconds (cumulative count 15508154)
+98.064% <= 1.703 milliseconds (cumulative count 15690313)
+98.803% <= 1.807 milliseconds (cumulative count 15808434)
+99.198% <= 1.903 milliseconds (cumulative count 15871690)
+99.448% <= 2.007 milliseconds (cumulative count 15911615)
+99.599% <= 2.103 milliseconds (cumulative count 15935790)
+99.921% <= 3.103 milliseconds (cumulative count 15987302)
+99.946% <= 4.103 milliseconds (cumulative count 15991362)
+99.956% <= 5.103 milliseconds (cumulative count 15992958)
+99.963% <= 6.103 milliseconds (cumulative count 15994042)
+99.964% <= 7.103 milliseconds (cumulative count 15994288)
+99.966% <= 8.103 milliseconds (cumulative count 15994482)
+99.966% <= 9.103 milliseconds (cumulative count 15994569)
+99.966% <= 10.103 milliseconds (cumulative count 15994598)
+99.966% <= 11.103 milliseconds (cumulative count 15994604)
+99.967% <= 12.103 milliseconds (cumulative count 15994644)
+99.967% <= 13.103 milliseconds (cumulative count 15994650)
+99.967% <= 320.255 milliseconds (cumulative count 15994663)
+99.967% <= 321.279 milliseconds (cumulative count 15994690)
+99.967% <= 322.303 milliseconds (cumulative count 15994700)
+99.967% <= 360.191 milliseconds (cumulative count 15994727)
+99.967% <= 361.215 milliseconds (cumulative count 15994745)
+99.967% <= 362.239 milliseconds (cumulative count 15994750)
+99.967% <= 431.103 milliseconds (cumulative count 15994763)
+99.967% <= 432.127 milliseconds (cumulative count 15994775)
+99.968% <= 433.151 milliseconds (cumulative count 15994800)
+99.968% <= 455.167 milliseconds (cumulative count 15994827)
+99.968% <= 456.191 milliseconds (cumulative count 15994844)
+99.968% <= 457.215 milliseconds (cumulative count 15994850)
+99.968% <= 500.223 milliseconds (cumulative count 15994881)
+99.968% <= 501.247 milliseconds (cumulative count 15994900)
+99.968% <= 603.135 milliseconds (cumulative count 15994905)
+99.968% <= 604.159 milliseconds (cumulative count 15994950)
+99.969% <= 720.383 milliseconds (cumulative count 15994975)
+99.969% <= 721.407 milliseconds (cumulative count 15995000)
+99.969% <= 732.159 milliseconds (cumulative count 15995030)
+99.969% <= 733.183 milliseconds (cumulative count 15995050)
+99.969% <= 741.375 milliseconds (cumulative count 15995068)
+99.969% <= 743.423 milliseconds (cumulative count 15995092)
+99.969% <= 744.447 milliseconds (cumulative count 15995100)
+99.970% <= 800.255 milliseconds (cumulative count 15995128)
+99.970% <= 801.279 milliseconds (cumulative count 15995150)
+99.970% <= 985.599 milliseconds (cumulative count 15995191)
+99.970% <= 986.111 milliseconds (cumulative count 15995200)
+99.970% <= 1182.719 milliseconds (cumulative count 15995206)
+99.970% <= 1183.743 milliseconds (cumulative count 15995250)
+99.971% <= 1222.655 milliseconds (cumulative count 15995289)
+99.971% <= 1223.679 milliseconds (cumulative count 15995300)
+99.971% <= 1240.063 milliseconds (cumulative count 15995314)
+99.971% <= 1241.087 milliseconds (cumulative count 15995350)
+99.971% <= 1282.047 milliseconds (cumulative count 15995376)
+99.971% <= 1283.071 milliseconds (cumulative count 15995400)
+99.972% <= 1285.119 milliseconds (cumulative count 15995443)
+99.972% <= 1286.143 milliseconds (cumulative count 15995454)
+99.972% <= 1287.167 milliseconds (cumulative count 15995500)
+99.972% <= 1297.407 milliseconds (cumulative count 15995505)
+99.972% <= 1298.431 milliseconds (cumulative count 15995550)
+99.972% <= 1307.647 milliseconds (cumulative count 15995573)
+99.972% <= 1308.671 milliseconds (cumulative count 15995600)
+99.973% <= 1348.607 milliseconds (cumulative count 15995614)
+99.973% <= 1349.631 milliseconds (cumulative count 15995650)
+99.973% <= 1384.447 milliseconds (cumulative count 15995655)
+99.973% <= 1385.471 milliseconds (cumulative count 15995700)
+99.973% <= 1389.567 milliseconds (cumulative count 15995701)
+99.973% <= 1390.591 milliseconds (cumulative count 15995742)
+99.973% <= 1391.615 milliseconds (cumulative count 15995750)
+99.974% <= 1406.975 milliseconds (cumulative count 15995795)
+99.974% <= 1407.999 milliseconds (cumulative count 15995850)
+99.974% <= 1429.503 milliseconds (cumulative count 15995853)
+99.974% <= 1430.527 milliseconds (cumulative count 15995888)
+99.974% <= 1431.551 milliseconds (cumulative count 15995900)
+99.975% <= 1442.815 milliseconds (cumulative count 15995930)
+99.975% <= 1443.839 milliseconds (cumulative count 15995950)
+99.975% <= 1446.911 milliseconds (cumulative count 15995967)
+99.975% <= 1447.935 milliseconds (cumulative count 15995990)
+99.975% <= 1448.959 milliseconds (cumulative count 15996032)
+99.975% <= 1449.983 milliseconds (cumulative count 15996050)
+99.975% <= 1468.415 milliseconds (cumulative count 15996063)
+99.976% <= 1469.439 milliseconds (cumulative count 15996100)
+99.976% <= 1478.655 milliseconds (cumulative count 15996114)
+99.976% <= 1479.679 milliseconds (cumulative count 15996150)
+99.976% <= 1518.591 milliseconds (cumulative count 15996153)
+99.976% <= 1519.615 milliseconds (cumulative count 15996194)
+99.976% <= 1520.639 milliseconds (cumulative count 15996200)
+99.976% <= 1528.831 milliseconds (cumulative count 15996205)
+99.977% <= 1529.855 milliseconds (cumulative count 15996250)
+99.977% <= 1539.071 milliseconds (cumulative count 15996276)
+99.977% <= 1540.095 milliseconds (cumulative count 15996300)
+99.977% <= 1554.431 milliseconds (cumulative count 15996305)
+99.977% <= 1555.455 milliseconds (cumulative count 15996400)
+99.978% <= 1584.127 milliseconds (cumulative count 15996447)
+99.978% <= 1585.151 milliseconds (cumulative count 15996450)
+99.978% <= 1586.175 milliseconds (cumulative count 15996488)
+99.978% <= 1587.199 milliseconds (cumulative count 15996500)
+99.978% <= 1593.343 milliseconds (cumulative count 15996534)
+99.978% <= 1594.367 milliseconds (cumulative count 15996550)
+99.979% <= 1599.487 milliseconds (cumulative count 15996574)
+99.979% <= 1600.511 milliseconds (cumulative count 15996592)
+99.979% <= 1601.535 milliseconds (cumulative count 15996612)
+99.979% <= 1602.559 milliseconds (cumulative count 15996677)
+99.979% <= 1603.583 milliseconds (cumulative count 15996700)
+99.979% <= 1616.895 milliseconds (cumulative count 15996709)
+99.980% <= 1617.919 milliseconds (cumulative count 15996736)
+99.980% <= 1618.943 milliseconds (cumulative count 15996750)
+99.980% <= 1620.991 milliseconds (cumulative count 15996766)
+99.980% <= 1622.015 milliseconds (cumulative count 15996800)
+99.980% <= 1631.231 milliseconds (cumulative count 15996846)
+99.980% <= 1632.255 milliseconds (cumulative count 15996850)
+99.980% <= 1637.375 milliseconds (cumulative count 15996861)
+99.980% <= 1638.399 milliseconds (cumulative count 15996877)
+99.981% <= 1639.423 milliseconds (cumulative count 15996900)
+99.981% <= 1640.447 milliseconds (cumulative count 15996916)
+99.981% <= 1641.471 milliseconds (cumulative count 15996950)
+99.981% <= 1679.359 milliseconds (cumulative count 15996981)
+99.981% <= 1680.383 milliseconds (cumulative count 15997000)
+99.982% <= 1681.407 milliseconds (cumulative count 15997043)
+99.982% <= 1682.431 milliseconds (cumulative count 15997050)
+99.982% <= 1683.455 milliseconds (cumulative count 15997072)
+99.982% <= 1684.479 milliseconds (cumulative count 15997079)
+99.982% <= 1685.503 milliseconds (cumulative count 15997098)
+99.982% <= 1686.527 milliseconds (cumulative count 15997134)
+99.982% <= 1687.551 milliseconds (cumulative count 15997150)
+99.982% <= 1704.959 milliseconds (cumulative count 15997178)
+99.983% <= 1705.983 milliseconds (cumulative count 15997200)
+99.983% <= 1730.559 milliseconds (cumulative count 15997201)
+99.983% <= 1731.583 milliseconds (cumulative count 15997250)
+99.983% <= 1747.967 milliseconds (cumulative count 15997296)
+99.983% <= 1748.991 milliseconds (cumulative count 15997300)
+99.983% <= 1752.063 milliseconds (cumulative count 15997329)
+99.983% <= 1753.087 milliseconds (cumulative count 15997350)
+99.983% <= 1800.191 milliseconds (cumulative count 15997356)
+99.984% <= 1801.215 milliseconds (cumulative count 15997400)
+99.984% <= 1807.359 milliseconds (cumulative count 15997423)
+99.984% <= 1808.383 milliseconds (cumulative count 15997450)
+99.984% <= 1844.223 milliseconds (cumulative count 15997451)
+99.984% <= 1845.247 milliseconds (cumulative count 15997471)
+99.984% <= 1846.271 milliseconds (cumulative count 15997500)
+99.985% <= 1862.655 milliseconds (cumulative count 15997541)
+99.985% <= 1863.679 milliseconds (cumulative count 15997550)
+99.985% <= 1879.039 milliseconds (cumulative count 15997551)
+99.985% <= 1880.063 milliseconds (cumulative count 15997600)
+99.985% <= 1895.423 milliseconds (cumulative count 15997633)
+99.985% <= 1896.447 milliseconds (cumulative count 15997650)
+99.985% <= 1901.567 milliseconds (cumulative count 15997669)
+99.986% <= 1902.591 milliseconds (cumulative count 15997700)
+99.986% <= 1935.359 milliseconds (cumulative count 15997725)
+99.986% <= 1936.383 milliseconds (cumulative count 15997750)
+99.986% <= 1982.463 milliseconds (cumulative count 15997788)
+99.986% <= 1983.487 milliseconds (cumulative count 15997800)
+99.986% <= 2014.207 milliseconds (cumulative count 15997811)
+99.987% <= 2015.231 milliseconds (cumulative count 15997850)
+99.987% <= 2016.255 milliseconds (cumulative count 15997879)
+99.987% <= 2017.279 milliseconds (cumulative count 15997900)
+99.987% <= 2019.327 milliseconds (cumulative count 15997922)
+99.987% <= 2020.351 milliseconds (cumulative count 15997943)
+99.987% <= 2021.375 milliseconds (cumulative count 15997950)
+99.987% <= 2092.031 milliseconds (cumulative count 15997966)
+99.987% <= 2093.055 milliseconds (cumulative count 15998000)
+99.988% <= 2105.343 milliseconds (cumulative count 15998039)
+99.988% <= 2107.391 milliseconds (cumulative count 15998050)
+99.988% <= 2236.415 milliseconds (cumulative count 15998100)
+99.988% <= 2295.807 milliseconds (cumulative count 15998147)
+99.989% <= 2297.855 milliseconds (cumulative count 15998200)
+99.989% <= 2306.047 milliseconds (cumulative count 15998250)
+99.989% <= 2316.287 milliseconds (cumulative count 15998314)
+99.990% <= 2318.335 milliseconds (cumulative count 15998350)
+99.990% <= 2322.431 milliseconds (cumulative count 15998400)
+99.990% <= 2330.623 milliseconds (cumulative count 15998401)
+99.990% <= 2332.671 milliseconds (cumulative count 15998450)
+99.991% <= 2349.055 milliseconds (cumulative count 15998495)
+99.991% <= 2351.103 milliseconds (cumulative count 15998500)
+99.991% <= 2353.151 milliseconds (cumulative count 15998550)
+99.991% <= 2363.391 milliseconds (cumulative count 15998559)
+99.991% <= 2365.439 milliseconds (cumulative count 15998600)
+99.991% <= 2377.727 milliseconds (cumulative count 15998638)
+99.992% <= 2379.775 milliseconds (cumulative count 15998650)
+99.992% <= 2408.447 milliseconds (cumulative count 15998685)
+99.992% <= 2410.495 milliseconds (cumulative count 15998700)
+99.992% <= 2414.591 milliseconds (cumulative count 15998750)
+99.992% <= 2449.407 milliseconds (cumulative count 15998758)
+99.992% <= 2451.455 milliseconds (cumulative count 15998790)
+99.992% <= 2453.503 milliseconds (cumulative count 15998800)
+99.993% <= 2463.743 milliseconds (cumulative count 15998850)
+99.993% <= 2471.935 milliseconds (cumulative count 15998900)
+99.993% <= 2488.319 milliseconds (cumulative count 15998950)
+99.994% <= 2498.559 milliseconds (cumulative count 15998979)
+99.994% <= 2500.607 milliseconds (cumulative count 15999000)
+99.994% <= 2510.847 milliseconds (cumulative count 15999048)
+99.994% <= 2512.895 milliseconds (cumulative count 15999050)
+99.994% <= 2514.943 milliseconds (cumulative count 15999087)
+99.994% <= 2516.991 milliseconds (cumulative count 15999100)
+99.995% <= 2539.519 milliseconds (cumulative count 15999147)
+99.995% <= 2541.567 milliseconds (cumulative count 15999150)
+99.995% <= 2555.903 milliseconds (cumulative count 15999187)
+99.995% <= 2557.951 milliseconds (cumulative count 15999200)
+99.995% <= 2576.383 milliseconds (cumulative count 15999225)
+99.996% <= 2578.431 milliseconds (cumulative count 15999299)
+99.996% <= 2580.479 milliseconds (cumulative count 15999300)
+99.996% <= 2586.623 milliseconds (cumulative count 15999323)
+99.996% <= 2588.671 milliseconds (cumulative count 15999350)
+99.996% <= 2643.967 milliseconds (cumulative count 15999400)
+99.997% <= 2662.399 milliseconds (cumulative count 15999463)
+99.997% <= 2664.447 milliseconds (cumulative count 15999500)
+99.997% <= 2668.543 milliseconds (cumulative count 15999538)
+99.997% <= 2670.591 milliseconds (cumulative count 15999550)
+99.997% <= 2676.735 milliseconds (cumulative count 15999577)
+99.998% <= 2678.783 milliseconds (cumulative count 15999629)
+99.998% <= 2680.831 milliseconds (cumulative count 15999650)
+99.998% <= 2732.031 milliseconds (cumulative count 15999700)
+99.998% <= 2738.175 milliseconds (cumulative count 15999750)
+99.999% <= 2779.135 milliseconds (cumulative count 15999800)
+99.999% <= 2797.567 milliseconds (cumulative count 15999808)
+99.999% <= 2799.615 milliseconds (cumulative count 15999850)
+99.999% <= 2869.247 milliseconds (cumulative count 15999900)
+100.000% <= 2899.967 milliseconds (cumulative count 15999950)
+100.000% <= 3135.487 milliseconds (cumulative count 16000000)
+100.000% <= 3135.487 milliseconds (cumulative count 16000000)
+
+Summary:
+  throughput summary: 29430.21 requests per second
+  latency summary (msec):
+          avg       min       p50       p95       p99       max
+        1.586     0.136     0.927     1.519     1.855  3135.487
+
+
+292768:M 07 Jul 2025 10:11:48.314 * Server initialized
+292768:M 07 Jul 2025 10:11:48.316 * DB loaded from append only file: 0.000 seconds
+292768:M 07 Jul 2025 10:11:48.316 * Ready to accept connections tcp
+292768:M 07 Jul 2025 10:12:44.712 * Starting automatic rewriting of AOF on 753425965200% growth
+292768:M 07 Jul 2025 10:12:44.712 * solesie: incr 초기화, 남은 lb: 2040210
+292768:M 07 Jul 2025 10:12:45.030 * Background append only file rewriting started by pid 294298
+294298:C 07 Jul 2025 10:13:14.178 * Successfully created the temporary AOF base
+294298:C 07 Jul 2025 10:13:14.271 * Fork CoW for AOF rewrite: current 2613 MB, peak 2613 MB, average 1580 MB
+292768:M 07 Jul 2025 10:13:14.600 * Background AOF rewrite terminated with success
+292768:M 07 Jul 2025 10:13:14.600 * Background AOF rewrite finished successfully
+292768:M 07 Jul 2025 10:13:25.349 * Starting automatic rewriting of AOF on 50% growth
+292768:M 07 Jul 2025 10:13:25.349 * solesie: incr 초기화, 남은 lb: 1834869
+292768:M 07 Jul 2025 10:13:25.802 * Background append only file rewriting started by pid 295944
+295944:C 07 Jul 2025 10:14:07.114 * Successfully created the temporary AOF base
+295944:C 07 Jul 2025 10:14:07.229 * Fork CoW for AOF rewrite: current 4600 MB, peak 4600 MB, average 2847 MB
+292768:M 07 Jul 2025 10:14:07.744 * Background AOF rewrite terminated with success
+292768:M 07 Jul 2025 10:14:07.744 * Background AOF rewrite finished successfully
+292768:M 07 Jul 2025 10:14:07.845 * 100 changes in 100 seconds. Saving...
+292768:M 07 Jul 2025 10:14:08.202 * Background saving started by pid 297642
+297642:C 07 Jul 2025 10:15:00.763 * DB saved on disk
+297642:C 07 Jul 2025 10:15:00.935 * Fork CoW for RDB: current 5504 MB, peak 5504 MB, average 3585 MB
+292768:M 07 Jul 2025 10:15:01.722 * Background saving terminated with success
+292768:M 07 Jul 2025 10:15:01.824 * Starting automatic rewriting of AOF on 116% growth
+292768:M 07 Jul 2025 10:15:01.824 * solesie: incr 초기화, 남은 lb: 3490998
+292768:M 07 Jul 2025 10:15:02.553 * Background append only file rewriting started by pid 299778
+299778:C 07 Jul 2025 10:15:57.622 * Successfully created the temporary AOF base
+299778:C 07 Jul 2025 10:15:57.772 * Fork CoW for AOF rewrite: current 5716 MB, peak 5716 MB, average 3725 MB
+292768:M 07 Jul 2025 10:15:58.515 * Background AOF rewrite terminated with success
+292768:M 07 Jul 2025 10:15:58.515 * Background AOF rewrite finished successfully
+292768:M 07 Jul 2025 10:16:30.432 * Starting automatic rewriting of AOF on 50% growth
+292768:M 07 Jul 2025 10:16:30.432 * solesie: incr 초기화, 남은 lb: 653495
+292768:M 07 Jul 2025 10:16:31.172 * Background append only file rewriting started by pid 303256
+303256:C 07 Jul 2025 10:18:12.947 * Successfully created the temporary AOF base
+303256:C 07 Jul 2025 10:18:13.144 * Fork CoW for AOF rewrite: current 6200 MB, peak 6200 MB, average 4698 MB
+292768:M 07 Jul 2025 10:18:16.005 * Background AOF rewrite terminated with success
+292768:M 07 Jul 2025 10:18:16.005 * Background AOF rewrite finished successfully
+292768:M 07 Jul 2025 10:18:16.106 * 100 changes in 100 seconds. Saving...
+292768:M 07 Jul 2025 10:18:16.536 * Background saving started by pid 307412
+307412:C 07 Jul 2025 10:21:20.029 * DB saved on disk
+307412:C 07 Jul 2025 10:21:20.211 * Fork CoW for RDB: current 5965 MB, peak 6102 MB, average 5119 MB
+292768:M 07 Jul 2025 10:21:21.131 * Background saving terminated with success
+292768:M 07 Jul 2025 10:21:21.232 * Starting automatic rewriting of AOF on 85% growth
+292768:M 07 Jul 2025 10:21:21.232 * solesie: incr 초기화, 남은 lb: 2962015
+292768:M 07 Jul 2025 10:21:23.393 * Background append only file rewriting started by pid 314702
+314702:C 07 Jul 2025 10:22:30.613 * Successfully created the temporary AOF base
+314702:C 07 Jul 2025 10:22:30.875 * Fork CoW for AOF rewrite: current 1 MB, peak 2 MB, average 1 MB
+292768:M 07 Jul 2025 10:22:31.106 * Background AOF rewrite terminated with success
+292768:M 07 Jul 2025 10:22:31.106 * Background AOF rewrite finished successfully
+292768:M 07 Jul 2025 10:23:02.008 * 100 changes in 100 seconds. Saving...
+292768:M 07 Jul 2025 10:23:02.320 * Background saving started by pid 316516
+316516:C 07 Jul 2025 10:23:59.262 * DB saved on disk
+316516:C 07 Jul 2025 10:23:59.523 * Fork CoW for RDB: current 1 MB, peak 1 MB, average 1 MB
+292768:M 07 Jul 2025 10:23:59.767 * Background saving terminated with success
+
+
+SSD:
+	RG 0 channel 0-7 / lun 0-7
+	print_sungjin(wpp->written) : {16536851}
+	print_sungjin(wpp->written) : {29666036}
+	print_sungjin(wpp->written) : {2}
+	print_sungjin(wpp->written) : {2}
+	print_sungjin(wpp->written) : {2}
+	print_sungjin(wpp->written) : {2}
+	print_sungjin(wpp->written) : {2}
+	print_sungjin(wpp->written) : {2}
+	print_sungjin(ssd->sungjin_stat.block_erased) : {9920}
+	print_sungjin(ssd->sungjin_stat.copied) : {18392899}
+	print_sungjin(ssd->sungjin_stat.discard) : {11655903}
+	print_sungjin(ssd->sungjin_stat.discard_ignored) : {27140391}
+	print_sungjin(ssd->sungjin_stat.invalidated) : {13318901}
+	print_sungjin(sum_written) : {0}
+	print_sungjin(ssd->sungjin_stat.write_io_n) : {3096200}
+	print_sungjin(ssd->sungjin_stat.read_io_n) : {191}
+	print_sungjin(ssd->sungjin_stat.read_sum) : {1932}
+	INITIALIZED current time: Mon Jul  7 19:29:04 2025
+	NVME_CMD_IO_MGMT_SEND sungjin
+	print_sungjin(nvme_io_mgmt_sungjin) : {94900665285008}
+	print_sungjin(end_lba) : {26214400}
+	msssd_io_mgmt_send_sungjin
+	print_sungjin(spp->blks_per_line) : {64}
+	print_sungjin(spp->pgs_per_line) : {262144}
+    GC: 215sec
+	WAF: 1.62
