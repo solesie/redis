@@ -6,7 +6,7 @@ set -euo pipefail
 #--------------------------------------------------
 TYPE="fs_redis_fdp_enabled_everysec"
 
-RESULTS_DIR="/home/solesie/redis/bench-results/${TYPE}/timebreakdown/only-memory-iter-time"
+RESULTS_DIR="/home/solesie/redis/bench-results/${TYPE}/recover-exec/exec"
 SERVER_LOG="${RESULTS_DIR}/server.txt"
 CONF_FILE="./${TYPE}.conf"
 REDIS_SERVER="./src/redis-server"
@@ -54,14 +54,14 @@ sleep 2
 # sudo ${REDIS_BENCH} \
 #     -h 127.0.0.1 -p 6379 \
 #     -c 50 -n 5321523 -d 4096 -t set -r 5321523 -k 1 
-echo "[2] 초기 데이터 적재 (20GiB 기준)"
-sudo ${REDIS_BENCH} \
-    -h 127.0.0.1 -p 6379 \
-    -c 50 -n 20971520 -d 4096 -t set -r 5321523 -k 1 
+# echo "[2] 초기 데이터 적재 (20GiB 기준)"
+# sudo ${REDIS_BENCH} \
+#     -h 127.0.0.1 -p 6379 \
+#     -c 50 -n 28835840 -d 4096 -t set -r 5321523 -k 1 
 
-echo "[3] BGREWRITEAOF 실행"
-sudo ${REDIS_CLI} BGREWRITEAOF
-sleep 60
+# echo "[3] BGREWRITEAOF 실행"
+# sudo ${REDIS_CLI} BGREWRITEAOF
+# sleep 60
 
 #--------------------------------------------------
 # 2) PHASE loop

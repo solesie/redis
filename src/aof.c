@@ -1441,7 +1441,7 @@ int loadSingleAppendOnlyFile(char *filename) {
     off_t last_progress_report_size = 0;
     int ret = AOF_OK;
 
-    sds aof_filepath = makePath(server.aof_dirname, filename);
+    sds aof_filepath = makePath(server.aof_base_dirname, filename);
     FILE *fp = fopen(aof_filepath, "r");
     if (fp == NULL) {
         int en = errno;

@@ -6929,8 +6929,8 @@ static inline uint64_t timespec_to_ns(const struct timespec *ts) {
 }
 
 int main(int argc, char **argv) {
-    /* solesie: 테스트용 */
-    // fdpNvme *fn = fdpNvmeCreate("/dev/nvme0n1p2");
+    // /* solesie: 테스트용 */
+    // fdpNvme *fn = fdpNvmeCreate("/dev/nvme0n1");
     // fdpNvmeDeallocateLba(fn, fdpNvmeGetStartLba(fn), fdpNvmeGetDeviceSize(fn) >> fdpNvmeGetLbaShift(fn));
     // fdpNvmeRelease(fn);
 
@@ -6939,45 +6939,36 @@ int main(int argc, char **argv) {
     // server.fdp_device_file = "/dev/nvme0n1";
     // fdpPersistencyInit();
 
-    // fdpUfsResetData(FDP_UFS_AOF_BASE);
-    // fdpUfsResetData(FDP_UFS_AOF_INCR);
-    // fdpUfsResetData(FDP_UFS_RDB);
-    // loadManifestFromDisk();
-
-    // #define TOTAL_BYTES    (3ULL * 1024 * 1024 * 1024) 
-    // #define CHUNK_SIZE     (4 * 1024)
+    // fdpUfsActivateRio();
+    // #define TOTAL_BYTES    (23ULL * 1024 * 1024) 
+    // #define CHUNK_SIZE     (23)
     // #define ITERATIONS     (TOTAL_BYTES / CHUNK_SIZE)
 
-
-    // fdpNvme *fn = server.fdp_ufs->fdp_nvme;
-    // fdpModule *fd = server.fdp_ufs->fdp_module;
-    
-    // struct timespec t0, t1;
-    // uint64_t total_with_ns;
-
-    // char *buf = (char*)zcalloc(TOTAL_BYTES);
-    // for(int i = 0; i < TOTAL_BYTES/6; ++i){
+    // char *buf = (char*)zcalloc(CHUNK_SIZE);
+    // for(int i = 0; i < CHUNK_SIZE; ++i){
     //     buf[i] = 65 + i % 26;
     // }
 
-    // // clock_gettime(CLOCK_MONOTONIC, &t0);
     // for(int i = 0; i < ITERATIONS; ++i){
     //     fdpUfsIOWrite(buf, CHUNK_SIZE, FDP_UFS_AOF_BASE);
-    //     fdpUfsIOWrite(buf, CHUNK_SIZE, FDP_UFS_AOF_INCR);
     // }
     // fdpUfsIOFlush(FDP_UFS_AOF_BASE);
-    // fdpUfsIOFlush(FDP_UFS_AOF_INCR);
-    // fdpUfsIOWait(FDP_UFS_AOF_BASE);
-    // fdpUfsIOWait(FDP_UFS_AOF_INCR);
-    // clock_gettime(CLOCK_MONOTONIC, &t1);
-    // total_with_ns = timespec_to_ns(&t1) - timespec_to_ns(&t0);
-    // printf("io_uring=%.3fs\n", total_with_ns/1e9);
+    // fdpUfsDeactivateRio();
 
-    // fdpUfsIORead(buf, TOTAL_BYTES, FDP_UFS_AOF_BASE);
-    // fdpUfsIOWait();
-    // for(int i = 0; i < 100; ++i){
-    //     printf("%c", buf[i]);
+    // fdpUfsActivateRio();
+    // char *rbuf = (char*)zcalloc(CHUNK_SIZE);
+    // for(int i = 0; i < ITERATIONS; ++i){
+    //     fdpUfsIORead(rbuf, CHUNK_SIZE, FDP_UFS_AOF_BASE);
+
+    //     for(int j = 0; j < CHUNK_SIZE; ++j){
+    //         if(rbuf[j] != buf[j]){
+    //             printf("%c", rbuf[j]);
+    //         } 
+    //         // assert(rbuf[j] == buf[j]);
+    //     }
     // }
+    // fdpUfsDeactivateRio();
+    
 
     // // fdpUfsIOWrite(buf, TOTAL_BYTES, 1, FDP_UFS_MANIFEST);
     // // printf("submission completed\n");

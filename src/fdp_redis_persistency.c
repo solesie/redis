@@ -91,32 +91,32 @@ void fdpPersistencyInit(void){
 
 void fdpPersistencyLoadManifestFromDisk(void){
     char buf_rio[MANIFEST_BUF_LEN];
-    char buf_bio[MANIFEST_BUF_LEN];
+    // char buf_bio[MANIFEST_BUF_LEN];
 
     fdpUfsActivateRio();
 
-    fdpUfsIORead(buf_bio, MANIFEST_BUF_LEN, FDP_UFS_MANIFEST_BIO);
-    if(fdpUfsIOWait(FDP_UFS_MANIFEST_BIO) != 1){
-        exit(1);
-    }
+    // fdpUfsIORead(buf_bio, MANIFEST_BUF_LEN, FDP_UFS_MANIFEST_BIO);
+    // if(fdpUfsIOWait(FDP_UFS_MANIFEST_BIO) != 1){
+    //     exit(1);
+    // }
 
     fdpUfsIORead(buf_rio, MANIFEST_BUF_LEN, FDP_UFS_MANIFEST_RIO);
     if(fdpUfsIOWait(FDP_UFS_MANIFEST_RIO) != 1){
         exit(1);
     }
 
-    // if(!checkCrc(buf, MANIFEST_BUF_LEN)){
+    if(!checkCrc(buf_rio, MANIFEST_BUF_LEN)){
         persistManifestBio();
         persistManifestRio();
 
         fdpUfsDeactivateRio();
         return;
-    // }
+    }
 
-    // fdpUfsDeactivateRio();
-    // memcpy(&ufs->manifest, buf, sizeof(ufs->manifest));
-    // printf("fdp ufs manifest exist!\n");
-    // return;
+    fdpUfsDeactivateRio();
+    memcpy(&server.fdp_ufs->manifest.rio, buf_rio, sizeof(server.fdp_ufs->manifest.rio));
+    printf("fdp ufs manifest exist!: %d %ld\n", server.fdp_ufs->manifest.rio.aof_base_start_lba, server.fdp_ufs->manifest.rio.aof_base_cur_offt);
+    return;
 }
 
 static int loadAofBase(void){

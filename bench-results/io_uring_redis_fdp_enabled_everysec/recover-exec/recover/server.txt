@@ -1,0 +1,17 @@
+34164:C 03 Aug 2025 08:23:40.522 # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+34164:C 03 Aug 2025 08:23:40.522 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+34164:C 03 Aug 2025 08:23:40.522 * Redis version=7.4.2, bits=64, commit=22972673, modified=1, pid=34164, just started
+34164:C 03 Aug 2025 08:23:40.522 * Configuration loaded
+34164:M 03 Aug 2025 08:23:40.523 * Increased maximum number of open files to 10032 (it was originally set to 1024).
+34164:M 03 Aug 2025 08:23:40.523 * monotonic clock: POSIX clock_gettime
+34164:M 03 Aug 2025 08:23:40.526 * Running mode=standalone, port=6379.
+34164:M 03 Aug 2025 08:23:41.846 * Server initialized
+fdp ufs manifest exist!: 2 20296642277
+34164:M 03 Aug 2025 08:23:41.851 * Loading RDB produced by version 7.4.2
+34164:M 03 Aug 2025 08:23:41.851 * RDB age 271 seconds
+34164:M 03 Aug 2025 08:23:41.851 * RDB memory usage when created -30456.29 Mb
+34164:M 03 Aug 2025 08:23:41.851 * RDB is base AOF
+34164:M 03 Aug 2025 08:24:22.926 * Done loading RDB, keys loaded: 4931155, keys expired: 0.
+34164:M 03 Aug 2025 08:24:22.927 * DB loaded from base: 41.079 seconds
+34164:M 03 Aug 2025 08:24:22.927 * DB loaded from append only file: 41.079 seconds(471.13123494mb/s)
+34164:M 03 Aug 2025 08:24:22.927 * Ready to accept connections tcp

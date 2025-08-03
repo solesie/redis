@@ -22,3 +22,10 @@
 35668:C 01 Aug 2025 07:15:10.993 * Fork CoW for AOF rewrite: current 5347 MB, peak 5815 MB, average 3756 MB
 35547:M 01 Aug 2025 07:15:11.904 * Background AOF rewrite terminated with success
 35547:M 01 Aug 2025 07:15:11.906 * Background AOF rewrite finished successfully
+3554735547:signal-handler (:signal-handler (17541223731754122373) ) Received SIGTERM scheduling shutdown...Received SIGTERM scheduling shutdown...
+
+35547:M 02 Aug 2025 08:12:53.800 * User requested shutdown...
+35547:M 02 Aug 2025 08:12:53.800 * Calling fsync() on the AOF file.
+35547:M 02 Aug 2025 08:12:53.800 # Fail to fsync the AOF file: Bad file descriptor.
+35547:M 02 Aug 2025 08:12:53.800 * Removing the pid file.
+35547:M 02 Aug 2025 08:12:53.800 # Redis is now ready to exit, bye bye...

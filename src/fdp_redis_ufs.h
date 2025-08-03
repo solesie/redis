@@ -82,6 +82,24 @@ typedef struct _fdpUfs{
     size_t rdb_wbuf_size;
     size_t rdb_wbuf_len;
 
+    /* solesie: rdb read buffer */
+    void *rdb_rbuf;
+    /* solesie: size should be aligned with lba size */
+    size_t rdb_rbuf_size;
+    size_t rdb_rbuf_len;
+
+    /* solesie: aof_base read buffer */
+    void *aof_base_rbuf;
+    /* solesie: size should be aligned with lba size */
+    size_t aof_base_rbuf_size;
+    size_t aof_base_rbuf_len;
+
+    /* solesie: aof_incr read buffer */
+    void *aof_incr_rbuf;
+    /* solesie: size should be aligned with lba size */
+    size_t aof_incr_rbuf_size;
+    size_t aof_incr_rbuf_len;
+
     /* solesie: no need to save read pointer in manifest */
     uint64_t aof_base_rofft;
     uint64_t aof_base_rofft_aligned;

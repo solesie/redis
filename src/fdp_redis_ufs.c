@@ -114,6 +114,10 @@ void fdpUfsInit(void){
     server.fdp_ufs->aof_base_wbuf_size = ios;
     server.fdp_ufs->aof_incr_wbuf_size = ios;
     server.fdp_ufs->rdb_wbuf_size = ios;
+    
+    server.fdp_ufs->aof_base_rbuf = zcalloc(ios);
+    server.fdp_ufs->aof_base_rbuf_len = 0;
+    server.fdp_ufs->aof_base_rbuf_size = ios;
 
     /* solesie: 테스트용 */
     fdpNvmeDeallocateLba(fn, 0, server.fdp_ufs->device_size >> server.fdp_ufs->lba_shift);
@@ -436,52 +440,66 @@ int fdpUfsIOWrite(const void *buf, uint64_t len, fdpUfsDataType type){
         *cur_offt += write_len;
         user_buf += write_len;
         remaining_len -= write_len;
+        *cache_buf_len += write_len;
     }
 
     assert(remaining_len == 0);
     return 1;
 }
 
-void fdpUfsIORead(void *buf, uint64_t len, fdpUfsDataType type){
+void fdpUfsIORead(void *buf, uint64_t len, fdpUfsDataType type) {
     fdpUfs *ufs = server.fdp_ufs;
     uint32_t lb_size = 1 << server.fdp_ufs->lba_shift;
 
     /* solesie: Apply direct io to manifest. */
-    if(type == FDP_UFS_MANIFEST_RIO){
+    if (type == FDP_UFS_MANIFEST_RIO) {
         readInternal(
-            ufs->fdp_module_rio, 
-            buf, 
-            len, 
-            ufs->manifest.rio.manifest_rio_start_lba << ufs->lba_shift);
+            ufs->fdp_module_rio,
+            buf,
+            len,
+            0 << ufs->lba_shift);
         return;
     }
-    if(type == FDP_UFS_MANIFEST_BIO){
+    if (type == FDP_UFS_MANIFEST_BIO) {
         readInternal(
             ufs->fdp_module_bio,
-            buf, 
-            len, 
-            ufs->manifest.bio.manifest_bio_start_lba << ufs->lba_shift);
+            buf,
+            len,
+            1 << ufs->lba_shift);
         return;
     }
 
     fdpModule *fm = NULL;
+    uint8_t *cache_buf = NULL;
+    size_t *cache_buf_size = NULL;
+    size_t *cache_buf_len = NULL;
     uint64_t *cur_offt = NULL;
     uint64_t *cur_offt_aligned = NULL;
-    switch (type){
+
+    switch (type) {
         case FDP_UFS_AOF_BASE: {
             fm = ufs->fdp_module_rio;
+            cache_buf = (uint8_t*)ufs->aof_base_rbuf;
+            cache_buf_size = &(ufs->aof_base_rbuf_size);
+            cache_buf_len = &(ufs->aof_base_rbuf_len);
             cur_offt = &(ufs->aof_base_rofft);
             cur_offt_aligned = &(ufs->aof_base_rofft_aligned);
             break;
         }
         case FDP_UFS_AOF_INCR: {
             fm = ufs->fdp_module_bio;
+            cache_buf = (uint8_t*)ufs->aof_incr_rbuf;
+            cache_buf_size = &(ufs->aof_incr_rbuf_size);
+            cache_buf_len = &(ufs->aof_incr_rbuf_len);
             cur_offt = &(ufs->aof_incr_rofft);
             cur_offt_aligned = &(ufs->aof_incr_rofft_aligned);
             break;
         }
         case FDP_UFS_RDB: {
             fm = ufs->fdp_module_rio;
+            cache_buf = (uint8_t*)ufs->rdb_rbuf;
+            cache_buf_size = &(ufs->rdb_rbuf_size);
+            cache_buf_len = &(ufs->rdb_rbuf_len);
             cur_offt = &(ufs->rdb_rofft);
             cur_offt_aligned = &(ufs->rdb_rofft_aligned);
             break;
@@ -491,9 +509,85 @@ void fdpUfsIORead(void *buf, uint64_t len, fdpUfsDataType type){
         }
     }
 
-    readInternal(fm, buf, len, *cur_offt_aligned);
-    *cur_offt += len;
+    uint64_t remaining_len = len;
+    uint8_t *user_buf = (uint8_t *)buf;
+
+    /* solesie: head of read (consume from cache) */
+    size_t copy_from_cache = min(remaining_len, *cache_buf_len);
+    if (copy_from_cache > 0) {
+        // Data in the read cache is at the beginning of the buffer.
+        memcpy(user_buf, cache_buf + ((*cache_buf_size) - (*cache_buf_len)), copy_from_cache);
+
+        // printf("solesie1: ");
+        // for(int i = 0; i < copy_from_cache; ++i){
+        //     printf("%x", ((char*)buf)[i]);
+        // } printf("\n");
+        
+        // Shift remaining data in the cache to the front
+        *cache_buf_len -= copy_from_cache;
+
+        user_buf += copy_from_cache;
+        *cur_offt += copy_from_cache;
+        remaining_len -= copy_from_cache;
+    }
+
+    /* solesie: body of read (read large chunks directly into user buffer) */
+    if (remaining_len >= *cache_buf_size) {
+        serverAssert(*cache_buf_len == 0); // Cache should be empty now
+        uint64_t direct_read_len = (remaining_len / (*cache_buf_size)) * (*cache_buf_size); /* floor */
+        
+        // The current read offset might not be LBA-aligned.
+        // We must start reading from an LBA-aligned offset.
+        *cur_offt_aligned = ((*cur_offt) / lb_size) * lb_size;
+        
+        // This direct read bypasses our cache.
+        readInternal(fm, user_buf, direct_read_len, *cur_offt_aligned);
+        fdpUfsIOWait(type);
+
+        *cur_offt += direct_read_len;
+        user_buf += direct_read_len;
+        remaining_len -= direct_read_len;
+    }
+    
+    /* solesie: tail of read (prefetch into cache, then copy) */
+    if (remaining_len > 0) {
+        serverAssert(*cache_buf_len == 0); // Cache must be empty
+        
+        // We need to read `remaining_len`, but we will prefetch a full cache block
+        // to optimize subsequent small reads.
+        *cur_offt_aligned = ((*cur_offt) / lb_size) * lb_size;
+        // printf("%ld %lld\n",*cur_offt_aligned, *cache_buf_size);
+
+        // Read a full block into our internal read cache.
+        // NOTE: We assume readInternal will fill the 'cache_buf' upon async completion.
+        // For this logic to work, the system must handle this async operation before
+        // the data is actually used.
+        readInternal(fm, cache_buf, *cache_buf_size, *cur_offt_aligned);
+        fdpUfsIOWait(type);
+        
+        // Let's assume the read was successful and the cache is now full.
+        // In a real async system, this would happen in a callback.
+        *cache_buf_len = *cache_buf_size; // Or bytes actually read if less than a full block
+
+        // Now, copy the requested part from the newly filled cache to the user buffer.
+        size_t copy_from_prefetched = min(remaining_len, *cache_buf_len);
+        memcpy(user_buf, cache_buf, copy_from_prefetched);
+        // printf("solesie2 %lld: ", remaining_len);
+        // for(int i = 0; i < copy_from_prefetched; ++i){
+        //     printf("%x", ((char*)user_buf)[i]);
+        // } printf("\n");
+        
+        // Update cache state
+        *cache_buf_len -= copy_from_prefetched;
+
+        user_buf += copy_from_prefetched;
+        *cur_offt += copy_from_prefetched;
+        remaining_len -= copy_from_prefetched;
+    }
+
+    // After all operations, update the aligned offset based on the final current offset
     *cur_offt_aligned = ((*cur_offt) / lb_size) * lb_size;
+    serverAssert(remaining_len == 0);
 }
 
 void fdpUfsIOFlush(fdpUfsDataType type){

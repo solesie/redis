@@ -1,0 +1,17 @@
+3056:C 03 Aug 2025 06:05:09.251 # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+3056:C 03 Aug 2025 06:05:09.251 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+3056:C 03 Aug 2025 06:05:09.251 * Redis version=7.4.2, bits=64, commit=22972673, modified=1, pid=3056, just started
+3056:C 03 Aug 2025 06:05:09.251 * Configuration loaded
+3056:M 03 Aug 2025 06:05:09.252 * Increased maximum number of open files to 10032 (it was originally set to 1024).
+3056:M 03 Aug 2025 06:05:09.252 * monotonic clock: POSIX clock_gettime
+3056:M 03 Aug 2025 06:05:09.254 * Running mode=standalone, port=6379.
+3056:M 03 Aug 2025 06:05:09.333 * Server initialized
+3056:M 03 Aug 2025 06:05:09.335 * DB loaded from append only file: 0.000 seconds
+3056:M 03 Aug 2025 06:05:09.335 * Ready to accept connections tcp
+3056:M 03 Aug 2025 06:08:31.615 * Starting automatic rewriting of AOF on 5757471652000% growth
+3056:M 03 Aug 2025 06:08:31.616 * solesie: incr 초기화, 남은 lb: 12367777
+3056:M 03 Aug 2025 06:08:32.864 * Background append only file rewriting started by pid 3157
+3157:C 03 Aug 2025 06:10:12.626 * Successfully created the temporary AOF base
+3157:C 03 Aug 2025 06:10:12.754 * Fork CoW for AOF rewrite: current 12338 MB, peak 12338 MB, average 8879 MB
+3056:M 03 Aug 2025 06:10:13.426 * Background AOF rewrite terminated with success
+3056:M 03 Aug 2025 06:10:13.426 * Background AOF rewrite finished successfully
