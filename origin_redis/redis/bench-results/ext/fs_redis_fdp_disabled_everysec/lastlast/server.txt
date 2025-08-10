@@ -1,0 +1,102 @@
+17933:C 28 Jul 2025 06:07:29.962 # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+17933:C 28 Jul 2025 06:07:29.962 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+17933:C 28 Jul 2025 06:07:29.962 * Redis version=7.4.2, bits=64, commit=46f1bac7, modified=1, pid=17933, just started
+17933:C 28 Jul 2025 06:07:29.962 * Configuration loaded
+17933:M 28 Jul 2025 06:07:29.963 * Increased maximum number of open files to 10032 (it was originally set to 1024).
+17933:M 28 Jul 2025 06:07:29.963 * monotonic clock: POSIX clock_gettime
+17933:M 28 Jul 2025 06:07:29.965 * Running mode=standalone, port=6379.
+17933:M 28 Jul 2025 06:07:29.965 * Server initialized
+17933:M 28 Jul 2025 06:07:29.966 * Creating AOF base file appendonly.aof.1.base.rdb on server start
+17933:M 28 Jul 2025 06:07:29.968 * Creating AOF incr file appendonly.aof.1.incr.aof on server start
+17933:M 28 Jul 2025 06:07:29.968 * Ready to accept connections tcp
+17933:M 28 Jul 2025 06:11:38.579 * Starting automatic rewriting of AOF on 5799256412500% growth
+17933:M 28 Jul 2025 06:11:38.589 * Creating AOF incr file appendonly.aof.2.incr.aof on background rewrite
+17933:M 28 Jul 2025 06:11:38.589 * Removing the history file appendonly.aof.1.base.rdb in the background
+17933:M 28 Jul 2025 06:11:38.589 * Removing the history file appendonly.aof.1.incr.aof in the background
+17933:M 28 Jul 2025 06:11:39.127 * Background append only file rewriting started by pid 22094
+22094:C 28 Jul 2025 06:13:31.001 * Successfully created the temporary AOF base file temp-rewriteaof-bg-22094.aof
+22094:C 28 Jul 2025 06:13:31.246 * Fork CoW for AOF rewrite: current 13025 MB, peak 13076 MB, average 9748 MB
+17933:M 28 Jul 2025 06:13:32.202 * Background AOF rewrite terminated with success
+/home/solesie/mnt/p0/appendonly.aof.2.base.rdb
+17933:M 28 Jul 2025 06:13:32.202 * Successfully renamed the temporary AOF base file temp-rewriteaof-bg-22094.aof into appendonly.aof.2.base.rdb
+17933:M 28 Jul 2025 06:13:32.285 * Background AOF rewrite finished successfully
+17933:M 28 Jul 2025 06:15:46.170 * Starting automatic rewriting of AOF on 266% growth
+17933:M 28 Jul 2025 06:15:46.308 * Creating AOF incr file appendonly.aof.3.incr.aof on background rewrite
+17933:M 28 Jul 2025 06:15:46.308 * Removing the history file appendonly.aof.2.base.rdb in the background
+17933:M 28 Jul 2025 06:15:46.311 * Removing the history file appendonly.aof.2.incr.aof in the background
+17933:M 28 Jul 2025 06:15:47.203 * Background append only file rewriting started by pid 28289
+28289:C 28 Jul 2025 06:17:43.751 * Successfully created the temporary AOF base file temp-rewriteaof-bg-28289.aof
+28289:C 28 Jul 2025 06:17:44.175 * Fork CoW for AOF rewrite: current 13630 MB, peak 13630 MB, average 8587 MB
+17933:M 28 Jul 2025 06:17:46.007 * Background AOF rewrite terminated with success
+/home/solesie/mnt/p0/appendonly.aof.3.base.rdb
+17933:M 28 Jul 2025 06:17:46.007 * Successfully renamed the temporary AOF base file temp-rewriteaof-bg-28289.aof into appendonly.aof.3.base.rdb
+17933:M 28 Jul 2025 06:17:46.009 * Background AOF rewrite finished successfully
+17933:M 28 Jul 2025 06:20:23.628 * Starting automatic rewriting of AOF on 266% growth
+17933:M 28 Jul 2025 06:20:23.629 * Creating AOF incr file appendonly.aof.4.incr.aof on background rewrite
+17933:M 28 Jul 2025 06:20:23.629 * Removing the history file appendonly.aof.3.base.rdb in the background
+17933:M 28 Jul 2025 06:20:23.631 * Removing the history file appendonly.aof.3.incr.aof in the background
+17933:M 28 Jul 2025 06:20:24.772 * Background append only file rewriting started by pid 35314
+17933:M 28 Jul 2025 06:21:53.285 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:21:56.288 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:21:59.289 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:22:05.217 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:22:08.220 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:22:15.760 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:22:18.762 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:22:23.459 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:22:25.805 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:22:28.700 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:22:31.154 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:22:35.777 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:22:41.163 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:22:46.081 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:22:50.773 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:22:53.174 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:22:55.571 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:22:57.946 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:23:01.028 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:23:03.708 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:23:06.637 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:23:09.821 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:23:14.207 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:23:17.004 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:23:20.466 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:23:23.961 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:23:27.241 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:23:30.962 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:23:34.132 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:23:40.676 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:23:44.210 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:23:55.786 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:24:00.079 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:24:10.031 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:24:12.386 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:24:14.787 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:24:22.023 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:24:26.920 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:24:36.464 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:24:43.826 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:24:47.176 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:24:55.536 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:25:02.449 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:25:09.171 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:25:14.760 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:25:17.183 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:25:21.508 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:25:28.269 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:25:37.828 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:25:40.311 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:25:43.049 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:25:47.581 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:25:53.686 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:26:05.845 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:M 28 Jul 2025 06:26:13.992 * Asynchronous AOF fsync is taking too long (disk is busy?). Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis.
+17933:signal-handler (1753684033) Received SIGTERM scheduling shutdown...
+17933:M 28 Jul 2025 06:27:13.335 * User requested shutdown...
+17933:M 28 Jul 2025 06:27:13.335 # There is a child rewriting the AOF. Killing it!
+17933:M 28 Jul 2025 06:27:13.335 * Killing running AOF rewrite child: 35314
+35314:signal-handler (1753684035) Received SIGTERM scheduling shutdown...
+35314:signal-handler (1753684035) Received SIGUSR1 in child, exiting now.
+17933:M 28 Jul 2025 06:27:18.459 * Calling fsync() on the AOF file.
+17933:M 28 Jul 2025 06:27:18.459 * Removing the pid file.
+17933:M 28 Jul 2025 06:27:18.459 # Redis is now ready to exit, bye bye...
