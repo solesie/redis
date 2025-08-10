@@ -114,8 +114,13 @@ void fdpPersistencyLoadManifestFromDisk(void){
     }
 
     fdpUfsDeactivateRio();
-    memcpy(&server.fdp_ufs->manifest.rio, buf_rio, sizeof(server.fdp_ufs->manifest.rio));
-    printf("fdp ufs manifest exist!: %d %ld\n", server.fdp_ufs->manifest.rio.aof_base_start_lba, server.fdp_ufs->manifest.rio.aof_base_cur_offt);
+
+    /* solesie: recovery test -> true */
+    if(false){
+        memcpy(&server.fdp_ufs->manifest.rio, buf_rio, sizeof(server.fdp_ufs->manifest.rio));
+        printf("fdp ufs manifest exist!: %d %ld\n", server.fdp_ufs->manifest.rio.aof_base_start_lba, server.fdp_ufs->manifest.rio.aof_base_cur_offt);
+    }
+
     return;
 }
 

@@ -37,24 +37,24 @@ void fdpUfsSuccessCb(void *arg){
     zfree(cb_arg);
 }
 
-/* solesie: devide LBA space like below.
- * ----------------------------------------------------
- * | manifest ----- aof_base ----- aof_incr -----  rdb | 
- * ---------------------------------------------------- */
+/* solesie: devide LBA space */
 static void fdpUfsInitManifest(fdpUfs *ufs){
     fdpNvme *fn = ufs->fdp_nvme;
     uint32_t lba_shift = ufs->lba_shift;
 
     /* solesie: devide lba space */ 
-    uint64_t unit = (ufs->device_size / 100) >> lba_shift;
+    uint64_t unit = (ufs->device_size / 180) >> lba_shift;
     uint64_t chunk1 = unit * 22;
     uint64_t chunk2 = unit * 56;
     // uint64_t chunk3 = unit * 22;
     ufs->manifest.rio.manifest_rio_start_lba = 0;
     ufs->manifest.bio.manifest_bio_start_lba = ufs->manifest.rio.manifest_rio_start_lba + 1;
     ufs->manifest.rio.aof_base_start_lba = ufs->manifest.bio.manifest_bio_start_lba + 1;
-    ufs->manifest.bio.aof_incr_start_lba = ufs->manifest.rio.aof_base_start_lba + chunk1;
-    ufs->manifest.rio.rdb_start_lba = ufs->manifest.bio.aof_incr_start_lba + chunk2;
+    ufs->manifest.rio.rdb_start_lba = ufs->manifest.rio.aof_base_start_lba + chunk1;
+    ufs->manifest.rio.reserve_start_lba = ufs->manifest.rio.aof_base_start_lba + chunk1;
+
+    ufs->manifest.bio.aof_incr_start_lba = ufs->manifest.rio.reserve_start_lba + chunk1;
+    ufs->manifest.bio.aof_incr2_start_lba = ufs->manifest.bio.aof_incr_start_lba + chunk2;
 
     /* solesie: allocate FDP placement handle */
     int manifest_phd = fdpNvmeAllocateFdpHandle(fn);
@@ -78,14 +78,42 @@ static void fdpUfsInitManifest(fdpUfs *ufs){
     ufs->manifest.rio.aof_base_cur_offt = ufs->manifest.rio.aof_base_cur_offt_aligned
         = ufs->aof_base_rofft = ufs->aof_base_rofft_aligned
         = ufs->manifest.rio.aof_base_start_lba << lba_shift;
-    ufs->manifest.bio.aof_incr_cur_offt = ufs->manifest.bio.aof_incr_cur_offt_aligned
-        = ufs->aof_incr_rofft = ufs->aof_incr_rofft_aligned
-        =ufs->manifest.bio.aof_incr_start_lba << lba_shift;
     ufs->manifest.rio.rdb_cur_offt = ufs->manifest.rio.rdb_cur_offt_aligned
         = ufs->rdb_rofft = ufs->rdb_rofft_aligned
         = ufs->manifest.rio.rdb_start_lba << lba_shift;
+    ufs->manifest.rio.reserve_cur_offt = ufs->manifest.rio.reserve_cur_offt_aligned
+        = ufs->manifest.rio.reserve_start_lba << lba_shift;
+    ufs->manifest.bio.aof_incr_cur_offt = ufs->manifest.bio.aof_incr_cur_offt_aligned
+        = ufs->aof_incr_rofft = ufs->aof_incr_rofft_aligned
+        = ufs->manifest.bio.aof_incr_start_lba << lba_shift;
+    ufs->manifest.bio.aof_incr2_cur_offt = ufs->manifest.bio.aof_incr2_cur_offt_aligned
+        = ufs->manifest.bio.aof_incr2_start_lba << lba_shift;
 
     return;
+}
+
+/* solesie: not production level ... 
+ * It may enough to fill Reserve slot and Incr2 with dummy to watch SSD GC.
+ * Write Isolation mechanism will not be effected.  */
+static void fill_dummy(void){
+    fdpUfsActivateRio();
+    uint64_t gb = 1ULL * 1024 * 1024 * 1024;
+    char* buf = (char*)zcalloc(gb);
+
+    memset(buf, 'd', sizeof(buf));
+    for(int i = 0; i < 20; ++i){
+        fdpUfsIOWrite(buf, gb, FDP_UFS_RESERVE);
+    }
+
+    fdpUfsIOWait(FDP_UFS_RESERVE);
+    fdpUfsDeactivateRio();
+
+    for(int i = 0; i < 54; ++i){
+        fdpUfsIOWrite(buf, gb, FDP_UFS_AOF_INCR2);
+    }
+    fdpUfsIOWait(FDP_UFS_AOF_INCR2);
+
+    zfree(buf);
 }
 
 #define QDEPTH_RIO 8
@@ -123,6 +151,9 @@ void fdpUfsInit(void){
     fdpNvmeDeallocateLba(fn, 0, server.fdp_ufs->device_size >> server.fdp_ufs->lba_shift);
 
     fdpUfsInitManifest(server.fdp_ufs);
+
+    /* solesie: watch GC */
+    fill_dummy();
 }
 
 /* solesie: Rio uses multi-process, unlike Bio uses multi-thread.
@@ -188,10 +219,10 @@ void fdpUfsResetAofIncr(void){
     uint32_t lba_shift = ufs->lba_shift;
     uint64_t start_offt = ufs->manifest.bio.aof_incr_start_lba << lba_shift;
     
-    serverLog(LL_NOTICE, "solesie: incr 초기화, 남은 lb: %ld", ufs->manifest.rio.rdb_start_lba - (ufs->manifest.bio.aof_incr_cur_offt >> lba_shift));
+    serverLog(LL_NOTICE, "solesie: incr 초기화, 남은 lb: %ld", ufs->manifest.bio.aof_incr2_start_lba - (ufs->manifest.bio.aof_incr_cur_offt >> lba_shift));
 
     /* solesie: deallocate */
-    uint32_t nlb = ufs->manifest.rio.rdb_start_lba - ufs->manifest.bio.aof_incr_start_lba;
+    uint32_t nlb = ufs->manifest.bio.aof_incr2_start_lba - ufs->manifest.bio.aof_incr_start_lba;
     if(nlb != 0){
         fdpNvmeDeallocateLba(ufs->fdp_nvme, ufs->manifest.bio.aof_incr_start_lba, nlb);
     }
@@ -327,6 +358,30 @@ int fdpUfsIOWrite(const void *buf, uint64_t len, fdpUfsDataType type){
         return 1;
     }
 
+    /* solesie: fill dummy logic */
+    if(type == FDP_UFS_RESERVE){
+        writeInternal(
+            ufs->fdp_module_rio,
+            buf,
+            len,
+            ufs->manifest.rio.reserve_cur_offt_aligned,
+            5,
+            0);
+        ufs->manifest.rio.reserve_cur_offt_aligned += len;
+        return 1;
+    }
+    if(type == FDP_UFS_AOF_INCR2){
+        writeInternal(
+            ufs->fdp_module_bio,
+            buf,
+            len,
+            ufs->manifest.bio.aof_incr2_cur_offt_aligned,
+            ufs->manifest.bio.aof_incr_phd,
+            0);
+        ufs->manifest.rio.reserve_cur_offt_aligned += len;
+        return 1;
+    }
+
     fdpModule *fm = NULL;
     uint8_t *cache_buf = NULL;
     uint64_t *cur_offt = NULL;
@@ -348,7 +403,7 @@ int fdpUfsIOWrite(const void *buf, uint64_t len, fdpUfsDataType type){
                 rg = 0;
             }
 
-            serverAssert(*cur_offt + len < (ufs->manifest.bio.aof_incr_start_lba << ufs->lba_shift));
+            serverAssert(*cur_offt + len < (ufs->manifest.rio.rdb_start_lba << ufs->lba_shift));
             break;
         }
         case FDP_UFS_AOF_INCR: {
@@ -363,9 +418,8 @@ int fdpUfsIOWrite(const void *buf, uint64_t len, fdpUfsDataType type){
                 rg = 1;
             }
 
-            if(*cur_offt + len >= (ufs->manifest.rio.rdb_start_lba << ufs->lba_shift)){
-                serverLog(LL_WARNING, "solesie: %lld < %lld", *cur_offt + len, (ufs->manifest.rio.rdb_start_lba << ufs->lba_shift));
-                serverAssert(*cur_offt + len < (ufs->manifest.rio.rdb_start_lba << ufs->lba_shift));
+            if(*cur_offt + len >= (ufs->manifest.bio.aof_incr2_start_lba << ufs->lba_shift)){
+                serverAssert(*cur_offt + len < (ufs->manifest.bio.aof_incr2_start_lba << ufs->lba_shift));
                 /* For the fragmentation issue, real-world Redis deployments may need to adopt region management techniques */
             }
             break;
@@ -382,7 +436,7 @@ int fdpUfsIOWrite(const void *buf, uint64_t len, fdpUfsDataType type){
                 rg = 0;
             }
 
-            serverAssert(*cur_offt + len < ufs->device_size);
+            serverAssert(*cur_offt + len < ufs->manifest.rio.reserve_start_lba << ufs->lba_shift);
             break;
         }
         default: {
@@ -643,6 +697,14 @@ void fdpUfsIOFlush(fdpUfsDataType type){
             }
             break;
         }
+
+        /* solesie: fill dummy logic */
+        case FDP_UFS_RESERVE: {
+            return;
+        }
+        case FDP_UFS_AOF_INCR2: {
+            return; 
+        }
         default: {
             exit(1);
         }
@@ -682,6 +744,13 @@ int fdpUfsIOWait(fdpUfsDataType type){
         }
         case FDP_UFS_RDB:{
             return fdpModuleIOWait(server.fdp_ufs->fdp_module_rio);
+        }
+        
+        case FDP_UFS_RESERVE:{
+            return fdpModuleIOWait(server.fdp_ufs->fdp_module_rio);
+        }
+        case FDP_UFS_AOF_INCR2:{
+            return fdpModuleIOWait(server.fdp_ufs->fdp_module_bio);
         }
         default:{
             exit(1);

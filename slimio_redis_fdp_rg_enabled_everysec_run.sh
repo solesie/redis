@@ -4,9 +4,9 @@ set -euo pipefail
 #--------------------------------------------------
 # 설정
 #--------------------------------------------------
-TYPE="fs_redis_fdp_disabled_everysec"
+TYPE="io_uring_redis_fdp_rg_enabled_everysec"
 
-RESULTS_DIR="./bench-results/${TYPE}"
+RESULTS_DIR="/home/solesie/redis/bench-results/${TYPE}"
 SERVER_LOG="${RESULTS_DIR}/server.txt"
 CONF_FILE="./${TYPE}.conf"
 REDIS_SERVER="./src/redis-server"
@@ -45,7 +45,7 @@ echo "[1] Redis 서버 시작 (로그: ${SERVER_LOG})"
 sudo ${REDIS_SERVER} "${CONF_FILE}" > "${SERVER_LOG}" 2>&1 & 
 SERVER_PID=$!
 echo "    → Redis PID=${SERVER_PID}"
-sleep 60
+sleep 2
 
 #--------------------------------------------------
 # 1) 초기 데이터 적재 & AOF 리라이트

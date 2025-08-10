@@ -1,0 +1,24 @@
+14290:C 10 Aug 2025 04:49:05.050 # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+14290:C 10 Aug 2025 04:49:05.050 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+14290:C 10 Aug 2025 04:49:05.050 * Redis version=7.4.2, bits=64, commit=01e83b1b, modified=1, pid=14290, just started
+14290:C 10 Aug 2025 04:49:05.050 * Configuration loaded
+14290:M 10 Aug 2025 04:49:05.050 * Increased maximum number of open files to 10032 (it was originally set to 1024).
+14290:M 10 Aug 2025 04:49:05.050 * monotonic clock: POSIX clock_gettime
+14290:M 10 Aug 2025 04:49:05.052 * Running mode=standalone, port=6379.
+14290:M 10 Aug 2025 04:50:05.974 * Server initialized
+14290:M 10 Aug 2025 04:50:05.976 * DB loaded from append only file: 0.000 seconds
+14290:M 10 Aug 2025 04:50:05.976 * Ready to accept connections tcp
+14290:M 10 Aug 2025 04:53:23.408 * Starting automatic rewriting of AOF on 5756366419100% growth
+14290:M 10 Aug 2025 04:53:23.408 * solesie: incr 초기화, 남은 lb: 626436
+14290:M 10 Aug 2025 04:53:24.964 * Background append only file rewriting started by pid 14437
+14437:C 10 Aug 2025 04:55:13.840 * Successfully created the temporary AOF base
+14437:C 10 Aug 2025 04:55:13.955 * Fork CoW for AOF rewrite: current 12529 MB, peak 12529 MB, average 9305 MB
+14290:M 10 Aug 2025 04:55:14.594 * Background AOF rewrite terminated with success
+14290:M 10 Aug 2025 04:55:14.594 * Background AOF rewrite finished successfully
+14290:M 10 Aug 2025 04:57:21.652 * Starting automatic rewriting of AOF on 5755695577100% growth
+14290:M 10 Aug 2025 04:57:21.652 * solesie: incr 초기화, 남은 lb: 628073
+14290:M 10 Aug 2025 04:57:23.807 * Background append only file rewriting started by pid 14508
+14508:C 10 Aug 2025 04:59:12.515 * Successfully created the temporary AOF base
+14508:C 10 Aug 2025 04:59:12.874 * Fork CoW for AOF rewrite: current 5345 MB, peak 5879 MB, average 3784 MB
+14290:M 10 Aug 2025 04:59:13.664 * Background AOF rewrite terminated with success
+14290:M 10 Aug 2025 04:59:13.665 * Background AOF rewrite finished successfully

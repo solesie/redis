@@ -4,9 +4,9 @@ set -euo pipefail
 #--------------------------------------------------
 # 설정
 #--------------------------------------------------
-TYPE="fs_redis_fdp_disabled_everysec"
+TYPE="io_uring_redis_fdp_disabled_always"
 
-RESULTS_DIR="./bench-results/${TYPE}"
+RESULTS_DIR="/home/solesie/redis/bench-results/${TYPE}/1"
 SERVER_LOG="${RESULTS_DIR}/server.txt"
 CONF_FILE="./${TYPE}.conf"
 REDIS_SERVER="./src/redis-server"

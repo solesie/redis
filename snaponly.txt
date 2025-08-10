@@ -1,0 +1,412 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 108K of event 'cycles:P'
+# Event count (approx.): 398302736557
+#
+# Children      Self  Command       Shared Object      Symbol                                      
+# ........  ........  ............  .................  ............................................
+#
+    11.33%     0.13%  redis-server  [kernel.kallsyms]  [k] f2fs_file_write_iter
+            |          
+             --11.70%--f2fs_file_write_iter
+                       |          
+                       |--6.94%--generic_perform_write
+                       |          |          
+                       |          |--4.77%--f2fs_write_begin
+                       |          |          |          
+                       |          |           --4.53%--pagecache_get_page
+                       |          |                     |          
+                       |          |                      --4.49%--__filemap_get_folio
+                       |          |                                |          
+                       |          |                                |--2.32%--filemap_add_folio
+                       |          |                                |          |          
+                       |          |                                |           --2.19%--__filemap_add_folio
+                       |          |                                |                     |          
+                       |          |                                |                      --1.12%--__mem_cgroup_charge
+                       |          |                                |          
+                       |          |                                 --1.83%--filemap_alloc_folio
+                       |          |                                           |          
+                       |          |                                            --1.65%--folio_alloc
+                       |          |                                                      |          
+                       |          |                                                       --1.63%--alloc_pages
+                       |          |                                                                 |          
+                       |          |                                                                  --1.55%--alloc_pages_mpol
+                       |          |                                                                            |          
+                       |          |                                                                             --1.46%--__alloc_pages
+                       |          |                                                                                       |          
+                       |          |                                                                                        --1.19%--get_page_from_freelist
+                       |          |          
+                       |           --1.38%--f2fs_write_end
+                       |                     |          
+                       |                      --1.11%--set_page_dirty
+                       |                                |          
+                       |                                 --1.07%--folio_mark_dirty
+                       |                                           |          
+                       |                                            --1.04%--f2fs_dirty_data_folio
+                       |                                                      |          
+                       |                                                       --0.75%--filemap_dirty_folio
+                       |                                                                 |          
+                       |                                                                  --0.62%--__folio_mark_dirty
+                       |          
+                        --4.35%--f2fs_preallocate_blocks
+                                  |          
+                                   --3.94%--f2fs_map_blocks
+                                             |          
+                                             |--2.01%--f2fs_get_dnode_of_data
+                                             |          |          
+                                             |           --1.74%--__get_node_page
+                                             |                     |          
+                                             |                      --1.64%--__get_node_page.part.0
+                                             |                                |          
+                                             |                                 --1.22%--pagecache_get_page
+                                             |                                           |          
+                                             |                                            --1.18%--__filemap_get_folio
+                                             |                                                      |          
+                                             |                                                       --0.90%--filemap_get_entry
+                                             |                                                                 |          
+                                             |                                                                  --0.51%--xas_load
+                                             |          
+                                              --1.20%--f2fs_reserve_new_blocks
+                                                        |          
+                                                         --0.77%--inc_valid_block_count.constprop.0
+
+     5.35%     0.00%  redis-server  [kernel.kallsyms]  [k] __f2fs_write_data_pages
+            |          
+             --5.35%--__f2fs_write_data_pages
+                       |          
+                        --5.33%--f2fs_write_cache_pages
+                                  |          
+                                   --4.55%--f2fs_write_single_data_page
+                                             |          
+                                              --4.23%--f2fs_do_write_data_page
+                                                        |          
+                                                        |--2.02%--f2fs_outplace_write_data
+                                                        |          |          
+                                                        |          |--1.44%--do_write_page
+                                                        |          |          |          
+                                                        |          |          |--0.57%--f2fs_submit_page_write
+                                                        |          |          |          
+                                                        |          |           --0.56%--f2fs_allocate_data_block
+                                                        |          |          
+                                                        |           --0.52%--f2fs_update_data_blkaddr
+                                                        |          
+                                                         --1.26%--f2fs_get_dnode_of_data
+                                                                   |          
+                                                                    --0.99%--__get_node_page
+                                                                              |          
+                                                                               --0.96%--__get_node_page.part.0
+                                                                                         |          
+                                                                                          --0.71%--pagecache_get_page
+                                                                                                    |          
+                                                                                                     --0.67%--__filemap_get_folio
+
+     5.35%     0.00%  redis-server  [kernel.kallsyms]  [k] f2fs_write_data_pages
+            |
+            ---f2fs_write_data_pages
+               |          
+                --5.35%--__f2fs_write_data_pages
+                          |          
+                           --5.33%--f2fs_write_cache_pages
+                                     |          
+                                      --4.55%--f2fs_write_single_data_page
+                                                |          
+                                                 --4.23%--f2fs_do_write_data_page
+                                                           |          
+                                                           |--2.02%--f2fs_outplace_write_data
+                                                           |          |          
+                                                           |          |--1.44%--do_write_page
+                                                           |          |          |          
+                                                           |          |          |--0.57%--f2fs_submit_page_write
+                                                           |          |          |          
+                                                           |          |           --0.56%--f2fs_allocate_data_block
+                                                           |          |          
+                                                           |           --0.52%--f2fs_update_data_blkaddr
+                                                           |          
+                                                            --1.26%--f2fs_get_dnode_of_data
+                                                                      |          
+                                                                       --0.99%--__get_node_page
+                                                                                 |          
+                                                                                  --0.96%--__get_node_page.part.0
+                                                                                            |          
+                                                                                             --0.71%--pagecache_get_page
+                                                                                                       |          
+                                                                                                        --0.67%--__filemap_get_folio
+
+     5.33%     0.09%  redis-server  [kernel.kallsyms]  [k] f2fs_write_cache_pages
+            |          
+             --5.25%--f2fs_write_cache_pages
+                       |          
+                        --4.55%--f2fs_write_single_data_page
+                                  |          
+                                   --4.23%--f2fs_do_write_data_page
+                                             |          
+                                             |--2.02%--f2fs_outplace_write_data
+                                             |          |          
+                                             |          |--1.44%--do_write_page
+                                             |          |          |          
+                                             |          |          |--0.57%--f2fs_submit_page_write
+                                             |          |          |          
+                                             |          |           --0.56%--f2fs_allocate_data_block
+                                             |          |          
+                                             |           --0.52%--f2fs_update_data_blkaddr
+                                             |          
+                                              --1.26%--f2fs_get_dnode_of_data
+                                                        |          
+                                                         --0.99%--__get_node_page
+                                                                   |          
+                                                                    --0.96%--__get_node_page.part.0
+                                                                              |          
+                                                                               --0.71%--pagecache_get_page
+                                                                                         |          
+                                                                                          --0.67%--__filemap_get_folio
+
+     4.81%     0.11%  redis-server  [kernel.kallsyms]  [k] f2fs_write_begin
+            |          
+             --4.70%--f2fs_write_begin
+                       |          
+                        --4.53%--pagecache_get_page
+                                  |          
+                                   --4.49%--__filemap_get_folio
+                                             |          
+                                             |--2.32%--filemap_add_folio
+                                             |          |          
+                                             |           --2.19%--__filemap_add_folio
+                                             |                     |          
+                                             |                      --1.12%--__mem_cgroup_charge
+                                             |          
+                                              --1.83%--filemap_alloc_folio
+                                                        |          
+                                                         --1.65%--folio_alloc
+                                                                   |          
+                                                                    --1.63%--alloc_pages
+                                                                              |          
+                                                                               --1.55%--alloc_pages_mpol
+                                                                                         |          
+                                                                                          --1.46%--__alloc_pages
+                                                                                                    |          
+                                                                                                     --1.19%--get_page_from_freelist
+
+     4.55%     0.12%  redis-server  [kernel.kallsyms]  [k] f2fs_write_single_data_page
+            |          
+             --4.43%--f2fs_write_single_data_page
+                       |          
+                        --4.23%--f2fs_do_write_data_page
+                                  |          
+                                  |--2.02%--f2fs_outplace_write_data
+                                  |          |          
+                                  |          |--1.44%--do_write_page
+                                  |          |          |          
+                                  |          |          |--0.57%--f2fs_submit_page_write
+                                  |          |          |          
+                                  |          |           --0.56%--f2fs_allocate_data_block
+                                  |          |          
+                                  |           --0.52%--f2fs_update_data_blkaddr
+                                  |          
+                                   --1.26%--f2fs_get_dnode_of_data
+                                             |          
+                                              --0.99%--__get_node_page
+                                                        |          
+                                                         --0.96%--__get_node_page.part.0
+                                                                   |          
+                                                                    --0.71%--pagecache_get_page
+                                                                              |          
+                                                                               --0.67%--__filemap_get_folio
+
+     4.39%     0.13%  redis-server  [kernel.kallsyms]  [k] f2fs_preallocate_blocks
+            |          
+             --4.26%--f2fs_preallocate_blocks
+                       |          
+                        --3.94%--f2fs_map_blocks
+                                  |          
+                                  |--2.01%--f2fs_get_dnode_of_data
+                                  |          |          
+                                  |           --1.74%--__get_node_page
+                                  |                     |          
+                                  |                      --1.64%--__get_node_page.part.0
+                                  |                                |          
+                                  |                                 --1.22%--pagecache_get_page
+                                  |                                           |          
+                                  |                                            --1.18%--__filemap_get_folio
+                                  |                                                      |          
+                                  |                                                       --0.90%--filemap_get_entry
+                                  |                                                                 |          
+                                  |                                                                  --0.51%--xas_load
+                                  |          
+                                   --1.20%--f2fs_reserve_new_blocks
+                                             |          
+                                              --0.77%--inc_valid_block_count.constprop.0
+
+     4.23%     0.08%  redis-server  [kernel.kallsyms]  [k] f2fs_do_write_data_page
+            |          
+             --4.15%--f2fs_do_write_data_page
+                       |          
+                       |--2.02%--f2fs_outplace_write_data
+                       |          |          
+                       |          |--1.44%--do_write_page
+                       |          |          |          
+                       |          |          |--0.57%--f2fs_submit_page_write
+                       |          |          |          
+                       |          |           --0.56%--f2fs_allocate_data_block
+                       |          |          
+                       |           --0.52%--f2fs_update_data_blkaddr
+                       |          
+                        --1.26%--f2fs_get_dnode_of_data
+                                  |          
+                                   --0.99%--__get_node_page
+                                             |          
+                                              --0.96%--__get_node_page.part.0
+                                                        |          
+                                                         --0.71%--pagecache_get_page
+                                                                   |          
+                                                                    --0.67%--__filemap_get_folio
+
+     3.94%     0.14%  redis-server  [kernel.kallsyms]  [k] f2fs_map_blocks
+            |          
+             --3.81%--f2fs_map_blocks
+                       |          
+                       |--2.01%--f2fs_get_dnode_of_data
+                       |          |          
+                       |           --1.74%--__get_node_page
+                       |                     |          
+                       |                      --1.64%--__get_node_page.part.0
+                       |                                |          
+                       |                                 --1.22%--pagecache_get_page
+                       |                                           |          
+                       |                                            --1.18%--__filemap_get_folio
+                       |                                                      |          
+                       |                                                       --0.90%--filemap_get_entry
+                       |                                                                 |          
+                       |                                                                  --0.51%--xas_load
+                       |          
+                        --1.20%--f2fs_reserve_new_blocks
+                                  |          
+                                   --0.77%--inc_valid_block_count.constprop.0
+
+     3.30%     0.33%  redis-server  [kernel.kallsyms]  [k] f2fs_get_dnode_of_data
+            |          
+             --2.97%--f2fs_get_dnode_of_data
+                       |          
+                        --2.73%--__get_node_page
+                                  |          
+                                   --2.60%--__get_node_page.part.0
+                                             |          
+                                              --1.93%--pagecache_get_page
+                                                        |          
+                                                         --1.85%--__filemap_get_folio
+                                                                   |          
+                                                                    --1.33%--filemap_get_entry
+                                                                              |          
+                                                                               --0.74%--xas_load
+
+     2.74%     0.00%  redis-server  [kernel.kallsyms]  [k] f2fs_file_fadvise
+            |          
+             --2.74%--f2fs_file_fadvise
+                       generic_fadvise
+                       |          
+                        --2.71%--mapping_try_invalidate
+                                  |          
+                                  |--1.78%--mapping_evict_folio
+                                  |          |          
+                                  |           --1.49%--remove_mapping
+                                  |                     |          
+                                  |                      --1.44%--__remove_mapping
+                                  |                                |          
+                                  |                                |--0.59%--_raw_spin_lock_irq
+                                  |                                |          
+                                  |                                 --0.51%--__filemap_remove_folio
+                                  |          
+                                   --0.51%--find_lock_entries
+
+     2.02%     0.02%  redis-server  [kernel.kallsyms]  [k] f2fs_outplace_write_data
+            |          
+             --2.01%--f2fs_outplace_write_data
+                       |          
+                       |--1.44%--do_write_page
+                       |          |          
+                       |          |--0.57%--f2fs_submit_page_write
+                       |          |          
+                       |           --0.56%--f2fs_allocate_data_block
+                       |          
+                        --0.52%--f2fs_update_data_blkaddr
+
+     1.40%     0.13%  redis-server  [kernel.kallsyms]  [k] f2fs_write_end
+            |          
+             --1.27%--f2fs_write_end
+                       |          
+                        --1.11%--set_page_dirty
+                                  |          
+                                   --1.07%--folio_mark_dirty
+                                             |          
+                                              --1.04%--f2fs_dirty_data_folio
+                                                        |          
+                                                         --0.75%--filemap_dirty_folio
+                                                                   |          
+                                                                    --0.62%--__folio_mark_dirty
+
+     1.21%     0.06%  redis-server  [kernel.kallsyms]  [k] f2fs_reserve_new_blocks
+            |          
+             --1.16%--f2fs_reserve_new_blocks
+                       |          
+                        --0.77%--inc_valid_block_count.constprop.0
+
+     1.06%     0.04%  redis-server  [kernel.kallsyms]  [k] f2fs_dirty_data_folio
+            |          
+             --1.02%--f2fs_dirty_data_folio
+                       |          
+                        --0.75%--filemap_dirty_folio
+                                  |          
+                                   --0.62%--__folio_mark_dirty
+
+     0.58%     0.08%  redis-server  [kernel.kallsyms]  [k] f2fs_submit_page_write
+     0.57%     0.11%  redis-server  [kernel.kallsyms]  [k] f2fs_allocate_data_block
+     0.52%     0.01%  redis-server  [kernel.kallsyms]  [k] f2fs_update_data_blkaddr
+            |          
+             --0.51%--f2fs_update_data_blkaddr
+
+     0.41%     0.00%  redis-server  [kernel.kallsyms]  [k] f2fs_update_read_extent_cache
+     0.38%     0.05%  redis-server  [kernel.kallsyms]  [k] f2fs_balance_fs
+     0.27%     0.05%  redis-server  [kernel.kallsyms]  [k] f2fs_dirty_node_folio
+     0.25%     0.25%  redis-server  [kernel.kallsyms]  [k] f2fs_release_folio
+     0.24%     0.02%  redis-server  [kernel.kallsyms]  [k] f2fs_mark_inode_dirty_sync
+     0.23%     0.20%  redis-server  [kernel.kallsyms]  [k] f2fs_update_dirty_folio
+     0.18%     0.00%  redis-server  [kernel.kallsyms]  [k] f2fs_submit_write_bio
+     0.17%     0.05%  redis-server  [kernel.kallsyms]  [k] f2fs_inode_dirtied
+     0.17%     0.10%  redis-server  [kernel.kallsyms]  [k] f2fs_put_page.constprop.0
+     0.16%     0.08%  redis-server  [kernel.kallsyms]  [k] f2fs_dirty_inode
+     0.15%     0.15%  redis-server  [kernel.kallsyms]  [k] f2fs_convert_inline_inode
+     0.11%     0.07%  redis-server  [kernel.kallsyms]  [k] f2fs_inode_chksum_verify
+     0.09%     0.02%  redis-server  [kernel.kallsyms]  [k] f2fs_get_node_info
+     0.08%     0.04%  redis-server  [kernel.kallsyms]  [k] f2fs_wait_discard_bio
+     0.07%     0.07%  redis-server  [kernel.kallsyms]  [k] f2fs_get_reserved_space
+     0.06%     0.06%  redis-server  [kernel.kallsyms]  [k] f2fs_should_use_dio
+     0.06%     0.06%  redis-server  [kernel.kallsyms]  [k] f2fs_enable_inode_chksum.isra.0
+     0.03%     0.03%  redis-server  [kernel.kallsyms]  [k] f2fs_wait_on_page_writeback
+     0.03%     0.01%  redis-server  [kernel.kallsyms]  [k] f2fs_is_valid_blkaddr
+     0.03%     0.01%  redis-server  [kernel.kallsyms]  [k] f2fs_start_bidx_of_node
+     0.02%     0.02%  redis-server  [kernel.kallsyms]  [k] f2fs_start_bidx_of_node.part.0
+     0.02%     0.02%  redis-server  [kernel.kallsyms]  [k] f2fs_usable_blks_in_seg
+     0.02%     0.00%  redis-server  [kernel.kallsyms]  [k] f2fs_update_meta_page
+     0.02%     0.00%  redis-server  [kernel.kallsyms]  [k] f2fs_update_age_extent_cache
+     0.02%     0.02%  redis-server  [kernel.kallsyms]  [k] f2fs_should_update_outplace
+     0.02%     0.00%  redis-server  [kernel.kallsyms]  [k] f2fs_grab_meta_page
+     0.01%     0.01%  redis-server  [kernel.kallsyms]  [k] f2fs_lookup_age_extent_cache
+     0.01%     0.01%  redis-server  [kernel.kallsyms]  [k] f2fs_encrypt_one_page
+     0.01%     0.01%  redis-server  [kernel.kallsyms]  [k] f2fs_is_cp_guaranteed
+     0.01%     0.01%  redis-server  [kernel.kallsyms]  [k] f2fs_is_compress_backend_ready
+     0.01%     0.00%  redis-server  [kernel.kallsyms]  [k] f2fs_new_node_page
+     0.00%     0.00%  redis-server  [kernel.kallsyms]  [k] f2fs_sync_file
+     0.00%     0.00%  redis-server  [kernel.kallsyms]  [k] f2fs_do_sync_file
+     0.00%     0.00%  redis-server  [kernel.kallsyms]  [k] f2fs_fsync_node_pages
+     0.00%     0.00%  redis-server  [kernel.kallsyms]  [k] f2fs_alloc_nid_done
+     0.00%     0.00%  redis-server  [kernel.kallsyms]  [k] f2fs_dirty_meta_folio
+     0.00%     0.00%  redis-server  [kernel.kallsyms]  [k] f2fs_do_write_node_page
+     0.00%     0.00%  redis-server  [kernel.kallsyms]  [k] f2fs_alloc_nid
+     0.00%     0.00%  redis-server  [kernel.kallsyms]  [k] f2fs_wait_on_node_pages_writeback
+
+
+#
+# (Tip: Compare performance results with: perf diff [<old file> <new file>])
+#

@@ -4,14 +4,18 @@ set -euo pipefail
 #--------------------------------------------------
 # 설정
 #--------------------------------------------------
-TYPE="fs_redis_fdp_disabled_everysec"
+TYPE="fs_redis_fdp_disabled_always"
 
 RESULTS_DIR="./bench-results/${TYPE}"
 SERVER_LOG="${RESULTS_DIR}/server.txt"
 CONF_FILE="./${TYPE}.conf"
 REDIS_SERVER="./src/redis-server"
-REDIS_CLI="./src/redis-cli"
-REDIS_BENCH="./src/redis-benchmark"
+YCSB_DIR="/home/solesie/YCSB"
+YCSB_BENCH="${YCSB_DIR}/bin/ycsb"
+YCSB_WORKLOAD="${YCSB_DIR}/workloads/workloada"
+YCSB_LOAD_FILE="${RESULTS_DIR}/outputLoad.txt"
+YCSB_RUN_LOG="${RESULTS_DIR}/outputRunLog.txt"
+MEM_FILE="${RESULTS_DIR}/mem.csv"
 
 mkdir -p "${RESULTS_DIR}"
 
@@ -39,64 +43,44 @@ mem_monitor() {
 }
 
 #--------------------------------------------------
-# Redis 서버 기동
+# 1) Redis 서버 기동
 #--------------------------------------------------
 echo "[1] Redis 서버 시작 (로그: ${SERVER_LOG})"
 sudo ${REDIS_SERVER} "${CONF_FILE}" > "${SERVER_LOG}" 2>&1 & 
 SERVER_PID=$!
 echo "    → Redis PID=${SERVER_PID}"
-sleep 60
+sleep 2
 
 #--------------------------------------------------
-# 1) 초기 데이터 적재 & AOF 리라이트
+# 2) 초기 데이터 적재
 #--------------------------------------------------
+cd ../YCSB
 echo "[2] 초기 데이터 적재 (20GiB 기준)"
-sudo ${REDIS_BENCH} \
-    -h 127.0.0.1 -p 6379 \
-    -c 50 -n 5321523 -d 4096 -t set -r 5321523 -k 1 
-
-echo "[3] BGREWRITEAOF 실행"
-sudo ${REDIS_CLI} BGREWRITEAOF
-sleep 60
+sudo ${YCSB_BENCH} \
+    load redis -s -P ${YCSB_WORKLOAD} -threads 16 > ${YCSB_LOAD_FILE}
+cd ../redis
 
 #--------------------------------------------------
-# 2) PHASE loop
+# 3) PHASE
 #--------------------------------------------------
-START_PHASE="${1:-1}"
-END_PHASE="${2:-5}"
-for PHASE in $(seq "${START_PHASE}" "${END_PHASE}"); do
-    echo "[PHASE ${PHASE}] 시작"
-    RPS_FILE="${RESULTS_DIR}/rps_${PHASE}.csv"
-    MEM_FILE="${RESULTS_DIR}/mem_${PHASE}.csv"
-    SUMMARY_FILE="${RESULTS_DIR}/summary_${PHASE}.txt"
+echo "[3] YCSB run (220GiB read/write)"
 
-    # 2-1) 메모리 모니터링 시작
-    mem_monitor "${MEM_FILE}" &
-    MEM_PID=$!
-    sleep 0.5
+# 3-1) 메모리 모니터링 시작
+mem_monitor "${MEM_FILE}" &
+MEM_PID=$!
+sleep 0.5
 
-    # 2-2) BGSAVE 스케줄링
-    echo "    → BGSAVE schedule"
-    sudo ${REDIS_CLI} BGSAVE schedule
+# 3-2) YCSB run
+cd ../YCSB
+sudo ${YCSB_BENCH} \
+    run redis -s -P ${YCSB_WORKLOAD} -threads 8 >> ${YCSB_RUN_LOG} 2>&1
+cd ../redis
 
-    # 2-3) 약 110GiB 데이터 적재 및 RPS 측정
-    echo "    → redis-benchmark (110GiB, RPS 기록 → ${RPS_FILE})"
-    sudo ${REDIS_BENCH} \
-        -h 127.0.0.1 -p 6379 \
-        -c 50 \
-        -n 28835840 -d 4096 -t set -r 5321523 -k 1 \
-        --rps-filename "${RPS_FILE}" \
-        > "${SUMMARY_FILE}" 2>&1
+# 3-3) 메모리 모니터링 종료
+echo "    → 메모리 모니터링 종료 (PID=${MEM_PID})"
+kill "${MEM_PID}" || true
 
-    # 2-4) 메모리 모니터링 종료
-    echo "    → 메모리 모니터링 종료 (PID=${MEM_PID})"
-    kill "${MEM_PID}" || true
-
-    echo "[PHASE ${PHASE}] 완료"
-    echo
-done
-
-sleep 60
+sleep 20
 
 #--------------------------------------------------
 # 마무리: Redis 서버 종료

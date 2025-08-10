@@ -17,7 +17,12 @@ typedef enum{
     FDP_UFS_MANIFEST_BIO,
     FDP_UFS_AOF_BASE,
     FDP_UFS_AOF_INCR,
-    FDP_UFS_RDB
+    FDP_UFS_RDB,
+
+    /* solesie: fill dummy logic */
+
+    FDP_UFS_RESERVE,
+    FDP_UFS_AOF_INCR2
 } fdpUfsDataType;
 
 /*-----------------------------------------------------------------------------
@@ -37,6 +42,10 @@ typedef struct {
         uint64_t    rdb_cur_offt;
         uint64_t    rdb_cur_offt_aligned;
         int         rdb_phd;
+
+        uint64_t    reserve_start_lba;
+        uint64_t    reserve_cur_offt;
+        uint64_t    reserve_cur_offt_aligned;
     } rio;
 
     struct {
@@ -47,6 +56,10 @@ typedef struct {
         uint64_t    aof_incr_cur_offt;
         uint64_t    aof_incr_cur_offt_aligned;
         int         aof_incr_phd;
+
+        uint64_t    aof_incr2_start_lba;
+        uint64_t    aof_incr2_cur_offt;
+        uint64_t    aof_incr2_cur_offt_aligned;
     } bio;
 } fdpUfsManifest;
 

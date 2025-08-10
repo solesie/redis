@@ -4,7 +4,7 @@ set -euo pipefail
 #--------------------------------------------------
 # 설정
 #--------------------------------------------------
-TYPE="fs_redis_fdp_disabled_everysec"
+TYPE="fs_redis_fdp_disabled_always"
 
 RESULTS_DIR="./bench-results/${TYPE}"
 SERVER_LOG="${RESULTS_DIR}/server.txt"
@@ -45,7 +45,7 @@ echo "[1] Redis 서버 시작 (로그: ${SERVER_LOG})"
 sudo ${REDIS_SERVER} "${CONF_FILE}" > "${SERVER_LOG}" 2>&1 & 
 SERVER_PID=$!
 echo "    → Redis PID=${SERVER_PID}"
-sleep 60
+sleep 2
 
 #--------------------------------------------------
 # 1) 초기 데이터 적재 & AOF 리라이트
@@ -55,15 +55,11 @@ sudo ${REDIS_BENCH} \
     -h 127.0.0.1 -p 6379 \
     -c 50 -n 5321523 -d 4096 -t set -r 5321523 -k 1 
 
-echo "[3] BGREWRITEAOF 실행"
-sudo ${REDIS_CLI} BGREWRITEAOF
-sleep 60
-
 #--------------------------------------------------
 # 2) PHASE loop
 #--------------------------------------------------
 START_PHASE="${1:-1}"
-END_PHASE="${2:-5}"
+END_PHASE="${2:-1}"
 for PHASE in $(seq "${START_PHASE}" "${END_PHASE}"); do
     echo "[PHASE ${PHASE}] 시작"
     RPS_FILE="${RESULTS_DIR}/rps_${PHASE}.csv"
@@ -75,16 +71,12 @@ for PHASE in $(seq "${START_PHASE}" "${END_PHASE}"); do
     MEM_PID=$!
     sleep 0.5
 
-    # 2-2) BGSAVE 스케줄링
-    echo "    → BGSAVE schedule"
-    sudo ${REDIS_CLI} BGSAVE schedule
-
     # 2-3) 약 110GiB 데이터 적재 및 RPS 측정
-    echo "    → redis-benchmark (110GiB, RPS 기록 → ${RPS_FILE})"
+    echo "    → redis-benchmark (90GiB, RPS 기록 → ${RPS_FILE})"
     sudo ${REDIS_BENCH} \
         -h 127.0.0.1 -p 6379 \
         -c 50 \
-        -n 28835840 -d 4096 -t set -r 5321523 -k 1 \
+        -n 23592960 -d 4096 -t set -r 5321523 -k 1 \
         --rps-filename "${RPS_FILE}" \
         > "${SUMMARY_FILE}" 2>&1
 
